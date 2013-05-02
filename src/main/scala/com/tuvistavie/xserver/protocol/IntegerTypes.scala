@@ -44,6 +44,8 @@ case class Int16(override val value: Int) extends IntValue(value) {
     val toWrite = if(stream.bigEndian) value else swapBytes.value
     stream.writeShort(toWrite)
   }
+
+  def toInt8 = Int8(value & 0xff)
 }
 
 object Int32 {
@@ -70,6 +72,10 @@ case class Int32(override val value: Int) extends IntValue(value) {
 
   def read(data: BinaryInputStream): Unit = {
   }
+
+  def toInt16 = Int16(value & 0xffff)
+
+  def toInt8 = Int8(value & 0xff)
 
 
 }

@@ -30,18 +30,18 @@ package requests {
   }
 
 
-  abstract class WindowValue(val value: Int32)
+  abstract class WindowValue(val value: IntValue)
   case class Pixmap(override val value: Int32) extends WindowValue(value)
   case class BackgroundPixel(override val value: Int32) extends WindowValue(value)
   case class BorderPixmap(override val value: Int32) extends WindowValue(value)
   case class BorderPixel(override val value: Int32) extends WindowValue(value)
-  case class BitGravity(override val value: Int32) extends WindowValue(value)
-  case class WindowGravity(override val value: Int32) extends WindowValue(value)
-  case class BackingStore(override val value: Int32) extends WindowValue(value)
+  case class BitGravity(override val value: Int8) extends WindowValue(value)
+  case class WindowGravity(override val value: Int8) extends WindowValue(value)
+  case class BackingStore(override val value: Int8) extends WindowValue(value)
   case class BackingPlanes(override val value: Int32) extends WindowValue(value)
   case class BackingPixels(override val value: Int32) extends WindowValue(value)
-  case class OverrideRedirect(override val value: Int32) extends WindowValue(value)
-  case class SaveUnder(override val value: Int32) extends WindowValue(value)
+  case class OverrideRedirect(override val value: Int8) extends WindowValue(value)
+  case class SaveUnder(override val value: Int8) extends WindowValue(value)
   case class EventMask(override val value: Int32) extends WindowValue(value)
   case class NoPropagateMask(override val value: Int32) extends WindowValue(value)
   case class ColorMap(override val value: Int32) extends WindowValue(value)
@@ -54,13 +54,13 @@ package requests {
       if((mask & 0x0002) != 0) values += BackgroundPixel(stream.readInt32())
       if((mask & 0x0004) != 0) values += BorderPixmap(stream.readInt32())
       if((mask & 0x0008) != 0) values += BorderPixel(stream.readInt32())
-      if((mask & 0x0010) != 0) values += BitGravity(stream.readInt32())
-      if((mask & 0x0020) != 0) values += WindowGravity(stream.readInt32())
-      if((mask & 0x0040) != 0) values += BackingStore(stream.readInt32())
+      if((mask & 0x0010) != 0) values += BitGravity(stream.readInt32().toInt8)
+      if((mask & 0x0020) != 0) values += WindowGravity(stream.readInt32().toInt8)
+      if((mask & 0x0040) != 0) values += BackingStore(stream.readInt32().toInt8)
       if((mask & 0x0080) != 0) values += BackingPlanes(stream.readInt32())
       if((mask & 0x0100) != 0) values += BackingPixels(stream.readInt32())
-      if((mask & 0x0200) != 0) values += OverrideRedirect(stream.readInt32())
-      if((mask & 0x0400) != 0) values += SaveUnder(stream.readInt32())
+      if((mask & 0x0200) != 0) values += OverrideRedirect(stream.readInt32().toInt8)
+      if((mask & 0x0400) != 0) values += SaveUnder(stream.readInt32().toInt8)
       if((mask & 0x0800) != 0) values += EventMask(stream.readInt32())
       if((mask & 0x1000) != 0) values += NoPropagateMask(stream.readInt32())
       if((mask & 0x2000) != 0) values += ColorMap(stream.readInt32())
@@ -213,25 +213,25 @@ package requests {
     }
   }
 
-  abstract class ConfigureWindowValue(val value: Int32)
-  case class X(override val value: Int32) extends ConfigureWindowValue(value)
-  case class Y(override val value: Int32) extends ConfigureWindowValue(value)
-  case class Width(override val value: Int32) extends ConfigureWindowValue(value)
-  case class Height(override val value: Int32) extends ConfigureWindowValue(value)
-  case class BorderWidth(override val value: Int32) extends ConfigureWindowValue(value)
+  abstract class ConfigureWindowValue(val value: IntValue)
+  case class X(override val value: Int16) extends ConfigureWindowValue(value)
+  case class Y(override val value: Int16) extends ConfigureWindowValue(value)
+  case class Width(override val value: Int16) extends ConfigureWindowValue(value)
+  case class Height(override val value: Int16) extends ConfigureWindowValue(value)
+  case class BorderWidth(override val value: Int16) extends ConfigureWindowValue(value)
   case class Sibling(override val value: Int32) extends ConfigureWindowValue(value)
-  case class StackMode(override val value: Int32) extends ConfigureWindowValue(value)
+  case class StackMode(override val value: Int8) extends ConfigureWindowValue(value)
 
   object ConfigureWindowValue {
     def apply(stream: BinaryInputStream, mask: Int): List[ConfigureWindowValue] = {
       val values = mutable.MutableList[ConfigureWindowValue]()
-      if((mask & 0x0001) != 0) values += X(stream.readInt32())
-      if((mask & 0x0002) != 0) values += Y(stream.readInt32())
-      if((mask & 0x0004) != 0) values += Width(stream.readInt32())
-      if((mask & 0x0008) != 0) values += Height(stream.readInt32())
-      if((mask & 0x0010) != 0) values += BorderWidth(stream.readInt32())
+      if((mask & 0x0001) != 0) values += X(stream.readInt32().toInt16)
+      if((mask & 0x0002) != 0) values += Y(stream.readInt32().toInt16)
+      if((mask & 0x0004) != 0) values += Width(stream.readInt32().toInt16)
+      if((mask & 0x0008) != 0) values += Height(stream.readInt32().toInt16)
+      if((mask & 0x0010) != 0) values += BorderWidth(stream.readInt32().toInt16)
       if((mask & 0x0020) != 0) values += Sibling(stream.readInt32())
-      if((mask & 0x0040) != 0) values += StackMode(stream.readInt32())
+      if((mask & 0x0040) != 0) values += StackMode(stream.readInt32().toInt8)
       values.toList
     }
   }
@@ -296,6 +296,20 @@ package requests {
     }
   }
 
+  case class GetAtomName (
+    val atom: Int32
+  ) extends Request(17)
+
+  object GetAtomName {
+    def apply(stream: BinaryInputStream) = {
+      new GetAtomName(stream.readInt32())
+    }
+  }
+
+  case class ChangeProperty (
+    val mode: Int8,
+    val window: Int32
+  ) extends Request(18)
 
 
 }
