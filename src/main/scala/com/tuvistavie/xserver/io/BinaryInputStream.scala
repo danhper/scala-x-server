@@ -11,6 +11,6 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
     val byte = inputStream.readByte()
     Int8(byte)
   }
-  def readInt16: Int16
-  def readInt32: Int32
+  def readInt16(): Int16
+  def readInt32(): Int32
 }
