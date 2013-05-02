@@ -5,7 +5,7 @@ import scala.collection.mutable
 import com.tuvistavie.xserver.protocol._
 import com.tuvistavie.xserver.io._
 
-abstract class WindowValue(value: Int32)
+abstract class WindowValue(val value: Int32)
 case class Pixmap(override val value: Int32) extends WindowValue(value)
 case class BackgroundPixel(override val value: Int32) extends WindowValue(value)
 case class BorderPixmap(override val value: Int32) extends WindowValue(value)
