@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.protocol
+package com.tuvistavie.xserver.protocol.types
 
 
 abstract class Value extends ByteSerializable {

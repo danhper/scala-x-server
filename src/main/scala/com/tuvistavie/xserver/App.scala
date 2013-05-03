@@ -7,7 +7,7 @@ import net.liftweb.json.Serialization
 import net.liftweb.json.NoTypeHints
 import net.liftweb.json.Serialization.write
 
-import com.tuvistavie.xserver.protocol._
+import com.tuvistavie.xserver.protocol.types._
 
 case class Person(name: String, age: Int8, foo: Int16, bar: Int32)
 

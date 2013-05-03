@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.protocol
+package com.tuvistavie.xserver.protocol.types
 
 import java.io.DataInputStream
 import java.io.DataOutputStream

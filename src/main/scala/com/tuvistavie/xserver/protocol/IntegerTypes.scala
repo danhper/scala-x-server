@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.protocol
+package com.tuvistavie.xserver.protocol.types
 
 import java.io.DataInputStream
 import java.io.DataOutputStream
@@ -58,9 +58,9 @@ case class Int32(override val value: Int) extends IntValue(value) {
 
   def swapBytes = {
     val newVal = ((value & 0XFF) << 32)  |
-                 ((value & 0xFF00) << 8) |
-                 ((value >> 8) & 0xFF00) |
-                 ((value >> 24) & 0xFF)
+    ((value & 0xFF00) << 8) |
+    ((value >> 8) & 0xFF00) |
+    ((value >> 24) & 0xFF)
 
     Int32(newVal)
   }
@@ -76,6 +76,4 @@ case class Int32(override val value: Int) extends IntValue(value) {
   def toInt16 = Int16(value & 0xffff)
 
   def toInt8 = Int8(value & 0xff)
-
-
 }
