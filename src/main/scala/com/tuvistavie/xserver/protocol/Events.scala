@@ -1,7 +1,7 @@
 package com.tuvistavie.xserver.protocol.events
 
 import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.xserver.protocol.types.Aliases._
+import com.tuvistavie.xserver.protocol.types.aliases._
 
 import com.tuvistavie.xserver.io._
 
@@ -24,12 +24,12 @@ case class KeyPress (
 
 object KeyPress {
   def apply(stream: BinaryInputStream, keycode: Keycode) = {
-    val keycode = stream.readInt8()
+    val keycode = stream.readUInt8()
     val sequenceNumber = stream.readInt16()
-    val time = stream.readInt32()
-    val root = stream.readInt32()
-    val event = stream.readInt32()
-    val child = stream.readInt32()
+    val time = stream.readUInt32()
+    val root = stream.readUInt32()
+    val event = stream.readUInt32()
+    val child = stream.readUInt32()
     val rootX = stream.readInt16()
     val rootY = stream.readInt16()
     val eventX = stream.readInt16()

@@ -1,21 +1,22 @@
 package com.tuvistavie.xserver.protocol.types
 
-
-
-object Aliases {
-  type Bitmask = Int32
-  type Window = Int32
-  type Pixmap = Int32
-  type Cursor = Int32
-  type Font = Int32
-  type GContext = Int32
-  type ColorMap = Int32
-  type Drawable = Int32
-  type Fontable = Int32
-  type Atom = Int32
-  type VisualID = Int32
-  type Timestamp = Int32
+package object aliases {
+  type Card8 = UInt8
+  type Card16 = UInt16
+  type Card32 = UInt32
+  type Bitmask = Card32
+  type Window = Card32
+  type Pixmap = Card32
+  type Cursor = Card32
+  type Font = Card32
+  type GContext = Card32
+  type ColorMap = Card32
+  type Drawable = Card32
+  type Fontable = Card32
+  type Atom = Card32
+  type VisualID = Card32
+  type Timestamp = Card32
   type Bool = Int8
-  type Keycode = Int8
+  type Keycode = Card8
 }
 

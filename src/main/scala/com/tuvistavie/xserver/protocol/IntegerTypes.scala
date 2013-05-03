@@ -9,12 +9,7 @@ abstract class IntValue(val value: Int) extends Value {
   type T = Int
 }
 
-object Int8 {
-  implicit def intToInt8(i: Int): Int8 = Int8(i)
-  implicit def int8ToInt(i: Int8): Int = i.value
-}
-
-case class Int8(override val value: Int) extends IntValue(value) {
+abstract class Int8Value(override val value: Int) extends IntValue(value) {
   override def byteSize = 1
 
   def write(stream: BinaryOutputStream): Unit = {
@@ -25,17 +20,38 @@ case class Int8(override val value: Int) extends IntValue(value) {
   }
 }
 
-object Int16 {
-  implicit def intToInt16(i: Int): Int16 = Int16(i)
-  implicit def int16ToInt(i: Int16): Int = i.value
+object Int8Value {
+  implicit def intToInt8(i: Int): Int8 = Int8(i)
+  implicit def intToUInt8(i: Int): UInt8 = UInt8(i)
+  implicit def int8ValueToInt(i: Int8Value): Int = i.value
 }
 
-case class Int16(override val value: Int) extends IntValue(value) {
+object Int8 {
+  def apply(value: Int) = new Int8(value)
+}
+class Int8(override val value: Int) extends Int8Value(value)
+
+object UInt8 {
+  def apply(value: Int) = new UInt8(value & 0xff)
+}
+
+class UInt8(override val value: Int) extends Int8Value(value)
+
+
+object Int16Value {
+  implicit def intToInt16(i: Int): Int16 = Int16(i)
+  implicit def intToUInt16(i: Int): UInt16 = UInt16(i)
+  implicit def int16ValueToInt(i: Int16Value): Int = i.value
+}
+
+abstract class Int16Value(override val value: Int) extends IntValue(value) {
   override def byteSize = 2
 
-  def swapBytes: Int16 = {
-    ((value & 0xFF) << 8) | ((value >> 8) & 0xFF)
+  def swappedValue: Int = {
+    ((value & 0xff) << 8) | ((value >> 8) & 0xff)
   }
+
+  def swapBytes: Int16Value
 
   def read(data: BinaryInputStream): Unit = {
   }
@@ -45,24 +61,36 @@ case class Int16(override val value: Int) extends IntValue(value) {
     stream.writeShort(toWrite)
   }
 
-  def toInt8 = Int8(value & 0xff)
+  def toUInt8 = UInt8(value)
 }
 
-object Int32 {
-  implicit def intToInt32(i: Int): Int32 = Int32(i)
-  implicit def int32ToInt(i: Int32): Int = i.value
+object UInt16 {
+  def apply(value: Int) = new UInt16(value & 0xffff)
 }
 
-case class Int32(override val value: Int) extends IntValue(value) {
+class UInt16(override val value: Int) extends Int16Value(value) {
+  def swapBytes = UInt16(swappedValue)
+}
+
+object Int16 {
+  def apply(value: Int) = new Int16(value)
+}
+
+class Int16(override val value: Int) extends Int16Value(value) {
+  def swapBytes = Int16(swappedValue)
+}
+
+
+abstract class Int32Value(override val value: Int) extends IntValue(value) {
   override def byteSize = 4
 
-  def swapBytes = {
-    val newVal = ((value & 0XFF) << 32)  |
+  def swapBytes: Int32Value
+
+  def swappedValue = {
+    ((value & 0XFF) << 32)  |
     ((value & 0xFF00) << 8) |
     ((value >> 8) & 0xFF00) |
     ((value >> 24) & 0xFF)
-
-    Int32(newVal)
   }
 
   def write(stream: BinaryOutputStream): Unit = {
@@ -73,7 +101,29 @@ case class Int32(override val value: Int) extends IntValue(value) {
   def read(data: BinaryInputStream): Unit = {
   }
 
-  def toInt16 = Int16(value & 0xffff)
+  def toUInt16 = UInt16(value & 0xffff)
 
-  def toInt8 = Int8(value & 0xff)
+  def toUInt8 = UInt8(value & 0xff)
+}
+
+object Int32Value {
+  implicit def intToInt32(i: Int): Int32 = Int32(i)
+  implicit def intToUInt32(i: Int): UInt32 = UInt32(i)
+  implicit def int32ValueToInt(i: Int32Value): Int = i.value
+}
+
+object UInt32 {
+  def apply(value: Int) = new UInt32(value & 0xffffffff)
+}
+
+class UInt32(override val value: Int) extends Int32Value(value) {
+  def swapBytes = UInt32(swappedValue)
+}
+
+object Int32 {
+  def apply(value: Int) = new Int32(value)
+}
+
+class Int32(override val value: Int) extends Int32Value(value) {
+  def swapBytes = Int32(swappedValue)
 }
