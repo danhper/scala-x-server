@@ -18,7 +18,7 @@ case class KeyPress (
   val eventX: Int16,
   val eventY: Int16,
   val state: Set[BaseKeyMask],
-  val sameScreen: Bool
+  val sameScreen: Boolean
 ) extends Event(2)
 
 case class KeyRelease (
@@ -33,7 +33,7 @@ case class KeyRelease (
   val eventX: Int16,
   val eventY: Int16,
   val state: Set[BaseKeyMask],
-  val sameScreen: Bool
+  val sameScreen: Boolean
 ) extends Event(3)
 
 case class ButtonPress (
@@ -48,7 +48,7 @@ case class ButtonPress (
   val eventX: Int16,
   val eventY: Int16,
   val state: Set[BaseKeyMask],
-  val sameScreen: Bool
+  val sameScreen: Boolean
 ) extends Event(4)
 
 case class ButtonRelease (
@@ -63,7 +63,7 @@ case class ButtonRelease (
   val eventX: Int16,
   val eventY: Int16,
   val state: Set[BaseKeyMask],
-  val sameScreen: Bool
+  val sameScreen: Boolean
 ) extends Event(5)
 
 case class MotionNotify (
@@ -78,7 +78,7 @@ case class MotionNotify (
   val eventX: Int16,
   val eventY: Int16,
   val state: Set[BaseKeyMask],
-  val sameScreen: Bool
+  val sameScreen: Boolean
 ) extends Event(6)
 
 case class EnterNotify (
@@ -93,7 +93,7 @@ case class EnterNotify (
   val eventX: Int16,
   val eventY: Int16,
   val state: Set[BaseKeyMask],
-  val sameScreen: Bool,
+  val sameScreen: Boolean,
   val focus: UInt8
 ) extends Event(7)
 
@@ -109,7 +109,7 @@ case class LeaveNotify (
   val eventX: Int16,
   val eventY: Int16,
   val state: Set[BaseKeyMask],
-  val sameScreen: Bool,
+  val sameScreen: Boolean,
   val focus: UInt8
 ) extends Event(8)
 
@@ -237,7 +237,68 @@ object VisibilityNotify {
     stream.skip(23)
     new VisibilityNotify(sequenceNumber, window, state)
   }
+}
 
+case class CreateNotify (
+  val sequenceNumber: Card16,
+  val parent: Window,
+  val window: Window,
+  val x: Int16,
+  val y: Int16,
+  val width: Card16,
+  val height: Int16,
+  val borderWidth: Card16,
+  val overrideReidrect: Boolean
+) extends Event(16)
+
+object CreateNotify {
+  def apply(stream: BinaryInputStream) = {
+    val sequenceNumber = stream.readUInt16()
+    val parent = stream.readUInt32()
+    val window = stream.readUInt32()
+    val x = stream.readInt16()
+    val y = stream.readInt16()
+    val width = stream.readUInt16()
+    val height = stream.readInt16()
+    val borderWidth = stream.readUInt16()
+    val overrideRedirect = stream.readBoolean()
+    stream.skip(9)
+    new CreateNotify(sequenceNumber, parent, window, x, y, width, height, borderWidth, overrideRedirect)
+  }
+}
+
+case class DestroyNotify(
+  val sequenceNumber: Card16,
+  val event: Window,
+  val window: Window
+) extends Event(17)
+
+object DestroyNotify {
+  def apply(stream: BinaryInputStream) = {
+    val sequenceNumber = stream.readUInt16()
+    val event = stream.readUInt32()
+    val window = stream.readUInt32()
+    stream.skip(20)
+    new DestroyNotify(sequenceNumber, event, window)
+  }
+}
+
+case class UnmapNotify (
+  val sequenceNumber: Card16,
+  val event: Window,
+  val window: Window,
+  val fromConfigure: Boolean
+) extends Event(17)
+
+object UnmapNotify {
+  def apply(stream: BinaryInputStream) = {
+    val sequenceNumber = stream.readUInt16()
+    val event = stream.readUInt32()
+    val window = stream.readUInt32()
+    val fromConfigure = stream.readBoolean()
+    stream.skip(19)
+    new UnmapNotify(sequenceNumber, event, window, fromConfigure)
+  }
 }
 
 object Event {
@@ -254,7 +315,7 @@ object Event {
     val eventX = stream.readInt16()
     val eventY = stream.readInt16()
     val state = KeyButMask.fromMask(stream.readInt16())
-    val sameScreen = stream.readInt8()
+    val sameScreen = stream.readBoolean()
     val rest = stream.readUInt8()
     code.value match {
       case 2 => new KeyPress(detail, sequenceNumber, time, root, event,

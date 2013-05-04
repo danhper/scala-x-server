@@ -279,17 +279,17 @@ object QueryTree {
 }
 
 case class InternAtom (
-  val onlyIfExists: Bool,
+  val onlyIfExists: Boolean,
   val name: String
   ) extends Request(16)
 
 object InternAtom {
-  def apply(stream: BinaryInputStream, onlyIfExists: Bool) = {
+  def apply(stream: BinaryInputStream, onlyIfExists: Card8) = {
     val nameLength = stream.readInt16()
     val name = new Array[Byte](nameLength)
     stream.read(name, 0, nameLength)
     stream.readPad(nameLength)
-    new InternAtom(onlyIfExists, new String(name))
+    new InternAtom(onlyIfExists.toBoolean, new String(name))
   }
 }
 
@@ -341,7 +341,7 @@ object DeleteProperty {
 }
 
 case class GetProperty(
-  val delete: Bool,
+  val delete: Boolean,
   val window: Window,
   val property: Atom,
   val propertyType: Atom,
@@ -350,13 +350,13 @@ case class GetProperty(
   ) extends Request(20)
 
 object GetProperty {
-  def apply(stream: BinaryInputStream, delete: Bool) = {
+  def apply(stream: BinaryInputStream, delete: Card8) = {
     val window = stream.readUInt32()
     val property = stream.readUInt32()
     val propertyType = stream.readUInt32()
     val longOffset = stream.readUInt32()
     val longLength = stream.readUInt32()
-    new GetProperty(delete, window, property, propertyType, longOffset, longLength)
+    new GetProperty(delete.toBoolean, window, property, propertyType, longOffset, longLength)
   }
 }
 
@@ -416,7 +416,7 @@ object ConvertSelection {
 }
 
 case class SendEvent (
-  val propagate: Bool,
+  val propagate: Boolean,
   val window: Window,
   val eventMask: Int32
   // val event: Event

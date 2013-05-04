@@ -18,6 +18,11 @@ abstract class Int8Value(override val value: Int) extends IntValue(value) {
 
   def read(data: BinaryInputStream): Unit = {
   }
+
+  def toBoolean = value match {
+    case 0 => false
+    case _ => true
+  }
 }
 
 object Int8Value {

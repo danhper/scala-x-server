@@ -19,7 +19,6 @@ package object types {
   type Atom = Card32
   type VisualID = Card32
   type Timestamp = Card32
-  type Bool = Int8
   type Keycode = Card8
   type Button = Card8
 
