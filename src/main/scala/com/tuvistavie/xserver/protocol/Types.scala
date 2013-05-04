@@ -220,6 +220,61 @@ package types {
     def fromMask(mask: Int) = generateMask(mask)
   }
 
+  class Point(val x: Int16, val y: Int16)
+  object Point {
+    def apply(stream: BinaryInputStream) = {
+      val x = stream.readInt16()
+      val y = stream.readInt16()
+      new Point(x, y)
+    }
+  }
 
+  class Rectangle(val x: Int16, val y: Int16, val width: Card16, val height: Card16)
+  object Rectangle {
+    def apply(stream: BinaryInputStream) = {
+      val x = stream.readInt16()
+      val y = stream.readInt16()
+      val width = stream.readUInt16()
+      val height = stream.readUInt16()
+      new Rectangle(x, y, width, height)
+    }
+  }
+
+  class Arc(val x: Int16, val y: Int16, val width: Card16, val height: Card16, angle1: Int16, angle2: Int16)
+  object Arc {
+    def apply(stream: BinaryInputStream) = {
+      val x = stream.readInt16()
+      val y = stream.readInt16()
+      val width = stream.readUInt16()
+      val height = stream.readUInt16()
+      val angle1 = stream.readInt16()
+      val angle2 = stream.readInt16()
+      new Arc(x, y, width, height, angle1, angle2)
+    }
+  }
+
+  class Host(val family: UInt8, val address: String)
+  object Host {
+    def apply(stream: BinaryInputStream) = {
+      val family = stream.readUInt8()
+      stream.skip(1)
+      val addressLength = stream.readUInt16()
+      var address = new Array[Byte](addressLength)
+      stream.read(address, 0, addressLength)
+      stream.readPad(addressLength)
+      new Host(family, new String(address))
+    }
+  }
+
+  class Str(val value: String)
+  object Str {
+    def apply(stream: BinaryInputStream) = {
+      val n = stream.readUInt8()
+      var str = new Array[Byte](n)
+      stream.read(str, 0, n)
+      stream.readPad(n)
+      new Str(new String(str))
+    }
+  }
 }
 
