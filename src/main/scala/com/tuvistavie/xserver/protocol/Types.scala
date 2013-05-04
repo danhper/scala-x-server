@@ -21,6 +21,7 @@ package object types {
   type Timestamp = Card32
   type Bool = Int8
   type Keycode = Card8
+  type Button = Card8
 
   def generateMaskSet[T](mask: Int, obj: Enumerable[T]): Set[T] = {
     def generate(mask: Int, currentVal: Int, set: Set[T]): Set[T] = {
