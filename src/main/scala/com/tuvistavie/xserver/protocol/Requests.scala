@@ -270,7 +270,7 @@ case class InternAtom (
 
 object InternAtom {
   def apply(stream: BinaryInputStream, onlyIfExists: Card8) = {
-    val nameLength = stream.readInt16()
+    val nameLength = stream.readUInt16()
     val name = new Array[Byte](nameLength)
     stream.read(name, 0, nameLength)
     stream.readPad(nameLength)
@@ -308,7 +308,7 @@ object ChangeProperty {
     val n = stream.readUInt32() * (format / 8)
     val data = mutable.MutableList[UInt8]()
     n times { data += stream.readUInt8() }
-    stream.readPad(n)
+    stream.readPad(UInt32(n))
     new ChangeProperty(mode, window, property, propertyType, format, data.toList)
   }
 }

@@ -8,6 +8,8 @@ import atoms.Atom
 
 abstract class IntValue(val value: Int) extends Value {
   type T = Int
+
+  def padding = (4 - (value % 4)) % 4
 }
 
 abstract class Int8Value(override val value: Int) extends IntValue(value) {

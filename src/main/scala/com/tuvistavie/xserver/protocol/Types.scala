@@ -3,7 +3,6 @@ package com.tuvistavie.xserver.protocol
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.util.Enumerable
 
-
 package object types {
   type Card8 = UInt8
   type Card16 = UInt16
@@ -276,7 +275,7 @@ package types {
     }
   }
 
-  class Host(val family: UInt8, val address: String)
+  case class Host(val family: UInt8, val address: String)
   object Host {
     def apply(stream: BinaryInputStream) = {
       val family = stream.readUInt8()
@@ -289,7 +288,10 @@ package types {
     }
   }
 
-  class Str(val value: String)
+  case class Str(val value: String) extends Value {
+    type T = String
+    override def byteSize = value.length + 1
+  }
   object Str {
     def apply(stream: BinaryInputStream) = {
       val n = stream.readUInt8()

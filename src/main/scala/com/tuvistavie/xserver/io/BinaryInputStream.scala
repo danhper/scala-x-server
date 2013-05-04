@@ -13,10 +13,7 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
     n times { readInt8() }
   }
 
-  def readPad(n: Int) = {
-    val p = (4 - (n % 4)) % 4
-    skip(p)
-  }
+  def readPad(n: IntValue) = skip(n.padding)
 
   def readInt8() = Int8(inputStream.readByte())
   def readUInt8() = UInt8(inputStream.readByte())
