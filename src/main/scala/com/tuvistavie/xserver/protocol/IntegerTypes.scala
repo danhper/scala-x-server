@@ -4,6 +4,7 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 
 import com.tuvistavie.xserver.io._
+import atoms.BaseAtom
 
 abstract class IntValue(val value: Int) extends Value {
   type T = Int
@@ -123,6 +124,7 @@ object UInt32 {
 
 class UInt32(override val value: Int) extends Int32Value(value) {
   def swapBytes = UInt32(swappedValue)
+  def toAtom = BaseAtom.fromValue(value)
 }
 
 object Int32 {

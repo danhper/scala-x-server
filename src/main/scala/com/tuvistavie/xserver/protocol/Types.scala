@@ -13,7 +13,7 @@ package object types {
   type Cursor = Card32
   type Font = Card32
   type GContext = Card32
-  type ColorMap = Card32
+  type Colormap = Card32
   type Drawable = Card32
   type Fontable = Card32
   type Atom = Card32

@@ -1,7 +1,10 @@
-package com.tuvistavie.xserver.protocol.atoms
+package com.tuvistavie.xserver.protocol.types.atoms
+
+import com.tuvistavie.util.Enumerable
 
 abstract sealed class BaseAtom(val value: Int)
 
+case object Nothing extends BaseAtom(0)
 case object Primary extends BaseAtom(1)
 case object Secondary extends BaseAtom(2)
 case object Arc extends BaseAtom(3)
@@ -71,7 +74,7 @@ case object CapHeight extends BaseAtom(66)
 case object WmClass extends BaseAtom(67)
 case object WmTransientFor extends BaseAtom(68)
 
-object BaseAtom {
+object BaseAtom extends Enumerable[BaseAtom] {
   def fromValue(value: Int) = value match {
     case Primary.value => Primary
     case Secondary.value => Secondary
@@ -141,6 +144,7 @@ object BaseAtom {
     case CapHeight.value => CapHeight
     case WmClass.value => WmClass
     case WmTransientFor.value => WmTransientFor
+    case _ => Nothing
   }
 }
 

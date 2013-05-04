@@ -25,6 +25,25 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
   def readInt32(): Int32
   def readUInt16(): UInt16
   def readUInt32(): UInt32
+
+  def readCard8() = readUInt8()
+  def readCard16() = readUInt16()
+  def readCard32() = readUInt32()
+  def readBitmask() = readCard32()
+  def readWindow() = readCard32()
+  def readPixmap() = readCard32()
+  def readCursor() = readCard32()
+  def readFont() = readCard32()
+  def readGContext() = readCard32()
+  def readColormap() = readCard32()
+  def readDrawable() = readCard32()
+  def readFontable() = readCard32()
+  def readAtom() = readCard32()
+  def readVisualID() = readCard32()
+  def readTimestamp() = readCard32()
+  def readKeycode() = readCard8()
+  def readButton() = readCard8()
+
 }
 
 class BinaryInputStreamLSB(override val inputStream: DataInputStream) extends BinaryInputStream(inputStream) {
