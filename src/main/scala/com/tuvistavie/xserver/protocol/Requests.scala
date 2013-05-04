@@ -28,11 +28,10 @@ object Request {
   }
 }
 
-
 abstract class WindowValue(val value: IntValue)
-case class BackgroundPixmap(override val value: Card32) extends WindowValue(value)
+case class BackgroundPixmap(override val value: Pixmap) extends WindowValue(value)
 case class BackgroundPixel(override val value: Card32) extends WindowValue(value)
-case class BorderPixmap(override val value: Card32) extends WindowValue(value)
+case class BorderPixmap(override val value: Pixmap) extends WindowValue(value)
 case class BorderPixel(override val value: Card32) extends WindowValue(value)
 case class BitGravity(override val value: UInt8) extends WindowValue(value)
 case class WindowGravity(override val value: UInt8) extends WindowValue(value)
