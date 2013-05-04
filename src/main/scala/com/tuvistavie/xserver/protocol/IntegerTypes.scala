@@ -78,6 +78,8 @@ object Int16Value {
 
 class UInt16(override val value: Int) extends Int16Value(value) {
   def swapBytes = UInt16(swappedValue)
+  def asSetOfKeyMask = SetOfKeyMask.fromMask(value)
+  def asSetOfKeyButMask = SetOfKeyButMask.fromMask(value)
 }
 
 object UInt16 {
@@ -127,9 +129,9 @@ object Int32Value {
 class UInt32(override val value: Int) extends Int32Value(value) {
   def swapBytes = UInt32(swappedValue)
   def asAtom = Atom.fromValue(value)
-  def asEventMask = NormalEventMask.fromMask(value)
-  def asPointerEventMask = PointerEventMask.fromMask(value)
-  def asDeviceEventMask = DeviceEventMask.fromMask(value)
+  def asSetOfEvent = SetOfEvent.fromMask(value)
+  def asSetOfPointerEvent = SetOfPointerEvent.fromMask(value)
+  def asSetOfDeviceEvent = SetOfDeviceEvent.fromMask(value)
 }
 
 object UInt32 {

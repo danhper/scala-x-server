@@ -18,7 +18,7 @@ case class KeyPress (
   val rootY: Int16,
   val eventX: Int16,
   val eventY: Int16,
-  val state: Set[BaseKeyMask],
+  val state: SetOfKeyButMask,
   val sameScreen: Boolean
 ) extends Event(2)
 
@@ -33,7 +33,7 @@ case class KeyRelease (
   val rootY: Int16,
   val eventX: Int16,
   val eventY: Int16,
-  val state: Set[BaseKeyMask],
+  val state: SetOfKeyButMask,
   val sameScreen: Boolean
 ) extends Event(3)
 
@@ -48,7 +48,7 @@ case class ButtonPress (
   val rootY: Int16,
   val eventX: Int16,
   val eventY: Int16,
-  val state: Set[BaseKeyMask],
+  val state: SetOfKeyButMask,
   val sameScreen: Boolean
 ) extends Event(4)
 
@@ -63,7 +63,7 @@ case class ButtonRelease (
   val rootY: Int16,
   val eventX: Int16,
   val eventY: Int16,
-  val state: Set[BaseKeyMask],
+  val state: SetOfKeyButMask,
   val sameScreen: Boolean
 ) extends Event(5)
 
@@ -78,7 +78,7 @@ case class MotionNotify (
   val rootY: Int16,
   val eventX: Int16,
   val eventY: Int16,
-  val state: Set[BaseKeyMask],
+  val state: SetOfKeyButMask,
   val sameScreen: Boolean
 ) extends Event(6)
 
@@ -93,7 +93,7 @@ case class EnterNotify (
   val rootY: Int16,
   val eventX: Int16,
   val eventY: Int16,
-  val state: Set[BaseKeyMask],
+  val state: SetOfKeyButMask,
   val sameScreen: Boolean,
   val focus: UInt8
 ) extends Event(7)
@@ -109,7 +109,7 @@ case class LeaveNotify (
   val rootY: Int16,
   val eventX: Int16,
   val eventY: Int16,
-  val state: Set[BaseKeyMask],
+  val state: SetOfKeyButMask,
   val sameScreen: Boolean,
   val focus: UInt8
 ) extends Event(8)
@@ -708,7 +708,7 @@ object Event {
     val rootY = stream.readInt16()
     val eventX = stream.readInt16()
     val eventY = stream.readInt16()
-    val state = KeyButMask.fromMask(stream.readInt16())
+    val state = stream.readSetOfKeyButMask()
     val sameScreen = stream.readBoolean()
     val rest = stream.readUInt8()
     code match {

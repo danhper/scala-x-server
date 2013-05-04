@@ -36,10 +36,13 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
   def readWindowGravity() = readCard8().asWindowGravity
   def readWindowGravity(n: Int) = readCard8(n).asWindowGravity
 
+  def readSetOfKeyMask() = readCard16().asSetOfKeyMask
+  def readSetOfKeyButMask() = readCard16().asSetOfKeyButMask
+
   def readAtom() = readCard32().asAtom
-  def readEventMask() = readCard32().asEventMask
-  def readDeviceEventMask() = readCard32().asDeviceEventMask
-  def readPointerEventMask() = readCard32().asPointerEventMask
+  def readSetOfEvent() = readCard32().asSetOfEvent
+  def readSetOfPointerEvent() = readCard32().asSetOfPointerEvent
+  def readSetOfDeviceEvent() = readCard32().asSetOfDeviceEvent
 
   def readCard8() = readUInt8()
   def readCard8(n: Int) = readUInt8(n)

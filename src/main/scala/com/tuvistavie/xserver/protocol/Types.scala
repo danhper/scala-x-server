@@ -46,6 +46,11 @@ package types {
     override def byteSize = 1
   }
 
+  object Bool {
+    def boolToInt(b: Bool) = if(b.value) 1 else 0
+    def intToBool(i: Int) = Bool(i != 0)
+  }
+
   abstract sealed class Gravity(override val value: Int) extends IntValue(value) {
     override def byteSize = 1
   }
@@ -100,14 +105,32 @@ package types {
     override def byteSize = 4
   }
 
+  object SetOfEvent {
+    implicit case object Unused extends EventMask(0xfe000000)
+    implicit val maskObject = EventMask
+    def fromMask(mask: Int) = SetOfEvent(generateMask(mask))
+  }
+
   case class SetOfDeviceEvent(override val value: Set[EventMask]) extends Value {
     type T = Set[EventMask]
     override def byteSize = 4
   }
 
+  object SetOfDeviceEvent {
+    implicit case object Unused extends EventMask(0xffff8003)
+    implicit val maskObject = EventMask
+    def fromMask(mask: Int) = SetOfDeviceEvent(generateMask(mask))
+  }
+
   case class SetOfPointerEvent(override val value: Set[EventMask]) extends Value {
     type T = Set[EventMask]
     override def byteSize = 4
+  }
+
+  object SetOfPointerEvent {
+    implicit case object Unused extends EventMask(0xffffc0b0)
+    implicit val maskObject = EventMask
+    def fromMask(mask: Int) = SetOfPointerEvent(generateMask(mask))
   }
 
 
@@ -170,27 +193,25 @@ package types {
     }
   }
 
-  abstract sealed class NormalEventMask(override val value: Int) extends EventMask(value)
-
-  object NormalEventMask {
-    implicit case object Unused extends NormalEventMask(0xfe000000)
-    implicit val maskObject = EventMask
-    def fromMask(mask: Int) = SetOfEvent(generateMask(mask))
+  case class SetOfKeyMask(val value: Set[BaseKeyMask]) extends Value {
+    type T = Set[BaseKeyMask]
+    override def byteSize = 4
+  }
+  object SetOfKeyMask {
+    implicit case object Unused extends BaseKeyMask(0xe000)
+    implicit val obj = BaseKeyMask
+    def fromMask(mask: Int) = SetOfKeyMask(generateMask(mask))
   }
 
-  abstract sealed class PointerEventMask(override val value: Int) extends EventMask(value)
-  object PointerEventMask {
-    implicit case object Unused extends NormalEventMask(0xffff8003)
-    implicit val maskObject = EventMask
-    def fromMask(mask: Int) = SetOfPointerEvent(generateMask(mask))
+  case class SetOfKeyButMask(val value: Set[BaseKeyMask]) extends Value {
+    type T = Set[BaseKeyMask]
+    override def byteSize = 4
   }
 
-  abstract sealed class DeviceEventMask(override val value: Int) extends EventMask(value)
-
-  object DeviceEventMask {
-    implicit case object Unused extends DeviceEventMask(0xffffc0b0)
-    implicit val maskObject = EventMask
-    def fromMask(mask: Int) = SetOfDeviceEvent(generateMask(mask))
+  object SetOfKeyButMask {
+    implicit case object Unused extends BaseKeyMask(0xff00)
+    implicit val obj = BaseKeyMask
+    def fromMask(mask: Int) = SetOfKeyButMask(generateMask(mask))
   }
 
   abstract sealed class BaseKeyMask(override val value: Int) extends IntValue(value) {
@@ -226,20 +247,6 @@ package types {
       case Button4.value => Button4
       case Button5.value => Button5
     }
-  }
-
-  abstract sealed class KeyButMask(override val value: Int) extends BaseKeyMask(value)
-  object KeyButMask {
-    implicit case object Unused extends BaseKeyMask(0xe000)
-    implicit val obj = BaseKeyMask
-    def fromMask(mask: Int) = generateMask(mask)
-  }
-
-  abstract sealed class KeyMask(override val value: Int) extends BaseKeyMask(value)
-  object KeyMask {
-    implicit case object Unused extends BaseKeyMask(0xff00)
-    implicit val obj = BaseKeyMask
-    def fromMask(mask: Int) = generateMask(mask)
   }
 
   class Point(val x: Int16, val y: Int16)
