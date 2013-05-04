@@ -29,42 +29,25 @@ object Request {
   }
 }
 
-abstract class WindowValue(val value: IntValue)
-case class BackgroundPixmap(override val value: Pixmap) extends WindowValue(value)
-case class BackgroundPixel(override val value: Card32) extends WindowValue(value)
-case class BorderPixmap(override val value: Pixmap) extends WindowValue(value)
-case class BorderPixel(override val value: Card32) extends WindowValue(value)
-case class BitGravity(override val value: UInt8) extends WindowValue(value)
-case class WindowGravity(override val value: UInt8) extends WindowValue(value)
-case class BackingStore(override val value: UInt8) extends WindowValue(value)
-case class BackingPlanes(override val value: Int32) extends WindowValue(value)
-case class BackingPixels(override val value: Int32) extends WindowValue(value)
-case class OverrideRedirect(override val value: UInt8) extends WindowValue(value)
-case class SaveUnder(override val value: UInt8) extends WindowValue(value)
-case class EventMask(override val value: Int32) extends WindowValue(value)
-case class NoPropagateMask(override val value: Int32) extends WindowValue(value)
-case class ColorMap(override val value: Int32) extends WindowValue(value)
-case class Cursor(override val value: Int32) extends WindowValue(value)
-
 object WindowValue {
-  def apply(stream: BinaryInputStream, mask: Int): List[WindowValue] = {
-    val values = mutable.MutableList[WindowValue]()
-    if((mask & 0x0001) != 0) values += BackgroundPixmap(stream.readUInt32())
-    if((mask & 0x0002) != 0) values += BackgroundPixel(stream.readUInt32())
-    if((mask & 0x0004) != 0) values += BorderPixmap(stream.readUInt32())
-    if((mask & 0x0008) != 0) values += BorderPixel(stream.readUInt32())
-    if((mask & 0x0010) != 0) values += BitGravity(stream.readInt32().toUInt8)
-    if((mask & 0x0020) != 0) values += WindowGravity(stream.readInt32().toUInt8)
-    if((mask & 0x0040) != 0) values += BackingStore(stream.readInt32().toUInt8)
-    if((mask & 0x0080) != 0) values += BackingPlanes(stream.readInt32())
-    if((mask & 0x0100) != 0) values += BackingPixels(stream.readInt32())
-    if((mask & 0x0200) != 0) values += OverrideRedirect(stream.readInt32().toUInt8)
-    if((mask & 0x0400) != 0) values += SaveUnder(stream.readInt32().toUInt8)
-    if((mask & 0x0800) != 0) values += EventMask(stream.readInt32())
-    if((mask & 0x1000) != 0) values += NoPropagateMask(stream.readInt32())
-    if((mask & 0x2000) != 0) values += ColorMap(stream.readInt32())
-    if((mask & 0x4000) != 0) values += Cursor(stream.readInt32())
-    values.toList
+  def apply(stream: BinaryInputStream, mask: Int): Map[String, Value] = {
+    val values = mutable.Map[String, Value]()
+    if((mask & 0x0001) != 0) values += ("backgroundPixmap" -> stream.readPixmap())
+    if((mask & 0x0002) != 0) values += ("backgroundPixel" -> stream.readCard32())
+    if((mask & 0x0004) != 0) values += ("borderPixmap" -> stream.readPixmap())
+    if((mask & 0x0008) != 0) values += ("borderPixel" -> stream.readCard32())
+    if((mask & 0x0010) != 0) values += ("bitGravity" -> stream.readBitGravity(4))
+    if((mask & 0x0020) != 0) values += ("windowGravity" -> stream.readWindowGravity(4))
+    if((mask & 0x0040) != 0) values += ("backingStore" -> stream.readCard8(4))
+    if((mask & 0x0080) != 0) values += ("backingPlanes" -> stream.readCard32())
+    if((mask & 0x0100) != 0) values += ("backingPixels" -> stream.readCard32())
+    if((mask & 0x0200) != 0) values += ("overrideRedirect" -> stream.readBool(4))
+    if((mask & 0x0400) != 0) values += ("saveUnder" -> stream.readBool(4))
+    if((mask & 0x0800) != 0) values += ("eventMask" -> stream.readEventMask())
+    if((mask & 0x1000) != 0) values += ("noPropagateMask" -> stream.readDeviceEventMask())
+    if((mask & 0x2000) != 0) values += ("colorMap" -> stream.readColormap())
+    if((mask & 0x4000) != 0) values += ("cursor" -> stream.readCursor())
+    Map(values.toStream: _*)
   }
 }
 
@@ -79,7 +62,7 @@ case class CreateWindow(
   val borderWidth: Card16,
   val windowClass: UInt16,
   val visualId: VisualID,
-  val values: List[WindowValue]
+  val values: Map[String, Value]
   ) extends Request(1)
 
 object CreateWindow {
@@ -102,7 +85,7 @@ object CreateWindow {
 
 case class ChangeWindowAttributes (
   val window: Window,
-  val values: List[WindowValue]
+  val values: Map[String, Value]
   ) extends Request(2)
 
 object ChangeWindowAttributes {
@@ -423,7 +406,7 @@ case class SendEvent (
   val window: Window,
   val eventMask: SetOfEvent,
   val event: Event
-)
+) extends Request(25)
 
 object SendEvent {
   def apply(stream: BinaryInputStream, propagate: UInt8) = {
@@ -434,5 +417,27 @@ object SendEvent {
   }
 }
 
+case class GrabPointer (
+  val ownerEvents: Boolean,
+  val grabWindow: Window,
+  val eventMask: SetOfEvent,
+  val pointerMode: Card8,
+  val keyboardMode: Card8,
+  var confineTo: Window,
+  val cursor: Cursor,
+  val time: Timestamp
+) extends Request(26)
 
-
+object GrabPointer {
+  def apply(stream: BinaryInputStream, ownerEvents: Card8) = {
+    val grabWindow = stream.readWindow()
+    val eventMask = stream.readEventMask()
+    val pointerMode = stream.readCard8()
+    val keyboardMode = stream.readCard8()
+    var confineTo = stream.readWindow()
+    val cursor = stream.readCursor()
+    val time = stream.readTimestamp()
+    new GrabPointer(ownerEvents.toBoolean, grabWindow, eventMask, pointerMode,
+      keyboardMode, confineTo, cursor, time)
+  }
+}

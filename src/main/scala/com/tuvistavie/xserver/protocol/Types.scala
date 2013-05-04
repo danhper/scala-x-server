@@ -3,6 +3,7 @@ package com.tuvistavie.xserver.protocol
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.util.Enumerable
 
+
 package object types {
   type Card8 = UInt8
   type Card16 = UInt16
@@ -21,8 +22,6 @@ package object types {
   type Keycode = Card8
   type Button = Card8
 
-  type SetOfEvent = Set[EventMask]
-
   def generateMaskSet[T](mask: Int, obj: Enumerable[T]): Set[T] = {
     def generate(mask: Int, currentVal: Int, set: Set[T]): Set[T] = {
       if(currentVal >= mask) set
@@ -34,7 +33,7 @@ package object types {
     generate(mask, 0x00, Set())
   }
 
-  private[types] def generateMask[T <: HasValue](mask: Int)(implicit obj: Enumerable[T], unused: T) = {
+  private[types] def generateMask[T <: IntValue](mask: Int)(implicit obj: Enumerable[T], unused: T) = {
     val set = generateMaskSet(mask, obj)
     if((mask & unused.value) != 0) set + unused
     else set
@@ -43,11 +42,14 @@ package object types {
 
 package types {
 
-  trait HasValue {
-    val value: Int
+  case class Bool(override val value: Boolean) extends Value {
+    type T = Boolean
+    override def byteSize = 1
   }
 
-  abstract sealed class Gravity(val value: Int)
+  abstract sealed class Gravity(override val value: Int) extends IntValue(value) {
+    override def byteSize = 1
+  }
   abstract sealed class BitGravity(override val value: Int) extends Gravity(value)
   abstract sealed class WindowGravity(override val value: Int) extends Gravity(value)
 
@@ -83,7 +85,7 @@ package types {
   object BitGravity {
     def fromValue(value: Int) = value match {
       case 0  => Forget
-      case _ => Gravity.fromValue(value).asInstanceOf[BitGravity]
+      case _ => Gravity.fromValue(value)
     }
   }
 
@@ -94,7 +96,25 @@ package types {
     }
   }
 
-  abstract sealed class EventMask(val value: Int) extends HasValue
+  case class SetOfEvent(override val value: Set[EventMask]) extends Value {
+    type T = Set[EventMask]
+    override def byteSize = 4
+  }
+
+  case class SetOfDeviceEvent(override val value: Set[EventMask]) extends Value {
+    type T = Set[EventMask]
+    override def byteSize = 4
+  }
+
+  case class SetOfPointerEvent(override val value: Set[EventMask]) extends Value {
+    type T = Set[EventMask]
+    override def byteSize = 4
+  }
+
+
+  abstract sealed class EventMask(override val value: Int) extends IntValue(value) {
+    override def byteSize = 4
+  }
   case object KeyPress extends EventMask(0x00000001)
   case object KeyRelease extends EventMask(0x00000002)
   case object ButtonPress extends EventMask(0x00000004)
@@ -156,14 +176,14 @@ package types {
   object NormalEventMask {
     implicit case object Unused extends NormalEventMask(0xfe000000)
     implicit val maskObject = EventMask
-    def fromMask(mask: Int) = generateMask(mask)
+    def fromMask(mask: Int) = SetOfEvent(generateMask(mask))
   }
 
   abstract sealed class PointerEventMask(override val value: Int) extends EventMask(value)
   object PointerEventMask {
     implicit case object Unused extends NormalEventMask(0xffff8003)
     implicit val maskObject = EventMask
-    def fromMask(mask: Int) = generateMask(mask)
+    def fromMask(mask: Int) = SetOfPointerEvent(generateMask(mask))
   }
 
   abstract sealed class DeviceEventMask(override val value: Int) extends EventMask(value)
@@ -171,10 +191,12 @@ package types {
   object DeviceEventMask {
     implicit case object Unused extends DeviceEventMask(0xffffc0b0)
     implicit val maskObject = EventMask
-    def fromMask(mask: Int) = generateMask(mask)
+    def fromMask(mask: Int) = SetOfDeviceEvent(generateMask(mask))
   }
 
-  abstract sealed class BaseKeyMask(val value: Int) extends HasValue
+  abstract sealed class BaseKeyMask(override val value: Int) extends IntValue(value) {
+    override def byteSize = 4
+  }
   case object Shift extends BaseKeyMask(0x0001)
   case object Lock extends BaseKeyMask(0x0002)
   case object Control extends BaseKeyMask(0x0004)

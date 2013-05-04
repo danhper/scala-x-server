@@ -35,7 +35,10 @@ object UInt8 {
   def apply(value: Int) = new UInt8(value & 0xff)
 }
 
-class UInt8(override val value: Int) extends Int8Value(value)
+class UInt8(override val value: Int) extends Int8Value(value) {
+  def asBitGravity = BitGravity.fromValue(value)
+  def asWindowGravity = WindowGravity.fromValue(value)
+}
 
 object Int8Value {
   implicit def intToInt8(i: Int): Int8 = Int8(i)
@@ -122,6 +125,9 @@ object Int32Value {
 class UInt32(override val value: Int) extends Int32Value(value) {
   def swapBytes = UInt32(swappedValue)
   def asAtom = Atom.fromValue(value)
+  def asEventMask = NormalEventMask.fromMask(value)
+  def asPointerEventMask = PointerEventMask.fromMask(value)
+  def asDeviceEventMask = DeviceEventMask.fromMask(value)
 }
 
 object UInt32 {
