@@ -22,6 +22,8 @@ package object types {
   type Keycode = Card8
   type Button = Card8
 
+  type SetOfEvent = Set[EventMask]
+
   def generateMaskSet[T](mask: Int, obj: Enumerable[T]): Set[T] = {
     def generate(mask: Int, currentVal: Int, set: Set[T]): Set[T] = {
       if(currentVal >= mask) set

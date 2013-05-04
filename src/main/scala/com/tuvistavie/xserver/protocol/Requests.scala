@@ -4,6 +4,7 @@ import scala.collection.mutable
 import com.tuvistavie.util.IntTimes._
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
+import com.tuvistavie.xserver.protocol.events.Event
 
 abstract class Request(val opCode: Int8)
 
@@ -418,9 +419,18 @@ object ConvertSelection {
 case class SendEvent (
   val propagate: Boolean,
   val window: Window,
-  val eventMask: Int32
-  // val event: Event
+  val eventMask: SetOfEvent,
+  val event: Event
 )
+
+object SendEvent {
+  def apply(stream: BinaryInputStream, propagate: UInt8) = {
+    val window = stream.readWindow()
+    val eventMask = NormalEventMask.fromMask(stream.readUInt32())
+    val event = Event(stream)
+    new SendEvent(propagate.toBoolean, window, eventMask, event)
+  }
+}
 
 
 
