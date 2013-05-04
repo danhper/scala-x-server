@@ -1,7 +1,7 @@
 package com.tuvistavie.xserver.protocol.events
 
 import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.xserver.protocol.types.atoms.BaseAtom
+import com.tuvistavie.xserver.protocol.types.atoms.Atom
 
 import com.tuvistavie.xserver.io._
 
@@ -519,7 +519,7 @@ object CirculateRequest {
 case class PropertyNotify (
   val sequenceNumber: Card16,
   val window: Window,
-  val atom: BaseAtom,
+  val atom: Atom,
   val time: Timestamp,
   val state: Card8
 ) extends Event(28)
@@ -529,7 +529,7 @@ object PropertyNotify {
     stream.skip(1)
     val sequenceNumber = stream.readCard16()
     val window = stream.readWindow()
-    val atom = stream.readUInt32().toAtom
+    val atom = stream.readAtom()
     val time = stream.readTimestamp()
     val state = stream.readCard8()
     stream.skip(15)
@@ -541,7 +541,7 @@ case class SelectionClear (
   val sequenceNumber: Card16,
   val time: Timestamp,
   val owner: Window,
-  val selection: BaseAtom
+  val selection: Atom
 ) extends Event(29)
 
 object SelectionClear {
@@ -550,7 +550,7 @@ object SelectionClear {
     val sequenceNumber = stream.readCard16()
     val time = stream.readTimestamp()
     val owner = stream.readWindow()
-    val selection = stream.readUInt32().toAtom
+    val selection = stream.readAtom()
     stream.skip(16)
     new SelectionClear(sequenceNumber, time, owner, selection)
   }
@@ -561,9 +561,9 @@ case class SelectionRequest (
   val time: Timestamp,
   val owner: Window,
   val requestor: Window,
-  val selection: BaseAtom,
-  val target: BaseAtom,
-  val property: BaseAtom
+  val selection: Atom,
+  val target: Atom,
+  val property: Atom
 ) extends Event(30)
 
 object SelectionRequest {
@@ -573,9 +573,9 @@ object SelectionRequest {
     val time = stream.readTimestamp()
     val owner = stream.readWindow()
     val requestor = stream.readWindow()
-    val selection = stream.readUInt32().toAtom
-    val target = stream.readUInt32().toAtom
-    val property = stream.readUInt32().toAtom
+    val selection = stream.readAtom()
+    val target = stream.readAtom()
+    val property = stream.readAtom()
     stream.skip(4)
     new SelectionRequest(sequenceNumber, time, owner, requestor, selection, target, property)
   }
@@ -585,9 +585,9 @@ case class SelectionNotify (
   val sequenceNumber: Card16,
   val time: Timestamp,
   val requestor: Window,
-  val selection: BaseAtom,
-  val target: BaseAtom,
-  val property: BaseAtom
+  val selection: Atom,
+  val target: Atom,
+  val property: Atom
 ) extends Event(31)
 
 object SelectionNotify {
@@ -596,9 +596,9 @@ object SelectionNotify {
     val sequenceNumber = stream.readCard16()
     val time = stream.readTimestamp()
     val requestor = stream.readWindow()
-    val selection = stream.readUInt32().toAtom
-    val target = stream.readUInt32().toAtom
-    val property = stream.readUInt32().toAtom
+    val selection = stream.readAtom()
+    val target = stream.readAtom()
+    val property = stream.readAtom()
     stream.skip(8)
     new SelectionNotify(sequenceNumber, time, requestor, selection, target, property)
   }
@@ -629,7 +629,7 @@ case class ClientMessage (
   val format: Card8,
   val sequenceNumber: Card16,
   val window: Window,
-  val messageType: BaseAtom,
+  val messageType: Atom,
   val data: Array[Byte]
 ) extends Event(33)
 
@@ -638,7 +638,7 @@ object ClientMessage {
     val format = stream.readCard8()
     val sequenceNumber = stream.readCard16()
     val window = stream.readWindow()
-    val messageType = stream.readUInt32().toAtom
+    val messageType = stream.readAtom()
     var data = new Array[Byte](20)
     stream.read(data, 0, 20)
     new ClientMessage(format, sequenceNumber, window, messageType, data)

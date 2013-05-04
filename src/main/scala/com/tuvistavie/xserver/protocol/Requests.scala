@@ -5,6 +5,7 @@ import com.tuvistavie.util.IntTimes._
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
 import com.tuvistavie.xserver.protocol.events.Event
+import com.tuvistavie.xserver.protocol.types.atoms.Atom
 
 abstract class Request(val opCode: Int8)
 
@@ -83,15 +84,15 @@ case class CreateWindow(
 
 object CreateWindow {
   def apply(stream: BinaryInputStream, depth: Card8) = {
-    val windowId = stream.readUInt32()
-    val parent = stream.readUInt32()
+    val windowId = stream.readWindow()
+    val parent = stream.readWindow()
     val x = stream.readInt16()
     val y = stream.readInt16()
-    val width = stream.readUInt16()
-    val height = stream.readUInt16()
-    val borderWidth = stream.readUInt16()
+    val width = stream.readCard16()
+    val height = stream.readCard16()
+    val borderWidth = stream.readCard16()
     val windowClass = stream.readUInt16()
-    val visualId = stream.readUInt32()
+    val visualId = stream.readVisualID()
     val bitmask = stream.readUInt32()
     val values =  WindowValue(stream, bitmask)
     new CreateWindow(depth, windowId, parent, x, y, width,
@@ -106,7 +107,7 @@ case class ChangeWindowAttributes (
 
 object ChangeWindowAttributes {
   def apply(stream: BinaryInputStream) = {
-    val window = stream.readUInt32()
+    val window = stream.readWindow()
     val bitmask = stream.readUInt32()
     val values = WindowValue(stream, bitmask)
     new ChangeWindowAttributes(window, values)
@@ -119,7 +120,7 @@ case class GetWindowAttributes (
 
 object GetWindowAttributes {
   def apply(stream: BinaryInputStream) = {
-    new GetWindowAttributes(stream.readUInt32())
+    new GetWindowAttributes(stream.readWindow())
   }
 }
 
@@ -129,7 +130,7 @@ case class DestroyWindow (
 
 object DestroyWindow {
   def apply(stream: BinaryInputStream) = {
-    new DestroyWindow(stream.readUInt32())
+    new DestroyWindow(stream.readWindow())
   }
 }
 
@@ -139,7 +140,7 @@ case class DestroySubWindows (
 
 object DestroySubWindows {
   def apply(stream: BinaryInputStream) = {
-    new DestroySubWindows(stream.readUInt32())
+    new DestroySubWindows(stream.readWindow())
   }
 }
 
@@ -150,7 +151,7 @@ case class ChangeSaveSet (
 
 object ChangeSaveSet {
   def apply(stream: BinaryInputStream, mode: UInt8) = {
-    new ChangeSaveSet(mode, stream.readUInt32())
+    new ChangeSaveSet(mode, stream.readWindow())
   }
 }
 
@@ -163,8 +164,8 @@ case class ReparentWindow (
 
 object ReparentWindow {
   def apply(stream: BinaryInputStream) = {
-    val window = stream.readUInt32()
-    val parent = stream.readUInt32()
+    val window = stream.readWindow()
+    val parent = stream.readWindow()
     val x = stream.readInt16()
     val y = stream.readInt16()
     new ReparentWindow(window, parent, x, y)
@@ -177,7 +178,7 @@ case class MapWindow (
 
 object MapWindow {
   def apply(stream: BinaryInputStream) = {
-    new MapWindow(stream.readUInt32())
+    new MapWindow(stream.readWindow())
   }
 }
 
@@ -187,7 +188,7 @@ case class MapSubwindows (
 
 object MapSubwindows {
   def apply(stream: BinaryInputStream) = {
-    new MapSubwindows(stream.readUInt32())
+    new MapSubwindows(stream.readWindow())
   }
 }
 
@@ -197,7 +198,7 @@ case class UnmapWindow (
 
 object UnmapWindow {
   def apply(stream: BinaryInputStream) = {
-    new UnmapWindow(stream.readUInt32())
+    new UnmapWindow(stream.readWindow())
   }
 }
 
@@ -207,7 +208,7 @@ case class UnmapSubwindows (
 
 object UnmapSubwindows {
   def apply(stream: BinaryInputStream) = {
-    new UnmapSubwindows(stream.readUInt32())
+    new UnmapSubwindows(stream.readWindow())
   }
 }
 
@@ -241,7 +242,7 @@ case class ConfigureWindow (
 
 object ConfigureWindow {
   def apply(stream: BinaryInputStream) = {
-    val window = stream.readUInt32()
+    val window = stream.readWindow()
     val mask = stream.readUInt16()
     val values = ConfigureWindowValue(stream, mask)
     new ConfigureWindow(window, values)
@@ -255,7 +256,7 @@ case class CirculateWindow (
 
 object CirculateWindow {
   def apply(stream: BinaryInputStream, direction: UInt8) = {
-    new CirculateWindow(direction, stream.readUInt32())
+    new CirculateWindow(direction, stream.readWindow())
   }
 }
 
@@ -265,7 +266,7 @@ case class GetGeometry (
 
 object GetGeometry {
   def apply(stream: BinaryInputStream) = {
-    new GetGeometry(stream.readUInt32())
+    new GetGeometry(stream.readDrawable())
   }
 }
 
@@ -275,7 +276,7 @@ case class QueryTree (
 
 object QueryTree {
   def apply(stream: BinaryInputStream) = {
-    new QueryTree(stream.readUInt32())
+    new QueryTree(stream.readWindow())
   }
 }
 
@@ -300,7 +301,8 @@ case class GetAtomName (
 
 object GetAtomName {
   def apply(stream: BinaryInputStream) = {
-    new GetAtomName(stream.readUInt32())
+    val atom = stream.readAtom()
+    new GetAtomName(atom)
   }
 }
 
@@ -315,9 +317,9 @@ case class ChangeProperty (
 
 object ChangeProperty {
   def apply(stream: BinaryInputStream, mode: UInt8) = {
-    val window = stream.readUInt32()
-    val property = stream.readUInt32()
-    val propertyType = stream.readUInt32()
+    val window = stream.readWindow()
+    val property = stream.readAtom()
+    val propertyType = stream.readAtom()
     val format = stream.readUInt8()
     stream.skip(3)
     val n = stream.readUInt32() * (format / 8)
@@ -335,8 +337,8 @@ case class DeleteProperty (
 
 object DeleteProperty {
   def apply(stream: BinaryInputStream) = {
-    val window = stream.readUInt32()
-    val property = stream.readUInt32()
+    val window = stream.readWindow()
+    val property = stream.readAtom()
     new DeleteProperty(window, property)
   }
 }
@@ -352,9 +354,9 @@ case class GetProperty(
 
 object GetProperty {
   def apply(stream: BinaryInputStream, delete: Card8) = {
-    val window = stream.readUInt32()
-    val property = stream.readUInt32()
-    val propertyType = stream.readUInt32()
+    val window = stream.readWindow()
+    val property = stream.readAtom()
+    val propertyType = stream.readAtom()
     val longOffset = stream.readUInt32()
     val longLength = stream.readUInt32()
     new GetProperty(delete.toBoolean, window, property, propertyType, longOffset, longLength)
@@ -379,8 +381,8 @@ case class SetSelectionOwner (
 
 object SetSelectionOwner {
   def apply(stream: BinaryInputStream) = {
-    val owner = stream.readUInt32()
-    val selection = stream.readUInt32()
+    val owner = stream.readWindow()
+    val selection = stream.readAtom()
     val time = stream.readUInt32()
     new SetSelectionOwner(owner, selection, time)
   }
@@ -393,7 +395,7 @@ case class GetSelectionOwner (
 
 object GetSelectionOwner {
   def apply(stream: BinaryInputStream) = {
-    new GetSelectionOwner(stream.readUInt32())
+    new GetSelectionOwner(stream.readAtom())
   }
 }
 
@@ -408,9 +410,9 @@ case class ConvertSelection (
 object ConvertSelection {
   def apply(stream: BinaryInputStream) = {
     val window = stream.readUInt32()
-    val selection = stream.readUInt32()
-    val target = stream.readUInt32()
-    val property = stream.readUInt32()
+    val selection = stream.readAtom()
+    val target = stream.readAtom()
+    val property = stream.readAtom()
     val time = stream.readUInt32()
     new ConvertSelection(window, selection, target, property, time)
   }

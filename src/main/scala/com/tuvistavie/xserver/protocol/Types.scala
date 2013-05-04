@@ -16,7 +16,6 @@ package object types {
   type Colormap = Card32
   type Drawable = Card32
   type Fontable = Card32
-  type Atom = Card32
   type VisualID = Card32
   type Timestamp = Card32
   type Keycode = Card8

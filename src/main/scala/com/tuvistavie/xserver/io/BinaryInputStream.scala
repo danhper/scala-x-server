@@ -38,7 +38,7 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
   def readColormap() = readCard32()
   def readDrawable() = readCard32()
   def readFontable() = readCard32()
-  def readAtom() = readCard32()
+  def readAtom() = readCard32().asAtom
   def readVisualID() = readCard32()
   def readTimestamp() = readCard32()
   def readKeycode() = readCard8()
