@@ -57,6 +57,7 @@
           <args>
             <arg>-unchecked</arg>
             <arg>-deprecation</arg>
+            <arg>-Ydependent-method-types</arg>
           </args>
         </configuration>
         <executions>

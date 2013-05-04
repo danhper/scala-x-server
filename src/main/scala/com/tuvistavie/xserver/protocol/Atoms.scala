@@ -1,6 +1,6 @@
 package com.tuvistavie.xserver.protocol.atoms
 
-abstract class BaseAtom(val value: Int)
+abstract sealed class BaseAtom(val value: Int)
 
 case object Primary extends BaseAtom(1)
 case object Secondary extends BaseAtom(2)
@@ -70,3 +70,77 @@ case object FullName extends BaseAtom(65)
 case object CapHeight extends BaseAtom(66)
 case object WmClass extends BaseAtom(67)
 case object WmTransientFor extends BaseAtom(68)
+
+object BaseAtom {
+  def fromValue(value: Int) = value match {
+    case Primary.value => Primary
+    case Secondary.value => Secondary
+    case Arc.value => Arc
+    case Atom.value => Atom
+    case Bitmap.value => Bitmap
+    case Cardinal.value => Cardinal
+    case Colormap.value => Colormap
+    case Cursor.value => Cursor
+    case CutBuffer0.value => CutBuffer0
+    case CutBuffer1.value => CutBuffer1
+    case CutBuffer2.value => CutBuffer2
+    case CutBuffer3.value => CutBuffer3
+    case CutBuffer4.value => CutBuffer4
+    case CutBuffer5.value => CutBuffer5
+    case CutBuffer6.value => CutBuffer6
+    case CutBuffer7.value => CutBuffer7
+    case Drawable.value => Drawable
+    case Font.value => Font
+    case Integer.value => Integer
+    case Pixmap.value => Pixmap
+    case Point.value => Point
+    case Rectangle.value => Rectangle
+    case ResourceManager.value => ResourceManager
+    case RgbColorMap.value => RgbColorMap
+    case RgbBestMap.value => RgbBestMap
+    case RgbBlueMap.value => RgbBlueMap
+    case RgbDefaultMap.value => RgbDefaultMap
+    case RgbGrayMap.value => RgbGrayMap
+    case RgbGreenMap.value => RgbGreenMap
+    case RgbRedMap.value => RgbRedMap
+    case String.value => String
+    case Visualid.value => Visualid
+    case Window.value => Window
+    case WmCommand.value => WmCommand
+    case WmHints.value => WmHints
+    case WmClientMachine.value => WmClientMachine
+    case WmIconName.value => WmIconName
+    case WmIconSize.value => WmIconSize
+    case WmName.value => WmName
+    case WmNormalHints.value => WmNormalHints
+    case WmSizeHints.value => WmSizeHints
+    case WmZoomHints.value => WmZoomHints
+    case MinSpace.value => MinSpace
+    case NormSpace.value => NormSpace
+    case MaxSpace.value => MaxSpace
+    case EndSpace.value => EndSpace
+    case SuperscriptX.value => SuperscriptX
+    case SuperscriptY.value => SuperscriptY
+    case SubscriptX.value => SubscriptX
+    case SubscriptY.value => SubscriptY
+    case UnderlinePosition.value => UnderlinePosition
+    case UnderlineThickness.value => UnderlineThickness
+    case StrikeoutAscent.value => StrikeoutAscent
+    case StrikeoutDescent.value => StrikeoutDescent
+    case ItalicAngle.value => ItalicAngle
+    case XHeight.value => XHeight
+    case QuadWidth.value => QuadWidth
+    case Weight.value => Weight
+    case PointSize.value => PointSize
+    case Resolution.value => Resolution
+    case Copyright.value => Copyright
+    case Notice.value => Notice
+    case FontName.value => FontName
+    case FamilyName.value => FamilyName
+    case FullName.value => FullName
+    case CapHeight.value => CapHeight
+    case WmClass.value => WmClass
+    case WmTransientFor.value => WmTransientFor
+  }
+}
+

@@ -4,7 +4,6 @@ import scala.collection.mutable
 import com.tuvistavie.util.IntTimes._
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.xserver.protocol.types.aliases._
 
 abstract class Request(val opCode: Int8)
 
