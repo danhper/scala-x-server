@@ -10,6 +10,9 @@ abstract class IntValue(val value: Int) extends Value {
   type T = Int
 
   def padding = (4 - (value % 4)) % 4
+
+  def toBool = Bool(value != 0)
+
 }
 
 abstract class Int8Value(override val value: Int) extends IntValue(value) {
@@ -20,11 +23,6 @@ abstract class Int8Value(override val value: Int) extends IntValue(value) {
   }
 
   def read(data: BinaryInputStream): Unit = {
-  }
-
-  def toBoolean = value match {
-    case 0 => false
-    case _ => true
   }
 }
 

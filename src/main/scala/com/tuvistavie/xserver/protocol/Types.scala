@@ -230,6 +230,7 @@ package types {
   case object Button3 extends BaseKeyMask(0x0400)
   case object Button4 extends BaseKeyMask(0x0800)
   case object Button5 extends BaseKeyMask(0x1000)
+  case object AnyModifier extends BaseKeyMask(0x8000)
 
   object BaseKeyMask extends Enumerable[BaseKeyMask] {
     def fromValue(value: Int) = value match {
@@ -246,6 +247,7 @@ package types {
       case Button3.value => Button3
       case Button4.value => Button4
       case Button5.value => Button5
+      case AnyModifier.value => AnyModifier
     }
   }
 

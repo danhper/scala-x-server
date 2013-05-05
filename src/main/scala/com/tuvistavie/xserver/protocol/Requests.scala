@@ -264,7 +264,7 @@ object QueryTree {
 }
 
 case class InternAtom (
-  val onlyIfExists: Boolean,
+  val onlyIfExists: Bool,
   val name: String
   ) extends Request(16)
 
@@ -274,7 +274,7 @@ object InternAtom {
     val name = new Array[Byte](nameLength)
     stream.read(name, 0, nameLength)
     stream.readPad(nameLength)
-    new InternAtom(onlyIfExists.toBoolean, new String(name))
+    new InternAtom(onlyIfExists.toBool, new String(name))
   }
 }
 
@@ -327,7 +327,7 @@ object DeleteProperty {
 }
 
 case class GetProperty(
-  val delete: Boolean,
+  val delete: Bool,
   val window: Window,
   val property: Atom,
   val propertyType: Atom,
@@ -342,7 +342,7 @@ object GetProperty {
     val propertyType = stream.readAtom()
     val longOffset = stream.readUInt32()
     val longLength = stream.readUInt32()
-    new GetProperty(delete.toBoolean, window, property, propertyType, longOffset, longLength)
+    new GetProperty(delete.toBool, window, property, propertyType, longOffset, longLength)
   }
 }
 
@@ -402,7 +402,7 @@ object ConvertSelection {
 }
 
 case class SendEvent (
-  val propagate: Boolean,
+  val propagate: Bool,
   val window: Window,
   val eventMask: SetOfEvent,
   val event: Event
@@ -413,12 +413,12 @@ object SendEvent {
     val window = stream.readWindow()
     val eventMask = stream.readSetOfEvent()
     val event = Event(stream)
-    new SendEvent(propagate.toBoolean, window, eventMask, event)
+    new SendEvent(propagate.toBool, window, eventMask, event)
   }
 }
 
 case class GrabPointer (
-  val ownerEvents: Boolean,
+  val ownerEvents: Bool,
   val grabWindow: Window,
   val eventMask: SetOfEvent,
   val pointerMode: Card8,
@@ -437,7 +437,7 @@ object GrabPointer {
     var confineTo = stream.readWindow()
     val cursor = stream.readCursor()
     val time = stream.readTimestamp()
-    new GrabPointer(ownerEvents.toBoolean, grabWindow, eventMask, pointerMode,
+    new GrabPointer(ownerEvents.toBool, grabWindow, eventMask, pointerMode,
       keyboardMode, confineTo, cursor, time)
   }
 }
@@ -465,9 +465,8 @@ case class GrabButton (
   val modifiers: SetOfKeyMask
 ) extends Request(28)
 
-
 object GrabButton {
-  def apply(stream: BinaryInputStream, ownerEvents: Bool) = {
+  def apply(stream: BinaryInputStream, ownerEvents: Card8) = {
     val grabWindow = stream.readWindow()
     val eventMask = stream.readSetOfPointerEvent()
     val pointerMode = stream.readCard8()
@@ -477,6 +476,130 @@ object GrabButton {
     val button = stream.readButton()
     stream.skip(1)
     val modifiers = stream.readSetOfKeyMask()
-    new GrabButton(ownerEvents, grabWindow, eventMask, pointerMode, keyboardMode, confineTo, cursor, button, modifiers)
+    new GrabButton(ownerEvents.toBool, grabWindow, eventMask, pointerMode,
+      keyboardMode, confineTo, cursor, button, modifiers)
+  }
+}
+
+case class UngrabButton (
+  val button: Button,
+  val grabWindow: Window,
+  val modifiers: SetOfKeyMask
+) extends Request(29)
+
+object UngrabButton {
+  def apply(stream: BinaryInputStream, button: Button) = {
+    val grabWindow = stream.readWindow()
+    val modifiers = stream.readSetOfKeyMask()
+    stream.skip(2)
+    new UngrabButton(button, grabWindow, modifiers)
+  }
+}
+
+case class ChangeActivePointerGrab (
+  val cursor: Cursor,
+  val time: Timestamp,
+  val eventMask: SetOfPointerEvent
+) extends Request(30)
+
+object ChangeActivePointerGrab {
+  def apply(stream: BinaryInputStream) = {
+    val cursor = stream.readCursor()
+    val time = stream.readTimestamp()
+    val eventMask = stream.readSetOfPointerEvent()
+  }
+}
+
+case class GrabKeyboard (
+  val ownerEvents: Bool,
+  val grabWindow: Window,
+  val time: Timestamp,
+  val pointerMode: Card8,
+  val keyboardMode: Card8
+) extends Request(31)
+
+object GrabKeyboard {
+  def apply(stream: BinaryInputStream, ownerEvents: Card8) = {
+    val grabWindow = stream.readWindow()
+    val time = stream.readTimestamp()
+    val pointerMode = stream.readCard8()
+    val keyboardMode = stream.readCard8()
+    stream.skip(2)
+    new GrabKeyboard(ownerEvents.toBool, grabWindow, time, pointerMode, keyboardMode)
+  }
+}
+
+case class UngrabKeyboard (
+  val time: Timestamp
+) extends Request(32)
+
+object UngrabKeyboard {
+  def apply(stream: BinaryInputStream) = {
+    val time = stream.readTimestamp()
+    new UngrabKeyboard(time)
+  }
+}
+
+case class GrabKey (
+  val ownerEvents: Bool,
+  val grabWindow: Window,
+  val modifiers: SetOfKeyMask,
+  val key: Keycode,
+  val pointerMode: Card8,
+  val keyboardMode: Card8
+) extends Request(33)
+
+object GrabKey {
+  def apply(stream: BinaryInputStream, ownerEvents: Card8) = {
+    val grabWindow = stream.readWindow()
+    val modifiers = stream.readSetOfKeyMask()
+    val key = stream.readKeycode()
+    val pointerMode = stream.readCard8()
+    val keyboardMode = stream.readCard8()
+    stream.skip(2)
+    new GrabKey(ownerEvents.toBool, grabWindow,
+      modifiers, key, pointerMode, keyboardMode)
+  }
+}
+
+case class UngrabKey (
+  val key: Keycode,
+  val grabWindow: Window,
+  val modifiers: SetOfKeyMask
+) extends Request(34)
+
+object UngrabKey {
+  def apply(stream: BinaryInputStream, key: Keycode) = {
+    val window = stream.readWindow()
+    val modifiers = stream.readSetOfKeyMask()
+    stream.skip(2)
+    new UngrabKey(key, window, modifiers)
+  }
+}
+
+case class AllowEvents(
+  val mode: Card8,
+  val time: Timestamp
+) extends Request(35)
+
+object AllowEvents {
+  def apply(stream: BinaryInputStream, mode: Card8) = {
+    val time = stream.readTimestamp()
+    new AllowEvents(mode, time)
+  }
+}
+
+case object GrabServer extends Request(36)
+
+case object UngrabServer extends Request(37)
+
+case class QueryPointer(
+  val window: Window
+) extends Request(38)
+
+case object QueryPointer {
+  def apply(stream: BinaryInputStream) = {
+    val window = stream.readWindow()
+    new QueryPointer(window)
   }
 }
