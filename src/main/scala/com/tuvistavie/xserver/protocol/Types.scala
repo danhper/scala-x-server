@@ -250,38 +250,11 @@ package types {
     }
   }
 
+  class Size(val width: Card16, val height: Card16)
   class Point(val x: Int16, val y: Int16)
-  object Point {
-    def apply(stream: BinaryInputStream) = {
-      val x = stream.readInt16()
-      val y = stream.readInt16()
-      new Point(x, y)
-    }
-  }
-
-  class Rectangle(val x: Int16, val y: Int16, val width: Card16, val height: Card16)
-  object Rectangle {
-    def apply(stream: BinaryInputStream) = {
-      val x = stream.readInt16()
-      val y = stream.readInt16()
-      val width = stream.readUInt16()
-      val height = stream.readUInt16()
-      new Rectangle(x, y, width, height)
-    }
-  }
-
-  class Arc(val x: Int16, val y: Int16, val width: Card16, val height: Card16, angle1: Int16, angle2: Int16)
-  object Arc {
-    def apply(stream: BinaryInputStream) = {
-      val x = stream.readInt16()
-      val y = stream.readInt16()
-      val width = stream.readUInt16()
-      val height = stream.readUInt16()
-      val angle1 = stream.readInt16()
-      val angle2 = stream.readInt16()
-      new Arc(x, y, width, height, angle1, angle2)
-    }
-  }
+  class Rectangle(val origin: Point, val size: Size)
+  class Segment(val origin: Point, val end: Point)
+  class Arc(val origin: Point, val size: Size, angle1: Int16, angle2: Int16)
 
   case class Host(val family: UInt8, val address: String)
   object Host {

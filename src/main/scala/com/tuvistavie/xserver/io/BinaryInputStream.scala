@@ -29,7 +29,9 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
 
   def readListOfStr(n: Int) = readList[Str](n)(readStr)
   def readListOfCard8(n: Int) = readList[Card8](n)(readCard8)
-  def readListOfRectangle(n: Int) = readList[Rectangle](n)(readRectangle)
+  def readListOfPoints(n: Int) = readList[Point](n)(readPoint)
+  def readListOfRectangles(n: Int) = readList[Rectangle](n)(readRectangle)
+  def readListOfSegments(n: Int) = readList[Segment](n)(readSegment)
 
 
   def readString8(n: Int) = {
@@ -46,12 +48,28 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
     Str(loopRead(n, ""))
   }
 
-  def readRectangle() = {
+  def readPoint() = {
     val x = readInt16()
     val y = readInt16()
-    val width = readUInt16()
-    val height = readUInt16()
-    new Rectangle(x, y, width, height)
+    new Point(x, y)
+  }
+
+  def readSegment() = {
+    val origin = readPoint()
+    val end = readPoint()
+    new Segment(origin, end)
+  }
+
+  def readSize() = {
+    val width = readCard16()
+    val height = readCard16()
+    new Size(width, height)
+  }
+
+  def readRectangle() = {
+    val origin = readPoint()
+    val size = readSize()
+    new Rectangle(origin, size)
   }
 
   def readSkip[T <: KnownSize](n: Int)(implicit valSize: Int, readVal: () => T): T

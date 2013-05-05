@@ -904,5 +904,174 @@ case class SetClipRectangles (
   val gc: GContext,
   val clipXOrigin: Int16,
   val clipYOrigin: Int16,
-  val listOfRectangle: List[Rectangle]
+  val rectangles: List[Rectangle]
 ) extends Request(59)
+
+object SetClipRectangles {
+  def apply(stream: BinaryInputStream, ordering: Card8, requestLength: Card16) = {
+    val gc = stream.readGContext()
+    val clipXOrigin = stream.readInt16()
+    val clipYOrigin = stream.readInt16()
+    val n = (requestLength - 3) / 2
+    val rectangles = stream.readListOfRectangles(n)
+    new SetClipRectangles(ordering, gc, clipXOrigin, clipYOrigin, rectangles)
+  }
+}
+
+case class FreeGC (
+  val gc: GContext
+) extends Request(60)
+
+object FreeGC {
+  def apply(stream: BinaryInputStream) = {
+    val gc = stream.readGContext()
+    new FreeGC(gc)
+  }
+}
+
+case class ClearArea (
+  val exposures: Bool,
+  val window: Window,
+  val x: Int16,
+  val y: Int16,
+  val width: Card16,
+  val height: Card16
+) extends Request(61)
+
+
+object ClearArea {
+  def apply(stream: BinaryInputStream, exposures: Card8) = {
+    val window = stream.readWindow()
+    val x = stream.readInt16()
+    val y = stream.readInt16()
+    val width = stream.readCard16()
+    val height = stream.readCard16()
+    new ClearArea(exposures.toBool, window, x, y, width, height)
+  }
+}
+
+case class CopyArea (
+  val srcDrawable: Drawable,
+  val dstDrawable: Drawable,
+  val gc: GContext,
+  val srcX: Int16,
+  val srcY: Int16,
+  val dstX: Int16,
+  val dstY: Int16,
+  val width: Card16,
+  val height: Card16
+) extends Request(62)
+
+object CopyArea {
+  def apply(stream: BinaryInputStream) = {
+    val srcDrawable = stream.readDrawable()
+    val dstDrawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val srcX = stream.readInt16()
+    val srcY = stream.readInt16()
+    val dstX = stream.readInt16()
+    val dstY = stream.readInt16()
+    val width = stream.readCard16()
+    val height = stream.readCard16()
+    new CopyArea(srcDrawable, dstDrawable, gc,
+      srcX, srcY, dstX, dstY, width, height)
+  }
+}
+
+case class CopyPlane (
+  val srcDrawable: Drawable,
+  val dstDrawable: Drawable,
+  val gc: GContext,
+  val srcX: Int16,
+  val srcY: Int16,
+  val dstX: Int16,
+  val dstY: Int16,
+  val width: Card16,
+  val height: Card16,
+  val bitPlane: Card32
+) extends Request(63)
+
+object CopyPlane {
+  def apply(stream: BinaryInputStream) = {
+    val srcDrawable = stream.readDrawable()
+    val dstDrawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val srcX = stream.readInt16()
+    val srcY = stream.readInt16()
+    val dstX = stream.readInt16()
+    val dstY = stream.readInt16()
+    val width = stream.readCard16()
+    val height = stream.readCard16()
+    val bitPlane = stream.readCard32()
+    new CopyPlane(srcDrawable, dstDrawable, gc,
+      srcX, srcY, dstX, dstY, width, height, bitPlane)
+  }
+}
+
+case class PolyPoint (
+  val coordinateMode: Card8,
+  val drawable: Drawable,
+  val gc: GContext,
+  val points: List[Point]
+) extends Request(64)
+
+object PolyPoint {
+  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val n = requestLength - 3
+    val points = stream.readListOfPoints(n)
+    new PolyPoint(coordinateMode, drawable, gc, points)
+  }
+}
+
+case class PolyLine (
+  val coordinateMode: Card8,
+  val drawable: Drawable,
+  val gc: GContext,
+  val points: List[Point]
+) extends Request(65)
+
+object PolyLine {
+  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val n = requestLength - 3
+    val points = stream.readListOfPoints(n)
+    new PolyLine(coordinateMode, drawable, gc, points)
+  }
+}
+
+case class PolySegment (
+  val coordinateMode: Card8,
+  val drawable: Drawable,
+  val gc: GContext,
+  val segments: List[Segment]
+) extends Request(66)
+
+object PolySegment {
+  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val n = requestLength - 3
+    val points = stream.readListOfSegments(n)
+    new PolySegment(coordinateMode, drawable, gc, points)
+  }
+}
+
+case class PolyRectangle (
+  val coordinateMode: Card8,
+  val drawable: Drawable,
+  val gc: GContext,
+  val rectangles: List[Rectangle]
+) extends Request(66)
+
+object PolyRectangle {
+  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val n = requestLength - 3
+    val points = stream.readListOfRectangles(n)
+    new PolyRectangle(coordinateMode, drawable, gc, points)
+  }
+}
