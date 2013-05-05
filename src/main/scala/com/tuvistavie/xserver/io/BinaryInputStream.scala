@@ -7,30 +7,61 @@ import com.tuvistavie.xserver.protocol.types._
 
 import com.tuvistavie.util._
 
-abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataInputStream(inputStream) {
+
+abstract class BinaryInputStream(val inputStream: InputStream) extends DataInputStream(inputStream) {
 
   def skip(n: IntTimes) = {
     n times { readInt8() }
   }
 
-  def readStr(n: Int) = {
+  implicit def readStr(): Str = {
+    val n = this.readByte()
+    readString8(n)
+  }
+
+  def readListOfStr(n: Int) = {
+    def loopRead(n: Int, list: List[Str]): List[Str] = n match {
+      case 0 => list reverse
+      case _ => loopRead(n - 1, readStr() :: list)
+    }
+    loopRead(n, List())
+  }
+
+  def readListOfCard8(n: Int) = {
+    def loopRead(n: Int, list: List[Card8]): List[Card8] = n match {
+      case 0 => list reverse
+      case _ => loopRead(n - 1, readCard8() :: list)
+    }
+    loopRead(n, List())
+  }
+
+  def readList[T](n: Int)(implicit readVal: () => T) = {
+    def loopRead(n: Int, list: List[T]): List[T] = n match {
+      case 0 => list reverse
+      case _ => loopRead(n - 1, readVal() :: list)
+    }
+    loopRead(n, List())
+  }
+
+
+  def readString8(n: Int) = {
     var bytes = new Array[Byte](n)
     read(bytes, 0, n)
     Str(bytes)
   }
 
   def readString16(n: Int) = {
-    def read(n: Int, str: String): String = {
-      if(n == 0) str
-      else read(n - 1, str + inputStream.readUnsignedShort())
+    def loopRead(n: Int, str: String): String = n match {
+      case 0 => str
+      case _ => loopRead(n - 1, str + this.readUnsignedShort())
     }
-    Str(read(n, ""))
+    Str(loopRead(n, ""))
   }
 
   def readPad(n: IntValue) = skip(n.padding)
 
-  def readInt8() = Int8(inputStream.readByte())
-  def readUInt8() = UInt8(inputStream.readByte())
+  def readInt8() = Int8(this.readByte())
+  def readUInt8() = UInt8(this.readByte())
   def readInt8(n: Int): Int8
   def readUInt8(n: Int): UInt8
 
@@ -42,7 +73,7 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
   def readUInt32(): UInt32
   def readInt32(): Int32
 
-  def readBool() = Bool(inputStream.readBoolean())
+  def readBool() = Bool(this.readBoolean())
   def readBool(n: Int): Bool
 
   def readBitGravity() = readCard8().asBitGravity
@@ -78,7 +109,7 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
   def readButton() = readCard8()
 }
 
-class BinaryInputStreamLSB(override val inputStream: DataInputStream) extends BinaryInputStream(inputStream) {
+class BinaryInputStreamLSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream) {
   override def readInt8(n: Int): Int8 = {
     val value = readInt8()
     skip(n - 1)
@@ -111,14 +142,14 @@ class BinaryInputStreamLSB(override val inputStream: DataInputStream) extends Bi
   }
 
 
-  override def readInt16() = Int16(inputStream.readShort()).swapBytes
-  override def readUInt16() = UInt16(inputStream.readShort()).swapBytes
+  override def readInt16() = Int16(this.readShort()).swapBytes
+  override def readUInt16() = UInt16(this.readShort()).swapBytes
 
-  override def readInt32() = Int32(inputStream.readInt()).swapBytes
-  override def readUInt32() = UInt32(inputStream.readInt()).swapBytes
+  override def readInt32() = Int32(this.readInt()).swapBytes
+  override def readUInt32() = UInt32(this.readInt()).swapBytes
 }
 
-class BinaryInputStreamMSB(override val inputStream: DataInputStream) extends BinaryInputStream(inputStream) {
+class BinaryInputStreamMSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream) {
   override def readInt8(n: Int): Int8 = {
     skip(n - 1)
     readInt8()
@@ -144,10 +175,10 @@ class BinaryInputStreamMSB(override val inputStream: DataInputStream) extends Bi
     readBool()
   }
 
-  override def readInt16() = Int16(inputStream.readShort())
-  override def readUInt16() = UInt16(inputStream.readShort())
+  override def readInt16() = Int16(this.readShort())
+  override def readUInt16() = UInt16(this.readShort())
 
-  override def readInt32() = Int32(inputStream.readInt())
-  override def readUInt32() = UInt32(inputStream.readInt())
+  override def readInt32() = Int32(this.readInt())
+  override def readUInt32() = UInt32(this.readInt())
 }
 

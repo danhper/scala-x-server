@@ -263,7 +263,7 @@ object InternAtom {
   def apply(stream: BinaryInputStream, onlyIfExists: Card8) = {
     val n = stream.readUInt16()
     stream.skip(2)
-    val name = stream.readStr(n)
+    val name = stream.readString8(n)
     stream.readPad(n)
     new InternAtom(onlyIfExists.toBool, name)
   }
@@ -681,7 +681,7 @@ object OpenFont {
     val font = stream.readFont()
     val n = stream.readCard16()
     stream.skip(2)
-    val name = stream.readStr(n)
+    val name = stream.readString8(n)
     stream.readPad(n)
     new OpenFont(font, name)
   }
@@ -709,7 +709,7 @@ object QueryFont {
   }
 }
 
-case class QueryTextExtents(
+case class QueryTextExtents (
   val font: Fontable,
   val string: Str
 ) extends Request(48)
@@ -725,4 +725,176 @@ object QueryTextExtents {
   }
 }
 
+case class ListFonts (
+  val maxNames: Card16,
+  val pattern: Str
+) extends Request(49)
 
+object ListFonts {
+  def apply(stream: BinaryInputStream) = {
+    val maxNames = stream.readCard16()
+    val n = stream.readCard16()
+    val pattern = stream.readString8(n)
+    stream.readPad(n)
+    new ListFonts(maxNames, pattern)
+  }
+}
+
+case class ListFontsWithInfo (
+  val maxNames: Card16,
+  val pattern: Str
+) extends Request(50)
+
+object ListFontsWithInfo {
+  def apply(stream: BinaryInputStream) = {
+    val maxNames = stream.readCard16()
+    val n = stream.readCard16()
+    val pattern = stream.readString8(n)
+    stream.readPad(n)
+    new ListFontsWithInfo(maxNames, pattern)
+  }
+}
+
+case class SetFontPath (
+  val strings: List[Str]
+) extends Request(51)
+
+object SetFontPath {
+  def apply(stream: BinaryInputStream) = {
+    val n = stream.readCard16()
+    stream.skip(2)
+    val strings = stream.readListOfStr(n)
+    new SetFontPath(strings)
+  }
+}
+
+case class GetFontPath (
+  val requestList: Card16
+) extends Request(52)
+
+object GetFontPath {
+  def apply(stream: BinaryInputStream) = {
+    val requestList = stream.readCard16()
+    new GetFontPath(requestList)
+  }
+}
+
+case class CreatePixmap (
+  val depth: Card8,
+  val pid: Pixmap,
+  val drawable: Drawable,
+  val width: Card16,
+  val height: Card16
+) extends Request(53)
+
+object CreatePixmap {
+  def apply(stream: BinaryInputStream, depth: Card8) = {
+    val pid = stream.readPixmap()
+    val drawable = stream.readDrawable()
+    val width = stream.readCard16()
+    val height = stream.readCard16()
+    new CreatePixmap(depth, pid, drawable, width, height)
+  }
+}
+
+case class FreePixmap (
+  val pixmap: Pixmap
+) extends Request(54)
+
+object FreePixmap {
+  def apply(stream: BinaryInputStream) = {
+    val pixmap = stream.readPixmap()
+    new FreePixmap(pixmap)
+  }
+}
+
+object GCValue {
+  def apply(stream: BinaryInputStream, mask: Int): Map[String, Value] = {
+    val values = mutable.Map[String, Value]()
+    if((mask & 0x00000001) != 0) values += ("function" -> stream.readCard8(4))
+    if((mask & 0x00000002) != 0) values += ("planeMask" -> stream.readCard32())
+    if((mask & 0x00000004) != 0) values += ("foreground" -> stream.readCard32())
+    if((mask & 0x00000008) != 0) values += ("background" -> stream.readCard32())
+    if((mask & 0x00000010) != 0) values += ("lineWidth" -> stream.readCard16(4))
+    if((mask & 0x00000020) != 0) values += ("lineStyle" -> stream.readCard8(4))
+    if((mask & 0x00000040) != 0) values += ("capStyle" -> stream.readCard8(4))
+    if((mask & 0x00000080) != 0) values += ("joinStyle" -> stream.readCard8(4))
+    if((mask & 0x00000100) != 0) values += ("fillStyle" -> stream.readCard8(4))
+    if((mask & 0x00000200) != 0) values += ("fillRule" -> stream.readCard8(4))
+    if((mask & 0x00000400) != 0) values += ("tile" -> stream.readPixmap())
+    if((mask & 0x00000800) != 0) values += ("stipple" -> stream.readPixmap())
+    if((mask & 0x00001000) != 0) values += ("tileStippleXOrigin" -> stream.readInt16(2))
+    if((mask & 0x00002000) != 0) values += ("tileStippleYOrigin" -> stream.readInt16(2))
+    if((mask & 0x00004000) != 0) values += ("font" -> stream.readFont())
+    if((mask & 0x00008000) != 0) values += ("subwindowMode" -> stream.readCard8(4))
+    if((mask & 0x00010000) != 0) values += ("graphicsExposures" -> stream.readBool(4))
+    if((mask & 0x00020000) != 0) values += ("clipXOrigin" -> stream.readInt16(4))
+    if((mask & 0x00040000) != 0) values += ("clipYOrigin" -> stream.readInt16(4))
+    if((mask & 0x00080000) != 0) values += ("clipMask" -> stream.readPixmap())
+    if((mask & 0x00100000) != 0) values += ("dashOffset" -> stream.readCard16(4))
+    if((mask & 0x00200000) != 0) values += ("dashes" -> stream.readCard8(4))
+    if((mask & 0x00400000) != 0) values += ("arcMode" -> stream.readCard8(4))
+    Map(values.toStream: _*)
+  }
+}
+
+case class CreateGC (
+  val cid: GContext,
+  val drawable: Drawable,
+  val values: Map[String, Value]
+) extends Request(55)
+
+object CreateGC {
+  def apply(stream: BinaryInputStream) = {
+    val cid = stream.readGContext()
+    val drawable = stream.readDrawable()
+    val bitmask = stream.readBitmask()
+    val values = GCValue(stream, bitmask)
+    new CreateGC(cid, drawable, values)
+  }
+}
+
+case class ChangeGC (
+  val gc: GContext,
+  val values: Map[String, Value]
+) extends Request(56)
+
+object ChangeGC {
+  def apply(stream: BinaryInputStream) = {
+    val gc = stream.readGContext()
+    val bitmask = stream.readBitmask()
+    val values = GCValue(stream, bitmask)
+    new ChangeGC(gc, values)
+  }
+}
+
+case class CopyGC (
+  val srcGc: GContext,
+  val dstGc: GContext,
+  val bitmask: Bitmask
+) extends Request(57)
+
+object CopyGC {
+  def apply(stream: BinaryInputStream) = {
+    val srcGc = stream.readGContext()
+    val dstGc = stream.readGContext()
+    val bitmask = stream.readBitmask()
+    new CopyGC(srcGc, dstGc, bitmask)
+  }
+}
+
+case class SetDashes(
+  val gc: GContext,
+  val dashOffset: Card16,
+  val dashes: List[Card8]
+) extends Request(58)
+
+object SetDashes {
+  def apply(stream: BinaryInputStream) = {
+    val gc = stream.readGContext()
+    val dashOffset = stream.readCard16()
+    val n = stream.readCard16()
+    val dashes = stream.readListOfCard8(n)
+    new SetDashes(gc, dashOffset, dashes)
+  }
+}

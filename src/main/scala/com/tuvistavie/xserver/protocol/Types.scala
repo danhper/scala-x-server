@@ -304,14 +304,6 @@ package types {
     override def byteSize = value.length + 1
   }
   object Str {
-    def apply(stream: BinaryInputStream): Str = {
-      val n = stream.readUInt8()
-      var str = new Array[Byte](n)
-      stream.read(str, 0, n)
-      stream.readPad(n)
-      Str(str)
-    }
-
     def apply(bytes: Array[Byte]): Str = {
       Str(new String(bytes))
     }
