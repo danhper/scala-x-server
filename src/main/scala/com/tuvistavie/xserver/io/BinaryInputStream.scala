@@ -13,6 +13,20 @@ abstract class BinaryInputStream(val inputStream: DataInputStream) extends DataI
     n times { readInt8() }
   }
 
+  def readStr(n: Int) = {
+    var bytes = new Array[Byte](n)
+    read(bytes, 0, n)
+    Str(bytes)
+  }
+
+  def readString16(n: Int) = {
+    def read(n: Int, str: String): String = {
+      if(n == 0) str
+      else read(n - 1, str + inputStream.readUnsignedShort())
+    }
+    Str(read(n, ""))
+  }
+
   def readPad(n: IntValue) = skip(n.padding)
 
   def readInt8() = Int8(inputStream.readByte())

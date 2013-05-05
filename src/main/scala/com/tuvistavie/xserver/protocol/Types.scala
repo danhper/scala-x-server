@@ -49,6 +49,8 @@ package types {
   object Bool {
     def boolToInt(b: Bool) = if(b.value) 1 else 0
     def intToBool(i: Int) = Bool(i != 0)
+    def boolToBoolean(b: Bool) = b.value
+    def booleanToBool(b: Boolean) = Bool(b)
   }
 
   abstract sealed class Gravity(override val value: Int) extends IntValue(value) {
@@ -302,12 +304,16 @@ package types {
     override def byteSize = value.length + 1
   }
   object Str {
-    def apply(stream: BinaryInputStream) = {
+    def apply(stream: BinaryInputStream): Str = {
       val n = stream.readUInt8()
       var str = new Array[Byte](n)
       stream.read(str, 0, n)
       stream.readPad(n)
-      new Str(new String(str))
+      Str(str)
+    }
+
+    def apply(bytes: Array[Byte]): Str = {
+      Str(new String(bytes))
     }
   }
 }

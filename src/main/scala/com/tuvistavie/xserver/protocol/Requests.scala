@@ -256,16 +256,16 @@ object QueryTree {
 
 case class InternAtom (
   val onlyIfExists: Bool,
-  val name: String
+  val name: Str
   ) extends Request(16)
 
 object InternAtom {
   def apply(stream: BinaryInputStream, onlyIfExists: Card8) = {
-    val nameLength = stream.readUInt16()
-    val name = new Array[Byte](nameLength)
-    stream.read(name, 0, nameLength)
-    stream.readPad(nameLength)
-    new InternAtom(onlyIfExists.toBool, new String(name))
+    val n = stream.readUInt16()
+    stream.skip(2)
+    val name = stream.readStr(n)
+    stream.readPad(n)
+    new InternAtom(onlyIfExists.toBool, name)
   }
 }
 
@@ -666,3 +666,63 @@ object SetInputFocus {
     new SetInputFocus(revertTo, focus, time)
   }
 }
+
+case object GetInputFocus extends Request(43)
+
+case object QueryKeymap extends Request(44)
+
+case class OpenFont (
+  val font: Font,
+  val name: Str
+) extends Request(45)
+
+object OpenFont {
+  def apply(stream: BinaryInputStream) = {
+    val font = stream.readFont()
+    val n = stream.readCard16()
+    stream.skip(2)
+    val name = stream.readStr(n)
+    stream.readPad(n)
+    new OpenFont(font, name)
+  }
+}
+
+case class CloseFont (
+  val font: Font
+) extends Request(46)
+
+object CloseFont {
+  def apply(stream: BinaryInputStream) = {
+    val font = stream.readFont()
+    new CloseFont(font)
+  }
+}
+
+case class QueryFont (
+  val font: Fontable
+) extends Request(47)
+
+object QueryFont {
+  def apply(stream: BinaryInputStream) = {
+    val font = stream.readFontable()
+    new QueryFont(font)
+  }
+}
+
+case class QueryTextExtents(
+  val font: Fontable,
+  val string: Str
+) extends Request(48)
+
+object QueryTextExtents {
+  def apply(stream: BinaryInputStream, oddLength: Bool, requestLength: Card16) = {
+    val font = stream.readFontable()
+    val stringAndPaddingLength = (requestLength - 2) * 4
+    val n = if(oddLength.value) stringAndPaddingLength - 2
+            else stringAndPaddingLength
+    stream.readString16(n / 2)
+    if(oddLength.value) stream.skip(2)
+  }
+}
+
+
