@@ -195,32 +195,23 @@ object UnmapSubwindows {
   }
 }
 
-abstract class ConfigureWindowValue(val value: IntValue)
-case class X(override val value: Int16) extends ConfigureWindowValue(value)
-case class Y(override val value: Int16) extends ConfigureWindowValue(value)
-case class Width(override val value: Card16) extends ConfigureWindowValue(value)
-case class Height(override val value: Card16) extends ConfigureWindowValue(value)
-case class BorderWidth(override val value: Card16) extends ConfigureWindowValue(value)
-case class Sibling(override val value: Window) extends ConfigureWindowValue(value)
-case class StackMode(override val value: UInt8) extends ConfigureWindowValue(value)
-
 object ConfigureWindowValue {
-  def apply(stream: BinaryInputStream, mask: Int): List[ConfigureWindowValue] = {
-    val values = mutable.MutableList[ConfigureWindowValue]()
-    if((mask & 0x0001) != 0) values += X(stream.readInt32().value)
-    if((mask & 0x0002) != 0) values += Y(stream.readInt32().value)
-    if((mask & 0x0004) != 0) values += Width(stream.readInt32().toUInt16)
-    if((mask & 0x0008) != 0) values += Height(stream.readInt32().toUInt16)
-    if((mask & 0x0010) != 0) values += BorderWidth(stream.readInt32().toUInt16)
-    if((mask & 0x0020) != 0) values += Sibling(stream.readUInt32())
-    if((mask & 0x0040) != 0) values += StackMode(stream.readInt32().toUInt8)
-    values.toList
+  def apply(stream: BinaryInputStream, mask: Int): Map[String, Value] = {
+    val values = mutable.Map[String, Value]()
+    if((mask & 0x0001) != 0) values += ("x" -> stream.readInt16(4))
+    if((mask & 0x0002) != 0) values += ("y" -> stream.readInt16(4))
+    if((mask & 0x0004) != 0) values += ("width" -> stream.readCard16(4))
+    if((mask & 0x0008) != 0) values += ("height" -> stream.readCard16(4))
+    if((mask & 0x0010) != 0) values += ("borderWidth" -> stream.readCard16(4))
+    if((mask & 0x0020) != 0) values += ("sibling" -> stream.readWindow())
+    if((mask & 0x0040) != 0) values += ("stackMode" -> stream.readCard8(4))
+    Map(values.toStream: _*)
   }
 }
 
 case class ConfigureWindow (
   val window: Window,
-  val values: List[ConfigureWindowValue]
+  val values: Map[String, Value]
   ) extends Request(12)
 
 object ConfigureWindow {
@@ -577,7 +568,7 @@ object UngrabKey {
   }
 }
 
-case class AllowEvents(
+case class AllowEvents (
   val mode: Card8,
   val time: Timestamp
 ) extends Request(35)
@@ -593,7 +584,7 @@ case object GrabServer extends Request(36)
 
 case object UngrabServer extends Request(37)
 
-case class QueryPointer(
+case class QueryPointer (
   val window: Window
 ) extends Request(38)
 
@@ -601,5 +592,77 @@ case object QueryPointer {
   def apply(stream: BinaryInputStream) = {
     val window = stream.readWindow()
     new QueryPointer(window)
+  }
+}
+
+case class GetMotionEvents (
+  val window: Window,
+  val start: Timestamp,
+  val stop: Timestamp
+) extends Request(39)
+
+object GetMotionEvents {
+  def apply(stream: BinaryInputStream) = {
+    val window = stream.readWindow()
+    val start = stream.readTimestamp()
+    val stop = stream.readTimestamp()
+    new GetMotionEvents(window, start, stop)
+  }
+}
+
+case class TranslateCoordinates (
+  val srcWindow: Window,
+  val dstWindow: Window,
+  val srcX: Int16,
+  val srcY: Int16
+) extends Request(40)
+
+object TranslateCoordinates {
+  def apply(stream: BinaryInputStream) = {
+    val srcWindow = stream.readWindow()
+    val dstWindow = stream.readWindow()
+    val srcX = stream.readInt16()
+    val srcY = stream.readInt16()
+    new TranslateCoordinates(srcWindow, dstWindow, srcX, srcY)
+  }
+}
+
+case class WarpPointer (
+  val srcWindow: Window,
+  val dstWindow: Window,
+  val srcX: Int16,
+  val srcY: Int16,
+  val srcWidth: Card16,
+  val srcHeight: Card16,
+  val dstX: Int16,
+  val dstY: Int16
+) extends Request(41)
+
+object WarpPointer {
+  def apply(stream: BinaryInputStream) = {
+    val srcWindow = stream.readWindow()
+    val dstWindow = stream.readWindow()
+    val srcX = stream.readInt16()
+    val srcY = stream.readInt16()
+    val srcWidth = stream.readCard16()
+    val srcHeight = stream.readCard16()
+    val dstX = stream.readInt16()
+    val dstY = stream.readInt16()
+    new WarpPointer(srcWindow, dstWindow, srcX, srcY,
+      srcWidth, srcHeight, dstX, dstY)
+  }
+}
+
+case class SetInputFocus (
+  val revertTo: Card8,
+  val focus: Window,
+  val time: Timestamp
+) extends Request(42)
+
+object SetInputFocus {
+  def apply(stream: BinaryInputStream, revertTo: Card8) = {
+    val focus = stream.readWindow()
+    val time = stream.readTimestamp()
+    new SetInputFocus(revertTo, focus, time)
   }
 }
