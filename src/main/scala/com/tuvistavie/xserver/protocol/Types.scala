@@ -41,21 +41,18 @@ package object types {
 
 package types {
 
-  case class Bool(override val value: Boolean) extends Value {
+  case class Bool(override val value: Boolean) extends Value with SingleByte {
     type T = Boolean
-    override def byteSize = 1
   }
 
-  object Bool {
+  object Bool extends SingleByte {
     def boolToInt(b: Bool) = if(b.value) 1 else 0
     def intToBool(i: Int) = Bool(i != 0)
     def boolToBoolean(b: Bool) = b.value
     def booleanToBool(b: Boolean) = Bool(b)
   }
 
-  abstract sealed class Gravity(override val value: Int) extends IntValue(value) {
-    override def byteSize = 1
-  }
+  abstract sealed class Gravity(override val value: Int) extends IntValue(value) with SingleByte
   abstract sealed class BitGravity(override val value: Int) extends Gravity(value)
   abstract sealed class WindowGravity(override val value: Int) extends Gravity(value)
 

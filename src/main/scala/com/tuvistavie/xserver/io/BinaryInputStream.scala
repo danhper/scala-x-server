@@ -14,25 +14,9 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
     n times { readInt8() }
   }
 
-  implicit def readStr(): Str = {
+  def readStr(): Str = {
     val n = this.readByte()
     readString8(n)
-  }
-
-  def readListOfStr(n: Int) = {
-    def loopRead(n: Int, list: List[Str]): List[Str] = n match {
-      case 0 => list reverse
-      case _ => loopRead(n - 1, readStr() :: list)
-    }
-    loopRead(n, List())
-  }
-
-  def readListOfCard8(n: Int) = {
-    def loopRead(n: Int, list: List[Card8]): List[Card8] = n match {
-      case 0 => list reverse
-      case _ => loopRead(n - 1, readCard8() :: list)
-    }
-    loopRead(n, List())
   }
 
   def readList[T](n: Int)(implicit readVal: () => T) = {
@@ -42,6 +26,10 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
     }
     loopRead(n, List())
   }
+
+  def readListOfStr(n: Int) = readList[Str](n)(readStr)
+  def readListOfCard8(n: Int) = readList[Card8](n)(readCard8)
+  def readListOfRectangle(n: Int) = readList[Rectangle](n)(readRectangle)
 
 
   def readString8(n: Int) = {
@@ -58,23 +46,35 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
     Str(loopRead(n, ""))
   }
 
+  def readRectangle() = {
+    val x = readInt16()
+    val y = readInt16()
+    val width = readUInt16()
+    val height = readUInt16()
+    new Rectangle(x, y, width, height)
+  }
+
+  def readSkip[T <: KnownSize](n: Int)(implicit valSize: Int, readVal: () => T): T
+
   def readPad(n: IntValue) = skip(n.padding)
 
-  def readInt8() = Int8(this.readByte())
-  def readUInt8() = UInt8(this.readByte())
-  def readInt8(n: Int): Int8
-  def readUInt8(n: Int): UInt8
+  def readInt8() = Int8(readByte())
+  def readInt8(n: Int): Int8 = readSkip[Int8](n)(1, readInt8)
+  def readUInt8() = UInt8(readByte())
+  def readUInt8(n: Int): UInt8 = readSkip[UInt8](n)(1, readUInt8)
+
+  def readBool() = Bool(readBoolean())
+  def readBool(n: Int): Bool = readSkip[Bool](n)(1, readBool)
+
 
   def readInt16(): Int16
+  def readInt16(n: Int): Int16 = readSkip[Int16](n)(2, readInt16)
   def readUInt16(): UInt16
-  def readInt16(n: Int): Int16
-  def readUInt16(n: Int): UInt16
+  def readUInt16(n: Int): UInt16 = readSkip[UInt16](n)(2, readUInt16)
 
   def readUInt32(): UInt32
   def readInt32(): Int32
 
-  def readBool() = Bool(this.readBoolean())
-  def readBool(n: Int): Bool
 
   def readBitGravity() = readCard8().asBitGravity
   def readBitGravity(n: Int) = readCard8(n).asBitGravity
@@ -110,69 +110,25 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
 }
 
 class BinaryInputStreamLSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream) {
-  override def readInt8(n: Int): Int8 = {
-    val value = readInt8()
-    skip(n - 1)
+
+  override def readSkip[T <: KnownSize](n: Int)(implicit valSize: Int, readVal: () => T): T = {
+    val value = readVal()
+    skip(n - valSize)
     value
   }
 
-  override def readUInt8(n: Int): UInt8 = {
-    val value = readUInt8()
-    skip(n - 1)
-    value
-  }
-
-  override def readInt16(n: Int): Int16 = {
-    val value = readInt16()
-    skip(n - 2)
-    value
-  }
-
-  override def readUInt16(n: Int): UInt16 = {
-    val value = readUInt16()
-    skip(n - 2)
-    value
-  }
-
-
-  override def readBool(n: Int): Bool = {
-    val value = readBoolean()
-    skip(n - 1)
-    Bool(value)
-  }
-
-
-  override def readInt16() = Int16(this.readShort()).swapBytes
-  override def readUInt16() = UInt16(this.readShort()).swapBytes
+  override def readInt16() = Int16(readShort()).swapBytes
+  override def readUInt16() = UInt16(readShort()).swapBytes
 
   override def readInt32() = Int32(this.readInt()).swapBytes
   override def readUInt32() = UInt32(this.readInt()).swapBytes
 }
 
 class BinaryInputStreamMSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream) {
-  override def readInt8(n: Int): Int8 = {
-    skip(n - 1)
-    readInt8()
-  }
 
-  override def readUInt8(n: Int): UInt8 = {
-    skip(n - 1)
-    readUInt8()
-  }
-
-  override def readInt16(n: Int): Int16 = {
-    skip(n - 2)
-    readInt16()
-  }
-
-  override def readUInt16(n: Int): UInt16 = {
-    skip(n - 2)
-    readUInt16()
-  }
-
-  override def readBool(n: Int): Bool = {
-    skip(n - 1)
-    readBool()
+  override def readSkip[T <: KnownSize](n: Int)(implicit valSize: Int, readVal: () => T): T = {
+    skip(n - valSize)
+    readVal()
   }
 
   override def readInt16() = Int16(this.readShort())

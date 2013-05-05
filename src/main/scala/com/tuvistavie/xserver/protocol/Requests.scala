@@ -898,3 +898,11 @@ object SetDashes {
     new SetDashes(gc, dashOffset, dashes)
   }
 }
+
+case class SetClipRectangles (
+  val ordering: Card8,
+  val gc: GContext,
+  val clipXOrigin: Int16,
+  val clipYOrigin: Int16,
+  val listOfRectangle: List[Rectangle]
+) extends Request(59)
