@@ -262,7 +262,7 @@ case class InternAtom (
 object InternAtom {
   def apply(stream: BinaryInputStream, onlyIfExists: Card8) = {
     val n = stream.readUInt16()
-    stream.skip(2)
+    stream.skipBytes(2)
     val name = stream.readString8(n)
     stream.readPad(n)
     new InternAtom(onlyIfExists.toBool, name)
@@ -295,7 +295,7 @@ object ChangeProperty {
     val property = stream.readAtom()
     val propertyType = stream.readAtom()
     val format = stream.readUInt8()
-    stream.skip(3)
+    stream.skipBytes(3)
     val n = stream.readUInt32() * (format / 8)
     val data = mutable.MutableList[UInt8]()
     n times { data += stream.readUInt8() }
@@ -465,7 +465,7 @@ object GrabButton {
     val confineTo = stream.readWindow()
     val cursor = stream.readCursor()
     val button = stream.readButton()
-    stream.skip(1)
+    stream.skipBytes(1)
     val modifiers = stream.readSetOfKeyMask()
     new GrabButton(ownerEvents.toBool, grabWindow, eventMask, pointerMode,
       keyboardMode, confineTo, cursor, button, modifiers)
@@ -482,7 +482,7 @@ object UngrabButton {
   def apply(stream: BinaryInputStream, button: Button) = {
     val grabWindow = stream.readWindow()
     val modifiers = stream.readSetOfKeyMask()
-    stream.skip(2)
+    stream.skipBytes(2)
     new UngrabButton(button, grabWindow, modifiers)
   }
 }
@@ -515,7 +515,7 @@ object GrabKeyboard {
     val time = stream.readTimestamp()
     val pointerMode = stream.readCard8()
     val keyboardMode = stream.readCard8()
-    stream.skip(2)
+    stream.skipBytes(2)
     new GrabKeyboard(ownerEvents.toBool, grabWindow, time, pointerMode, keyboardMode)
   }
 }
@@ -547,7 +547,7 @@ object GrabKey {
     val key = stream.readKeycode()
     val pointerMode = stream.readCard8()
     val keyboardMode = stream.readCard8()
-    stream.skip(2)
+    stream.skipBytes(2)
     new GrabKey(ownerEvents.toBool, grabWindow,
       modifiers, key, pointerMode, keyboardMode)
   }
@@ -563,7 +563,7 @@ object UngrabKey {
   def apply(stream: BinaryInputStream, key: Keycode) = {
     val window = stream.readWindow()
     val modifiers = stream.readSetOfKeyMask()
-    stream.skip(2)
+    stream.skipBytes(2)
     new UngrabKey(key, window, modifiers)
   }
 }
@@ -680,7 +680,7 @@ object OpenFont {
   def apply(stream: BinaryInputStream) = {
     val font = stream.readFont()
     val n = stream.readCard16()
-    stream.skip(2)
+    stream.skipBytes(2)
     val name = stream.readString8(n)
     stream.readPad(n)
     new OpenFont(font, name)
@@ -721,7 +721,7 @@ object QueryTextExtents {
     val n = if(oddLength.value) stringAndPaddingLength - 2
             else stringAndPaddingLength
     stream.readString16(n / 2)
-    if(oddLength.value) stream.skip(2)
+    if(oddLength.value) stream.skipBytes(2)
   }
 }
 
@@ -762,7 +762,7 @@ case class SetFontPath (
 object SetFontPath {
   def apply(stream: BinaryInputStream) = {
     val n = stream.readCard16()
-    stream.skip(2)
+    stream.skipBytes(2)
     val strings = stream.readListOfStr(n)
     new SetFontPath(strings)
   }
@@ -1064,7 +1064,7 @@ case class PolyRectangle (
   val drawable: Drawable,
   val gc: GContext,
   val rectangles: List[Rectangle]
-) extends Request(66)
+) extends Request(67)
 
 object PolyRectangle {
   def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
@@ -1073,5 +1073,282 @@ object PolyRectangle {
     val n = requestLength - 3
     val points = stream.readListOfRectangles(n)
     new PolyRectangle(coordinateMode, drawable, gc, points)
+  }
+}
+
+case class PolyArc (
+  val drawable: Drawable,
+  val gc: GContext,
+  val arcs: List[Arc]
+) extends Request(68)
+
+object PolyArc {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val n = requestLength - 3
+    val arcs = stream.readListOfArcs(n)
+    new PolyArc(drawable, gc, arcs)
+  }
+}
+
+case class FillPoly (
+  val drawable: Drawable,
+  val gc: GContext,
+  val shape: Card8,
+  val coordinateMode: Card8,
+  val points: List[Point]
+) extends Request(69)
+
+object FillPoly {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val shape = stream.readCard8()
+    val coordinateMode = stream.readCard8()
+    stream.skipBytes(2)
+    val n = requestLength - 4
+    val points = stream.readListOfPoints(n)
+    new FillPoly(drawable, gc, shape, coordinateMode, points)
+  }
+}
+
+case class PolyFillRectangle (
+  val coordinateMode: Card8,
+  val drawable: Drawable,
+  val gc: GContext,
+  val rectangles: List[Rectangle]
+) extends Request(70)
+
+
+object PolyFillRectangle {
+  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val n = requestLength - 3
+    val points = stream.readListOfRectangles(n)
+    new PolyFillRectangle(coordinateMode, drawable, gc, points)
+  }
+}
+
+case class PolyFillArc (
+  val drawable: Drawable,
+  val gc: GContext,
+  val arcs: List[Arc]
+) extends Request(71)
+
+object PolyFillArc {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val n = requestLength - 3
+    val arcs = stream.readListOfArcs(n)
+    new PolyFillArc(drawable, gc, arcs)
+  }
+}
+
+case class PutImage (
+  val format: Card8,
+  val drawable: Drawable,
+  val gc: GContext,
+  val width: Card16,
+  val height: Card16,
+  val dstX: Int16,
+  val dstY: Int16,
+  val depth: Card8,
+  val data: List[Int8]
+) extends Request(72)
+
+object PutImage {
+  def apply(stream: BinaryInputStream, format: Card8, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val width = stream.readCard16()
+    val height = stream.readCard16()
+    val dstX = stream.readInt16()
+    val dstY = stream.readInt16()
+    val leftPad = stream.readCard8()
+    val depth = stream.readCard8()
+    stream.skipBytes(2 + leftPad)
+    val n = (requestLength - 6) * 4
+    val data = stream.readListOfInt8(n)
+    new PutImage(format, drawable, gc, width,
+      height, dstX, dstY, depth, data)
+  }
+}
+
+case class GetImage (
+  val format: Card8,
+  val drawable: Drawable,
+  val x: Int16,
+  val y: Int16,
+  val width: Card16,
+  val height: Card16,
+  val planeMask: Card32
+) extends Request(73)
+
+object GetImage {
+  def apply(stream: BinaryInputStream) = {
+    val format = stream.readCard8()
+    val drawable = stream.readDrawable()
+    val x = stream.readInt16()
+    val y = stream.readInt16()
+    val width = stream.readCard16()
+    val height = stream.readCard16()
+    val planeMask = stream.readCard32()
+    new GetImage(format, drawable, x, y, width, height, planeMask)
+  }
+}
+
+case class PolyText8 (
+  val drawable: Drawable,
+  val gc: GContext,
+  val x: Int16,
+  val y: Int16,
+  val items: List[TextItem]
+) extends Request(74)
+
+object PolyText8 {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val x = stream.readInt16()
+    val y = stream.readInt16()
+    val n = (requestLength - 4) * 4
+    val items = stream.readListOfTextItem8(n)
+    new PolyText8(drawable, gc, x, y, items)
+  }
+}
+
+case class PolyText16 (
+  val drawable: Drawable,
+  val gc: GContext,
+  val x: Int16,
+  val y: Int16,
+  val items: List[TextItem]
+) extends Request(75)
+
+object PolyText16 {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val x = stream.readInt16()
+    val y = stream.readInt16()
+    val n = (requestLength - 4) * 4
+    val items = stream.readListOfTextItem16(n)
+    new PolyText16(drawable, gc, x, y, items)
+  }
+}
+
+case class ImageText8 (
+  val drawable: Drawable,
+  val gc: GContext,
+  val x: Int16,
+  val y: Int16,
+  val string: Str
+) extends Request(76)
+
+object ImageText8 {
+  def apply(stream: BinaryInputStream, n: Card8) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val x = stream.readInt16()
+    val y = stream.readInt16()
+    val string = stream.readString8(n)
+    stream.readPad(n)
+    new ImageText8(drawable, gc, x, y, string)
+  }
+}
+
+case class ImageText16 (
+  val drawable: Drawable,
+  val gc: GContext,
+  val x: Int16,
+  val y: Int16,
+  val string: Str
+) extends Request(77)
+
+object ImageText16 {
+  def apply(stream: BinaryInputStream, n: Card8) = {
+    val drawable = stream.readDrawable()
+    val gc = stream.readGContext()
+    val x = stream.readInt16()
+    val y = stream.readInt16()
+    val string = stream.readString16(n)
+    stream.readPad((2 * n):Card8)
+    new ImageText16(drawable, gc, x, y, string)
+  }
+}
+
+case class CreateColormap (
+  val alloc: Card8,
+  val mid: Colormap,
+  val window: Window,
+  val visualId: VisualID
+) extends Request(78)
+
+object CreateColorMap {
+  def apply(stream: BinaryInputStream, alloc: Card8) = {
+    val mid = stream.readColormap()
+    val window = stream.readWindow()
+    val visualId = stream.readVisualID()
+    new CreateColorMap(alloc, mid, window, visualId)
+  }
+}
+
+case class FreeColormap (
+  val cmap: Colormap
+) extends Request(79)
+
+object FreeColormap {
+  def apply(stream: BinaryInputStream) = {
+    val cmap = stream.readColormap()
+    new FreeColormap(cmap)
+  }
+}
+
+case class CopyColormapAndFree (
+  val mid: Colormap,
+  val srcCmap: Colormap
+) extends Request(80)
+
+object CopyColormapAndFree {
+  def apply(stream: BinaryInputStream) = {
+    val mid = stream.readColormap()
+    val srcCmap = stream.readColormap()
+    new CopyColormapAndFree(mid, srcCmap)
+  }
+}
+
+case class InstallColormap (
+  val cmap: Colormap
+) extends Request(81)
+
+object InstallColormap {
+  def apply(stream: BinaryInputStream) = {
+    val cmap = stream.readColormap()
+    new InstallColormap(cmap)
+  }
+}
+
+case class UninstallColormap (
+  val cmap: Colormap
+) extends Request(82)
+
+object UninstallColormap {
+  def apply(stream: BinaryInputStream) = {
+    val cmap = stream.readColormap()
+    new UninstallColormap(cmap)
+  }
+}
+
+case class ListInstalledColormaps (
+  val window: Window
+) extends Request(83)
+
+object ListInstalledColormaps {
+  def apply(stream: BinaryInputStream) = {
+    val window = stream.readWindow()
+    new ListInstalledColormaps(window)
   }
 }

@@ -250,17 +250,22 @@ package types {
     }
   }
 
-  class Size(val width: Card16, val height: Card16)
-  class Point(val x: Int16, val y: Int16)
-  class Rectangle(val origin: Point, val size: Size)
-  class Segment(val origin: Point, val end: Point)
-  class Arc(val origin: Point, val size: Size, angle1: Int16, angle2: Int16)
+  case class Size(val width: Card16, val height: Card16)
+  case class Point(val x: Int16, val y: Int16)
+  case class Rectangle(val origin: Point, val size: Size)
+  case class Segment(val origin: Point, val end: Point)
+  case class Arc(val origin: Point, val size: Size, angle1: Int16, angle2: Int16)
+
+  abstract class TextItem
+  case class TextItemString(val delta: Int8, val name: Str) extends TextItem
+  case class TextItemBytes(val font: Font)extends TextItem
+
 
   case class Host(val family: UInt8, val address: String)
   object Host {
     def apply(stream: BinaryInputStream) = {
       val family = stream.readUInt8()
-      stream.skip(1)
+      stream.skipBytes(1)
       val addressLength = stream.readUInt16()
       var address = new Array[Byte](addressLength)
       stream.read(address, 0, addressLength)
@@ -278,5 +283,6 @@ package types {
       Str(new String(bytes))
     }
   }
+
 }
 

@@ -134,7 +134,7 @@ object Focus {
     val sequenceNumber = stream.readUInt16()
     val event = stream.readUInt32()
     val mode = stream.readUInt8()
-    stream.skip(23)
+    stream.skipBytes(23)
     code.value match {
       case 9 => new FocusIn(detail, sequenceNumber, event, mode)
       case 10 => new FocusOut(detail, sequenceNumber, event, mode)
@@ -166,7 +166,7 @@ case class Expose (
 
 object Expose {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val window = stream.readUInt32()
     val x = stream.readUInt16()
@@ -174,7 +174,7 @@ object Expose {
     val width = stream.readUInt16()
     val height = stream.readUInt16()
     val count = stream.readUInt16()
-    stream.skip(14)
+    stream.skipBytes(14)
     new Expose(sequenceNumber, window, x, y, width, height, count)
   }
 }
@@ -193,7 +193,7 @@ case class GraphicsExposure (
 
 object GraphicsExposure {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val window = stream.readUInt32()
     val x = stream.readUInt16()
@@ -203,7 +203,7 @@ object GraphicsExposure {
     val minorOpCode = stream.readUInt16()
     val count = stream.readUInt16()
     val majorOpCode = stream.readUInt8()
-    stream.skip(11)
+    stream.skipBytes(11)
     new GraphicsExposure(sequenceNumber, window, x, y, width, height, minorOpCode, count, majorOpCode)
   }
 }
@@ -217,12 +217,12 @@ case class NoExposure (
 
 object NoExposure {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val drawable = stream.readUInt32()
     val minorOpCode = stream.readUInt16()
     val majorOpCode = stream.readUInt8()
-    stream.skip(21)
+    stream.skipBytes(21)
     new NoExposure(sequenceNumber, drawable, minorOpCode, majorOpCode)
   }
 }
@@ -235,11 +235,11 @@ case class VisibilityNotify (
 
 object VisibilityNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val window = stream.readUInt32()
     val state = stream.readUInt8()
-    stream.skip(23)
+    stream.skipBytes(23)
     new VisibilityNotify(sequenceNumber, window, state)
   }
 }
@@ -258,7 +258,7 @@ case class CreateNotify (
 
 object CreateNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val parent = stream.readUInt32()
     val window = stream.readUInt32()
@@ -268,7 +268,7 @@ object CreateNotify {
     val height = stream.readInt16()
     val borderWidth = stream.readUInt16()
     val overrideRedirect = stream.readBoolean()
-    stream.skip(9)
+    stream.skipBytes(9)
     new CreateNotify(sequenceNumber, parent, window, x, y, width, height, borderWidth, overrideRedirect)
   }
 }
@@ -281,11 +281,11 @@ case class DestroyNotify(
 
 object DestroyNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val event = stream.readUInt32()
     val window = stream.readUInt32()
-    stream.skip(20)
+    stream.skipBytes(20)
     new DestroyNotify(sequenceNumber, event, window)
   }
 }
@@ -299,12 +299,12 @@ case class UnmapNotify (
 
 object UnmapNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val event = stream.readUInt32()
     val window = stream.readUInt32()
     val fromConfigure = stream.readBoolean()
-    stream.skip(19)
+    stream.skipBytes(19)
     new UnmapNotify(sequenceNumber, event, window, fromConfigure)
   }
 }
@@ -318,12 +318,12 @@ case class MapNotify (
 
 object MapNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val event = stream.readUInt32()
     val window = stream.readUInt32()
     val fromConfigure = stream.readBoolean()
-    stream.skip(19)
+    stream.skipBytes(19)
     new MapNotify(sequenceNumber, event, window, fromConfigure)
   }
 }
@@ -336,11 +336,11 @@ case class MapRequest (
 
 object MapRequest {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readUInt16()
     val event = stream.readUInt32()
     val window = stream.readUInt32()
-    stream.skip(20)
+    stream.skipBytes(20)
     new MapRequest(sequenceNumber, event, window)
   }
 }
@@ -357,7 +357,7 @@ case class ReparentNotify (
 
 object ReparentNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val event = stream.readWindow()
     val window = stream.readWindow()
@@ -365,7 +365,7 @@ object ReparentNotify {
     val x = stream.readInt16()
     val y = stream.readInt16()
     val overrideRedirect = stream.readBoolean()
-    stream.skip(11)
+    stream.skipBytes(11)
     new ReparentNotify(sequenceNumber, event, window, parent, x, y, overrideRedirect)
   }
 }
@@ -385,7 +385,7 @@ case class ConfigureNotify (
 
 object ConfigureNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val event = stream.readWindow()
     val window = stream.readWindow()
@@ -396,7 +396,7 @@ object ConfigureNotify {
     val height = stream.readCard16()
     val borderWidth = stream.readCard16()
     val overrideRedirect = stream.readBoolean()
-    stream.skip(5)
+    stream.skipBytes(5)
     new ConfigureNotify(sequenceNumber, event, window, parent, x, y, width, height, borderWidth, overrideRedirect)
   }
 }
@@ -428,7 +428,7 @@ object ConfigureRequest {
     val height = stream.readCard16()
     val borderWidth = stream.readCard16()
     val mask = stream.readBitmask()
-    stream.skip(4)
+    stream.skipBytes(4)
     new ConfigureRequest(stackMode, sequenceNumber, parent, window,
       sibling, x, y, width, height, borderWidth, mask)
   }
@@ -444,13 +444,13 @@ case class GravityNotify (
 
 object GravityNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val event = stream.readWindow()
     val window = stream.readWindow()
     val x = stream.readInt16()
     val y = stream.readInt16()
-    stream.skip(16)
+    stream.skipBytes(16)
     new GravityNotify(sequenceNumber, event, window, x, y)
   }
 }
@@ -464,12 +464,12 @@ case class ResizeRequest (
 
 object ResizeRequest {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val window = stream.readWindow()
     val width = stream.readCard16()
     val height = stream.readCard16()
-    stream.skip(20)
+    stream.skipBytes(20)
     new ResizeRequest(sequenceNumber, window, width, height)
   }
 }
@@ -484,13 +484,13 @@ case class CirculateNotify (
 
 object CirculateNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val event = stream.readWindow()
     val window = stream.readWindow()
     val unused = stream.readWindow()
     val place = stream.readCard8()
-    stream.skip(15)
+    stream.skipBytes(15)
     new CirculateNotify(sequenceNumber, event, window, unused, place)
   }
 }
@@ -505,13 +505,13 @@ case class CirculateRequest (
 
 object CirculateRequest {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val event = stream.readWindow()
     val window = stream.readWindow()
     val unused = stream.readWindow()
     val place = stream.readCard8()
-    stream.skip(15)
+    stream.skipBytes(15)
     new CirculateRequest(sequenceNumber, event, window, unused, place)
   }
 }
@@ -526,13 +526,13 @@ case class PropertyNotify (
 
 object PropertyNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val window = stream.readWindow()
     val atom = stream.readAtom()
     val time = stream.readTimestamp()
     val state = stream.readCard8()
-    stream.skip(15)
+    stream.skipBytes(15)
     new PropertyNotify(sequenceNumber, window, atom, time, state)
   }
 }
@@ -546,12 +546,12 @@ case class SelectionClear (
 
 object SelectionClear {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val time = stream.readTimestamp()
     val owner = stream.readWindow()
     val selection = stream.readAtom()
-    stream.skip(16)
+    stream.skipBytes(16)
     new SelectionClear(sequenceNumber, time, owner, selection)
   }
 }
@@ -568,7 +568,7 @@ case class SelectionRequest (
 
 object SelectionRequest {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val time = stream.readTimestamp()
     val owner = stream.readWindow()
@@ -576,7 +576,7 @@ object SelectionRequest {
     val selection = stream.readAtom()
     val target = stream.readAtom()
     val property = stream.readAtom()
-    stream.skip(4)
+    stream.skipBytes(4)
     new SelectionRequest(sequenceNumber, time, owner, requestor, selection, target, property)
   }
 }
@@ -592,14 +592,14 @@ case class SelectionNotify (
 
 object SelectionNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val time = stream.readTimestamp()
     val requestor = stream.readWindow()
     val selection = stream.readAtom()
     val target = stream.readAtom()
     val property = stream.readAtom()
-    stream.skip(8)
+    stream.skipBytes(8)
     new SelectionNotify(sequenceNumber, time, requestor, selection, target, property)
   }
 }
@@ -614,13 +614,13 @@ case class ColormapNotify(
 
 object ColormapNotify {
   def apply(stream: BinaryInputStream) = {
-    stream.skip(1)
+    stream.skipBytes(1)
     val sequenceNumber = stream.readCard16()
     val window = stream.readWindow()
     val colormap = stream.readColormap()
     val isNew = stream.readBoolean()
     val state = stream.readUInt8()
-    stream.skip(18)
+    stream.skipBytes(18)
     new ColormapNotify(sequenceNumber, window, colormap, isNew, state)
   }
 }
