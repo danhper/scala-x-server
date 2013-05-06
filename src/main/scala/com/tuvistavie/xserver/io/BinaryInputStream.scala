@@ -28,12 +28,14 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
     else UInt16(readUnsignedShort()).swapBytes
 
   }
-  def readInt32(): Int32
+
+  implicit def readInt32(): Int32
   def readInt32(bigEndian: Boolean): Int32 = {
     if(bigEndian) Int32(readInt())
     else Int32(readInt()).swapBytes
   }
-  def readUInt32(): UInt32
+
+  implicit def readUInt32(): UInt32
   def readUInt32(bigEndian: Boolean): UInt32 = {
     if(bigEndian) UInt32(readInt())
     else UInt32(readInt()).swapBytes
@@ -144,17 +146,27 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
     }
   }
 
+  implicit def readColorItem() = {
+    val pixel = readCard32()
+    val red = readCard16()
+    val green = readCard16()
+    val blue = readCard16()
+    val flag = readCard8()
+    skipBytes(1)
+    new ColorItem(pixel, red, green, blue, flag)
+  }
+
   def readCard8(): Card8 = readUInt8()
   def readCard8(n: Int) = readUInt8(n)
-  def readCard16() = readUInt16()
+  def readCard16(): Card16 = readUInt16()
   def readCard16(n: Int) = readUInt16(n)
-  def readCard32() = readUInt32()
+  def readCard32(): Card32 = readUInt32()
   def readCard32(bigEndian: Boolean) = readUInt32(bigEndian)
   def readBitmask() = readCard32()
   def readWindow() = readCard32()
   def readPixmap() = readCard32()
   def readCursor() = readCard32()
-  def readFont() = readCard32()
+  def readFont(): Font = readCard32()
   def readFont(bigEndian: Boolean) = readCard32(bigEndian)
   def readGContext() = readCard32()
   def readColormap() = readCard32()
@@ -162,6 +174,7 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
   def readFontable() = readCard32()
   def readVisualID() = readCard32()
   def readTimestamp() = readCard32()
+  def readKeysym() = readCard32()
   def readKeycode() = readCard8()
   def readButton() = readCard8()
 
@@ -169,12 +182,15 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
   def readListOfStr(n: Int) = readList[Str](n)
   def readListOfInt8(n: Int) = readList[Int8](n)
   def readListOfCard8(n: Int) = readList[Card8](n)
+  def readListOfCard32(n: Int) = readList[Card32](n)
   def readListOfPoints(n: Int) = readList[Point](n)
   def readListOfRectangles(n: Int) = readList[Rectangle](n)
   def readListOfSegments(n: Int) = readList[Segment](n)
   def readListOfArcs(n: Int) = readList[Arc](n)
   def readListOfTextItem8(n: Int) = readList[TextItem](n)
   def readListOfTextItem16(n: Int) = readList[TextItem](n)(readTextItem16)
+  def readListOfColorItems(n: Int) = readList[ColorItem](n)
+  def readListOfKeysyms(n: Int) = readList[Keysym](n)
 }
 
 class BinaryInputStreamLSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream, false) {

@@ -18,6 +18,7 @@ package object types {
   type Fontable = Card32
   type VisualID = Card32
   type Timestamp = Card32
+  type Keysym = Card32
   type Keycode = Card8
   type Button = Card8
 
@@ -46,10 +47,11 @@ package types {
   }
 
   object Bool extends SingleByte {
-    def boolToInt(b: Bool) = if(b.value) 1 else 0
-    def intToBool(i: Int) = Bool(i != 0)
-    def boolToBoolean(b: Bool) = b.value
-    def booleanToBool(b: Boolean) = Bool(b)
+    implicit def boolToInt(b: Bool) = if(b.value) 1 else 0
+    implicit def intToBool(i: Int) = Bool(i != 0)
+    implicit def boolToBoolean(b: Bool) = b.value
+    implicit def booleanToBool(b: Boolean) = Bool(b)
+    implicit def intvalue8ToBool(c: IntValue) = c.toBool
   }
 
   abstract sealed class Gravity(override val value: Int) extends IntValue(value) with SingleByte
@@ -258,7 +260,9 @@ package types {
 
   abstract class TextItem
   case class TextItemString(val delta: Int8, val name: Str) extends TextItem
-  case class TextItemBytes(val font: Font)extends TextItem
+  case class TextItemBytes(val font: Font) extends TextItem
+
+  case class ColorItem(val pixel: Card32, val red: Card16, val green: Card16, val blue: Card16, val flag: Card8)
 
 
   case class Host(val family: UInt8, val address: String)

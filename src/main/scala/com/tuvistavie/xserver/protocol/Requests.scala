@@ -1292,7 +1292,7 @@ object CreateColorMap {
     val mid = stream.readColormap()
     val window = stream.readWindow()
     val visualId = stream.readVisualID()
-    new CreateColorMap(alloc, mid, window, visualId)
+    new CreateColormap(alloc, mid, window, visualId)
   }
 }
 
@@ -1350,5 +1350,298 @@ object ListInstalledColormaps {
   def apply(stream: BinaryInputStream) = {
     val window = stream.readWindow()
     new ListInstalledColormaps(window)
+  }
+}
+
+case class AllocColor (
+  val cmap: Colormap,
+  val red: Card16,
+  val green: Card16,
+  val blue: Card16
+) extends Request(84)
+
+object AllocColor {
+  def apply(stream: BinaryInputStream) = {
+    val cmap = stream.readColormap()
+    val red = stream.readCard16()
+    val green = stream.readCard16()
+    val blue = stream.readCard16()
+    stream.skipBytes(2)
+    new AllocColor(cmap, red, green, blue)
+  }
+}
+
+case class AllocNamedColor (
+  val cmap: Colormap,
+  val name: Str
+) extends Request(85)
+
+object AllocNamedColor {
+  def apply(stream: BinaryInputStream) = {
+    val cmap = stream.readColormap()
+    val n = stream.readCard16()
+    stream.skipBytes(2)
+    val name = stream.readString8(n)
+    stream.readPad(n)
+    new AllocNamedColor(cmap, name)
+  }
+}
+
+case class AllocColorCells (
+  val cmap: Colormap,
+  val colors: Card16,
+  val planes: Card16
+) extends Request(86)
+
+object AllocColorCells {
+  def apply(stream: BinaryInputStream) = {
+    val cmap = stream.readColormap()
+    val colors = stream.readCard16()
+    val planes = stream.readCard16()
+    new AllocColorCells(cmap, colors, planes)
+  }
+}
+
+case class AllocColorPlanes (
+  val contiguous: Bool,
+  val cmap: Colormap,
+  val colors: Card16,
+  val reds: Card16,
+  val greens: Card16,
+  val blues: Card16
+) extends Request(87)
+
+object AllocColorPlanes {
+  def apply(stream: BinaryInputStream, contiguous: Card8) = {
+    val cmap = stream.readColormap()
+    val colors = stream.readCard16()
+    val reds = stream.readCard16()
+    val greens = stream.readCard16()
+    val blues = stream.readCard16()
+    new AllocColorPlanes(contiguous, cmap, colors, reds, greens, blues)
+  }
+}
+
+case class FreeColors (
+  val cmap: Colormap,
+  val planeMask: Card32,
+  val pixels: List[Card32]
+) extends Request(88)
+
+object FreeColors {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val cmap = stream.readColormap()
+    val planeMask = stream.readCard32()
+    val n = requestLength - 3
+    val pixels = stream.readListOfCard32(n)
+    new FreeColors(cmap, planeMask, pixels)
+  }
+}
+
+case class StoreColors (
+  val cmap: Colormap,
+  val items: List[ColorItem]
+) extends Request(89)
+
+object StoreColors {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val cmap = stream.readColormap()
+    val n = requestLength - 2
+    val items = stream.readListOfColorItems(n)
+    new StoreColors(cmap, items)
+  }
+}
+
+case class StoreNamedColor (
+  val flag: Card8,
+  val cmap: Colormap,
+  val pixel: Card32,
+  val name: Str
+) extends Request(90)
+
+object StoreNamedColor {
+  def apply(stream: BinaryInputStream, flag: Card8) = {
+    val cmap = stream.readColormap()
+    val pixel = stream.readCard32()
+    val n = stream.readCard8()
+    stream.skipBytes(2)
+    val name = stream.readString8(n)
+    stream.readPad(n)
+    new StoreNamedColor(flag, cmap, pixel, name)
+  }
+}
+
+case class QueryColors(
+  val cmap: Colormap,
+  val pixels: List[Card32]
+) extends Request(91)
+
+object QueryColors {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
+    val cmap = stream.readColormap()
+    val n = requestLength - 2
+    val pixels = stream.readListOfCard32(n)
+    new QueryColors(cmap, pixels)
+  }
+}
+
+case class LookupColor (
+  val cmap: Colormap,
+  val name: Str
+) extends Request(92)
+
+object LookupColor {
+  def apply(stream: BinaryInputStream) = {
+    val cmap = stream.readColormap()
+    val n = stream.readCard16()
+    stream.skipBytes(2)
+    val name = stream.readString8(n)
+    stream.readPad(n)
+    new LookupColor(cmap, name)
+  }
+}
+
+case class CreateCursor (
+  val cid: Cursor,
+  val source: Pixmap,
+  val mask: Pixmap,
+  val foreRed: Card16,
+  val foreGreen: Card16,
+  val foreBlue: Card16,
+  val backRed: Card16,
+  val backGreen: Card16,
+  val backBlue: Card16,
+  val x: Card16,
+  val y: Card16
+) extends Request(93)
+
+object CreateCursor {
+  def apply(stream: BinaryInputStream) = {
+    val cid = stream.readCursor()
+    val source = stream.readPixmap()
+    val mask = stream.readPixmap()
+    val foreRed = stream.readCard16()
+    val foreGreen = stream.readCard16()
+    val foreBlue = stream.readCard16()
+    val backRed = stream.readCard16()
+    val backGreen = stream.readCard16()
+    val backBlue = stream.readCard16()
+    val x = stream.readCard16()
+    val y = stream.readCard16()
+    new CreateCursor(cid, source, mask, foreRed, foreGreen,
+      foreBlue, backRed, backGreen, backBlue, x, y)
+  }
+}
+
+case class CreateGlyphCursor (
+  val cid: Cursor,
+  val sourceFont: Font,
+  val maskFont: Font,
+  val sourceChar: Card16,
+  val maskChar: Card16,
+  val foreRed: Card16,
+  val foreGreen: Card16,
+  val foreBlue: Card16,
+  val backRed: Card16,
+  val backGreen: Card16,
+  val backBlue: Card16
+) extends Request(94)
+
+object CreateGlyphCursor {
+  def apply(stream: BinaryInputStream) = {
+    val cid = stream.readCursor()
+    val sourceFont = stream.readFont()
+    val maskFont = stream.readFont()
+    val sourceChar = stream.readCard16()
+    val maskChar = stream.readCard16()
+    val foreRed = stream.readCard16()
+    val foreGreen = stream.readCard16()
+    val foreBlue = stream.readCard16()
+    val backRed = stream.readCard16()
+    val backGreen = stream.readCard16()
+    val backBlue = stream.readCard16()
+    new CreateGlyphCursor(cid, sourceFont, maskFont, sourceChar,
+      maskChar, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue)
+  }
+}
+
+case class FreeCursor (
+  val cursor: Cursor
+) extends Request(95)
+
+object FreeCursor {
+  def apply(stream: BinaryInputStream) = {
+    val cursor = stream.readCursor()
+    new FreeCursor(cursor)
+  }
+}
+
+case class RecolorCursor (
+  val cursor: Cursor,
+  val foreRed: Card16,
+  val foreGreen: Card16,
+  val foreBlue: Card16,
+  val backRed: Card16,
+  val backGreen: Card16,
+  val backBlue: Card16
+) extends Request(96)
+
+object RecolorCursor {
+  def apply(stream: BinaryInputStream) = {
+    val cursor = stream.readCursor()
+    val foreRed = stream.readCard16()
+    val foreGreen = stream.readCard16()
+    val foreBlue = stream.readCard16()
+    val backRed = stream.readCard16()
+    val backGreen = stream.readCard16()
+    val backBlue = stream.readCard16()
+    new RecolorCursor(cursor, foreRed, foreGreen, foreBlue,
+      backRed, backGreen, backBlue)
+  }
+}
+
+case class QueryBestSize (
+  val classType: Card8,
+  val drawable: Drawable,
+  val size: Size
+) extends Request(97)
+
+object QueryBestSize {
+  def apply(stream: BinaryInputStream, classType: Card8) = {
+    val drawable = stream.readDrawable()
+    val size = stream.readSize()
+    new QueryBestSize(classType, drawable, size)
+  }
+}
+
+case class QueryExtension (
+  val name: Str
+) extends Request(98)
+
+object QueryExtension {
+  def apply(stream: BinaryInputStream) = {
+    val n = stream.readCard8()
+    stream.skipBytes(2)
+    val name = stream.readString8(n)
+    stream.readPad(n)
+    new QueryExtension(name)
+  }
+}
+
+case object ListExtensions extends Request(99)
+
+case class ChangeKeyboardMapping (
+  val firstKeycode: Keycode,
+  val keysyms: List[Keysym]
+) extends Request(100)
+
+object ChangeKeyboardMapping {
+  def apply(stream: BinaryInputStream, keycodeCount: Card8) = {
+    val firstKeycode = stream.readKeycode()
+    val keysymsPerKeycode = stream.readCard8()
+    stream.skipBytes(2)
+    val numberOfKeysyms = keycodeCount * keysymsPerKeycode
+    val keysyms = stream.readListOfKeysyms(numberOfKeysyms)
+    new ChangeKeyboardMapping(firstKeycode, keysyms)
   }
 }
