@@ -14,25 +14,10 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
     n times { readInt8() }
   }
 
-  def readStr(): Str = {
+  implicit def readStr(): Str = {
     val n = this.readByte()
     readString8(n)
   }
-
-  def readList[T](n: Int)(implicit readVal: () => T) = {
-    def loopRead(n: Int, list: List[T]): List[T] = n match {
-      case 0 => list reverse
-      case _ => loopRead(n - 1, readVal() :: list)
-    }
-    loopRead(n, List())
-  }
-
-  def readListOfStr(n: Int) = readList[Str](n)(readStr)
-  def readListOfCard8(n: Int) = readList[Card8](n)(readCard8)
-  def readListOfPoints(n: Int) = readList[Point](n)(readPoint)
-  def readListOfRectangles(n: Int) = readList[Rectangle](n)(readRectangle)
-  def readListOfSegments(n: Int) = readList[Segment](n)(readSegment)
-
 
   def readString8(n: Int) = {
     var bytes = new Array[Byte](n)
@@ -48,47 +33,56 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
     Str(loopRead(n, ""))
   }
 
-  def readPoint() = {
+  implicit def readPoint() = {
     val x = readInt16()
     val y = readInt16()
     new Point(x, y)
   }
 
-  def readSegment() = {
+  implicit def readSegment() = {
     val origin = readPoint()
     val end = readPoint()
     new Segment(origin, end)
   }
 
-  def readSize() = {
+  def readSize(): Size = {
     val width = readCard16()
     val height = readCard16()
     new Size(width, height)
   }
 
-  def readRectangle() = {
+  implicit def readRectangle() = {
     val origin = readPoint()
     val size = readSize()
     new Rectangle(origin, size)
   }
 
-  def readSkip[T <: KnownSize](n: Int)(implicit valSize: Int, readVal: () => T): T
+  def readList[T](n: Int)(implicit readVal: () => T) = {
+    def loopRead(n: Int, list: List[T]): List[T] = n match {
+      case 0 => list reverse
+      case _ => loopRead(n - 1, readVal() :: list)
+    }
+    loopRead(n, List())
+  }
+
+
+  def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T
 
   def readPad(n: IntValue) = skip(n.padding)
 
-  def readInt8() = Int8(readByte())
-  def readInt8(n: Int): Int8 = readSkip[Int8](n)(1, readInt8)
-  def readUInt8() = UInt8(readByte())
-  def readUInt8(n: Int): UInt8 = readSkip[UInt8](n)(1, readUInt8)
+  implicit def readInt8(): Int8 = Int8(readByte())
+  def readInt8(n: Int): Int8 = readSkip[Int8](n, 1)
+  implicit def readUInt8(): UInt8 = UInt8(readByte())
+  def readUInt8(n: Int): UInt8 = readSkip[UInt8](n, 1)
 
-  def readBool() = Bool(readBoolean())
-  def readBool(n: Int): Bool = readSkip[Bool](n)(1, readBool)
+  implicit def readBool() = Bool(readBoolean())
+  def readBool(n: Int): Bool = readSkip[Bool](n, 1)
 
 
-  def readInt16(): Int16
-  def readInt16(n: Int): Int16 = readSkip[Int16](n)(2, readInt16)
-  def readUInt16(): UInt16
-  def readUInt16(n: Int): UInt16 = readSkip[UInt16](n)(2, readUInt16)
+  implicit def readInt16(): Int16
+  def readInt16(n: Int): Int16 = readSkip[Int16](n, 2)
+  implicit def readUInt16(): UInt16
+  def readUInt16(n: Int): UInt16 = readSkip[UInt16](n, 2)
 
   def readUInt32(): UInt32
   def readInt32(): Int32
@@ -125,11 +119,18 @@ abstract class BinaryInputStream(val inputStream: InputStream) extends DataInput
   def readTimestamp() = readCard32()
   def readKeycode() = readCard8()
   def readButton() = readCard8()
+
+
+  def readListOfStr(n: Int) = readList[Str](n)
+  def readListOfCard8(n: Int) = readList[Card8](n)
+  def readListOfPoints(n: Int) = readList[Point](n)
+  def readListOfRectangles(n: Int) = readList[Rectangle](n)
+  def readListOfSegments(n: Int) = readList[Segment](n)
 }
 
 class BinaryInputStreamLSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream) {
 
-  override def readSkip[T <: KnownSize](n: Int)(implicit valSize: Int, readVal: () => T): T = {
+  override def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T = {
     val value = readVal()
     skip(n - valSize)
     value
@@ -144,7 +145,7 @@ class BinaryInputStreamLSB(override val inputStream: InputStream) extends Binary
 
 class BinaryInputStreamMSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream) {
 
-  override def readSkip[T <: KnownSize](n: Int)(implicit valSize: Int, readVal: () => T): T = {
+  override def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T = {
     skip(n - valSize)
     readVal()
   }
