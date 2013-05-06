@@ -7,24 +7,133 @@ import com.tuvistavie.xserver.protocol.types._
 import com.tuvistavie.xserver.protocol.events.Event
 import com.tuvistavie.xserver.protocol.types.atoms.Atom
 
-abstract class Request(val opCode: Int8)
+abstract class Request(val opCode: Card8)
 
 object Request {
   def apply(opCode: Int8, stream: BinaryInputStream) = {
-    val data = stream.readUInt8()
+    val data = stream.readCard8()
+    val length = stream.readCard16()
     opCode value match {
-      case 1 => CreateWindow(stream, data)
-      case 2 => ChangeWindowAttributes(stream)
-      case 3 => GetWindowAttributes(stream)
-      case 4 => DestroyWindow(stream)
-      case 5 => DestroySubWindows(stream)
-      case 6 => ChangeSaveSet(stream, data)
-      case 7 => ReparentWindow(stream)
-      case 8 => MapWindow(stream)
-      case 9 => MapSubwindows(stream)
-      case 10 => UnmapWindow(stream)
-      case 11 => UnmapSubwindows(stream)
-      case 12 => ConfigureWindow(stream)
+      case   1 => CreateWindow(stream, data)
+      case   2 => ChangeWindowAttributes(stream)
+      case   3 => GetWindowAttributes(stream)
+      case   4 => DestroyWindow(stream)
+      case   5 => DestroySubWindows(stream)
+      case   6 => ChangeSaveSet(stream, data)
+      case   7 => ReparentWindow(stream)
+      case   8 => MapWindow(stream)
+      case   9 => MapSubwindows(stream)
+      case  10 => UnmapWindow(stream)
+      case  11 => UnmapSubwindows(stream)
+      case  12 => ConfigureWindow(stream)
+      case  13 => CirculateWindow(stream, data)
+      case  14 => GetGeometry(stream)
+      case  15 => QueryTree(stream)
+      case  16 => InternAtom(stream, data)
+      case  17 => GetAtomName(stream)
+      case  18 => ChangeProperty(stream, data)
+      case  19 => DeleteProperty(stream)
+      case  20 => GetProperty(stream, data)
+      case  21 => ListProperties(stream)
+      case  22 => SetSelectionOwner(stream)
+      case  23 => GetSelectionOwner(stream)
+      case  24 => ConvertSelection(stream)
+      case  25 => SendEvent(stream, data)
+      case  26 => GrabPointer(stream, data)
+      case  27 => UngrabPointer(stream)
+      case  28 => GrabButton(stream, data)
+      case  29 => UngrabButton(stream, data)
+      case  30 => ChangeActivePointerGrab(stream)
+      case  31 => GrabKeyboard(stream, data)
+      case  32 => UngrabKeyboard(stream)
+      case  33 => GrabKey(stream, data)
+      case  34 => UngrabKey(stream, data)
+      case  35 => AllowEvents(stream, data)
+      case  36 => GrabServer
+      case  37 => UngrabServer
+      case  38 => QueryPointer(stream)
+      case  39 => GetMotionEvents(stream)
+      case  40 => TranslateCoordinates(stream)
+      case  41 => WarpPointer(stream)
+      case  42 => SetInputFocus(stream, data)
+      case  43 => GetInputFocus
+      case  44 => QueryKeymap
+      case  45 => OpenFont(stream)
+      case  46 => CloseFont(stream)
+      case  47 => QueryFont(stream)
+      case  48 => QueryTextExtents(stream, data, length)
+      case  49 => ListFonts(stream)
+      case  50 => ListFontsWithInfo(stream)
+      case  51 => SetFontPath(stream)
+      case  52 => GetFontPath
+      case  53 => CreatePixmap(stream, data)
+      case  54 => FreePixmap(stream)
+      case  55 => CreateGC(stream)
+      case  56 => ChangeGC(stream)
+      case  57 => CopyGC(stream)
+      case  58 => SetDashes(stream)
+      case  59 => SetClipRectangles(stream, data, length)
+      case  60 => FreeGC(stream)
+      case  61 => ClearArea(stream, data)
+      case  62 => CopyArea(stream)
+      case  63 => CopyPlane(stream)
+      case  64 => PolyPoint(stream, data, length)
+      case  65 => PolyLine(stream, data, length)
+      case  66 => PolySegment(stream, length)
+      case  67 => PolyRectangle(stream, length)
+      case  68 => PolyArc(stream, length)
+      case  69 => FillPoly(stream, length)
+      case  70 => PolyFillRectangle(stream, length)
+      case  71 => PolyFillArc(stream, length)
+      case  72 => PutImage(stream, data, length)
+      case  73 => GetImage(stream, data)
+      case  74 => PolyText8(stream, length)
+      case  75 => PolyText16(stream, length)
+      case  76 => ImageText8(stream, data)
+      case  77 => ImageText16(stream, data)
+      case  78 => CreateColormap(stream, data)
+      case  79 => FreeColormap(stream)
+      case  80 => CopyColormapAndFree(stream)
+      case  81 => InstallColormap(stream)
+      case  82 => UninstallColormap(stream)
+      case  83 => ListInstalledColormaps(stream)
+      case  84 => AllocColor(stream)
+      case  85 => AllocNamedColor(stream)
+      case  86 => AllocColorCells(stream, data)
+      case  87 => AllocColorPlanes(stream, data)
+      case  88 => FreeColors(stream, length)
+      case  89 => StoreColors(stream, length)
+      case  90 => StoreNamedColor(stream, data)
+      case  91 => QueryColors(stream, length)
+      case  92 => LookupColor(stream)
+      case  93 => CreateCursor(stream)
+      case  94 => CreateGlyphCursor(stream)
+      case  95 => FreeCursor(stream)
+      case  96 => RecolorCursor(stream)
+      case  97 => QueryBestSize(stream, data)
+      case  98 => QueryExtension(stream)
+      case  99 => ListExtensions
+      case 100 => ChangeKeyboardMapping(stream, data)
+      case 101 => GetKeyboardMapping(stream)
+      case 102 => ChangeKeyboardControl(stream)
+      case 103 => GetKeyboardControl
+      case 104 => Bell(stream, data)
+      case 105 => ChangePointerControl(stream)
+      case 106 => GetPointerControl
+      case 107 => SetScreenSaver(stream)
+      case 108 => GetScreenSaver
+      case 109 => ChangeHosts(stream, data)
+      case 110 => ListHosts
+      case 111 => SetAccessControl(stream, data)
+      case 112 => SetCloseDownMode(stream, data)
+      case 113 => KillClient(stream)
+      case 114 => RotateProperties(stream)
+      case 115 => ForceScreenSaver(stream, data)
+      case 116 => SetPointerMapping(stream, data)
+      case 117 => GetPointerMapping
+      case 118 => SetModifierMapping(stream, data)
+      case 119 => GetModifierMapping
+      case 127 => NoOperation(stream)
     }
   }
 }
@@ -103,7 +212,8 @@ case class GetWindowAttributes (
 
 object GetWindowAttributes {
   def apply(stream: BinaryInputStream) = {
-    new GetWindowAttributes(stream.readWindow())
+    val window = stream.readWindow()
+    new GetWindowAttributes(window)
   }
 }
 
@@ -113,7 +223,8 @@ case class DestroyWindow (
 
 object DestroyWindow {
   def apply(stream: BinaryInputStream) = {
-    new DestroyWindow(stream.readWindow())
+    val window = stream.readWindow()
+    new DestroyWindow(window)
   }
 }
 
@@ -123,7 +234,8 @@ case class DestroySubWindows (
 
 object DestroySubWindows {
   def apply(stream: BinaryInputStream) = {
-    new DestroySubWindows(stream.readWindow())
+    val window = stream.readWindow()
+    new DestroySubWindows(window)
   }
 }
 
@@ -134,7 +246,8 @@ case class ChangeSaveSet (
 
 object ChangeSaveSet {
   def apply(stream: BinaryInputStream, mode: UInt8) = {
-    new ChangeSaveSet(mode, stream.readWindow())
+    val window = stream.readWindow()
+    new ChangeSaveSet(mode, window)
   }
 }
 
@@ -161,7 +274,8 @@ case class MapWindow (
 
 object MapWindow {
   def apply(stream: BinaryInputStream) = {
-    new MapWindow(stream.readWindow())
+    val window = stream.readWindow()
+    new MapWindow(window)
   }
 }
 
@@ -171,7 +285,8 @@ case class MapSubwindows (
 
 object MapSubwindows {
   def apply(stream: BinaryInputStream) = {
-    new MapSubwindows(stream.readWindow())
+    val window = stream.readWindow()
+    new MapSubwindows(window)
   }
 }
 
@@ -181,7 +296,8 @@ case class UnmapWindow (
 
 object UnmapWindow {
   def apply(stream: BinaryInputStream) = {
-    new UnmapWindow(stream.readWindow())
+    val window = stream.readWindow()
+    new UnmapWindow(window)
   }
 }
 
@@ -191,7 +307,8 @@ case class UnmapSubwindows (
 
 object UnmapSubwindows {
   def apply(stream: BinaryInputStream) = {
-    new UnmapSubwindows(stream.readWindow())
+    val window = stream.readWindow()
+    new UnmapSubwindows(window)
   }
 }
 
@@ -224,13 +341,14 @@ object ConfigureWindow {
 }
 
 case class CirculateWindow (
-  val direction: UInt8,
+  val direction: Card8,
   val window: Window
   ) extends Request(13)
 
 object CirculateWindow {
-  def apply(stream: BinaryInputStream, direction: UInt8) = {
-    new CirculateWindow(direction, stream.readWindow())
+  def apply(stream: BinaryInputStream, direction: Card8) = {
+    val window = stream.readWindow()
+    new CirculateWindow(direction, window)
   }
 }
 
@@ -240,7 +358,8 @@ case class GetGeometry (
 
 object GetGeometry {
   def apply(stream: BinaryInputStream) = {
-    new GetGeometry(stream.readDrawable())
+    val drawable = stream.readDrawable()
+    new GetGeometry(drawable)
   }
 }
 
@@ -250,7 +369,8 @@ case class QueryTree (
 
 object QueryTree {
   def apply(stream: BinaryInputStream) = {
-    new QueryTree(stream.readWindow())
+    val window = stream.readWindow()
+    new QueryTree(window)
   }
 }
 
@@ -343,7 +463,8 @@ case class ListProperties (
 
 object ListProperties {
   def apply(stream: BinaryInputStream) = {
-    new ListProperties(stream.readUInt32())
+    val window = stream.readWindow()
+    new ListProperties(window)
   }
 }
 
@@ -369,7 +490,8 @@ case class GetSelectionOwner (
 
 object GetSelectionOwner {
   def apply(stream: BinaryInputStream) = {
-    new GetSelectionOwner(stream.readAtom())
+    val atom = stream.readAtom()
+    new GetSelectionOwner(atom)
   }
 }
 
@@ -715,13 +837,13 @@ case class QueryTextExtents (
 ) extends Request(48)
 
 object QueryTextExtents {
-  def apply(stream: BinaryInputStream, oddLength: Bool, requestLength: Card16) = {
+  def apply(stream: BinaryInputStream, oddLength: Card8, requestLength: Card16) = {
     val font = stream.readFontable()
     val stringAndPaddingLength = (requestLength - 2) * 4
-    val n = if(oddLength.value) stringAndPaddingLength - 2
+    val n = if(oddLength.toBool.value) stringAndPaddingLength - 2
             else stringAndPaddingLength
     stream.readString16(n / 2)
-    if(oddLength.value) stream.skipBytes(2)
+    if(oddLength.toBool.value) stream.skipBytes(2)
   }
 }
 
@@ -1043,36 +1165,34 @@ object PolyLine {
 }
 
 case class PolySegment (
-  val coordinateMode: Card8,
   val drawable: Drawable,
   val gc: GContext,
   val segments: List[Segment]
 ) extends Request(66)
 
 object PolySegment {
-  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
     val drawable = stream.readDrawable()
     val gc = stream.readGContext()
     val n = requestLength - 3
     val points = stream.readListOfSegments(n)
-    new PolySegment(coordinateMode, drawable, gc, points)
+    new PolySegment(drawable, gc, points)
   }
 }
 
 case class PolyRectangle (
-  val coordinateMode: Card8,
   val drawable: Drawable,
   val gc: GContext,
   val rectangles: List[Rectangle]
 ) extends Request(67)
 
 object PolyRectangle {
-  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
     val drawable = stream.readDrawable()
     val gc = stream.readGContext()
     val n = requestLength - 3
     val points = stream.readListOfRectangles(n)
-    new PolyRectangle(coordinateMode, drawable, gc, points)
+    new PolyRectangle(drawable, gc, points)
   }
 }
 
@@ -1114,7 +1234,6 @@ object FillPoly {
 }
 
 case class PolyFillRectangle (
-  val coordinateMode: Card8,
   val drawable: Drawable,
   val gc: GContext,
   val rectangles: List[Rectangle]
@@ -1122,12 +1241,12 @@ case class PolyFillRectangle (
 
 
 object PolyFillRectangle {
-  def apply(stream: BinaryInputStream, coordinateMode: Card8, requestLength: Card16) = {
+  def apply(stream: BinaryInputStream, requestLength: Card16) = {
     val drawable = stream.readDrawable()
     val gc = stream.readGContext()
     val n = requestLength - 3
     val points = stream.readListOfRectangles(n)
-    new PolyFillRectangle(coordinateMode, drawable, gc, points)
+    new PolyFillRectangle(drawable, gc, points)
   }
 }
 
@@ -1188,8 +1307,7 @@ case class GetImage (
 ) extends Request(73)
 
 object GetImage {
-  def apply(stream: BinaryInputStream) = {
-    val format = stream.readCard8()
+  def apply(stream: BinaryInputStream, format: Card8) = {
     val drawable = stream.readDrawable()
     val x = stream.readInt16()
     val y = stream.readInt16()
@@ -1287,7 +1405,7 @@ case class CreateColormap (
   val visualId: VisualID
 ) extends Request(78)
 
-object CreateColorMap {
+object CreateColormap {
   def apply(stream: BinaryInputStream, alloc: Card8) = {
     val mid = stream.readColormap()
     val window = stream.readWindow()
@@ -1388,17 +1506,18 @@ object AllocNamedColor {
 }
 
 case class AllocColorCells (
+  val contiguous: Bool,
   val cmap: Colormap,
   val colors: Card16,
   val planes: Card16
 ) extends Request(86)
 
 object AllocColorCells {
-  def apply(stream: BinaryInputStream) = {
+  def apply(stream: BinaryInputStream, contiguous: Card8) = {
     val cmap = stream.readColormap()
     val colors = stream.readCard16()
     val planes = stream.readCard16()
-    new AllocColorCells(cmap, colors, planes)
+    new AllocColorCells(contiguous.toBool, cmap, colors, planes)
   }
 }
 
@@ -1645,3 +1764,199 @@ object ChangeKeyboardMapping {
     new ChangeKeyboardMapping(firstKeycode, keysyms)
   }
 }
+
+case class GetKeyboardMapping (
+  val firstKeycode: Keycode,
+  val count: Card8
+) extends Request(101)
+
+object GetKeyboardMapping {
+  def apply(stream: BinaryInputStream) = {
+    val firstKeycode = stream.readKeycode()
+    val count = stream.readCard8()
+    stream.skipBytes(2)
+    new GetKeyboardMapping(firstKeycode, count)
+  }
+}
+
+case class ChangeKeyboardControl (
+  val values: Map[String, Value]
+) extends Request(102)
+
+object ChangeKeyboardControl {
+  def apply(stream: BinaryInputStream) = {
+    val bitmask = stream.readBitmask()
+    var values = mutable.Map[String, Value]()
+    if((bitmask & 0x0001) != 0) values += ("keyClickPercent" -> stream.readInt8())
+    if((bitmask & 0x0002) != 0) values += ("bellPercent" -> stream.readInt8())
+    if((bitmask & 0x0004) != 0) values += ("bellPitch" -> stream.readInt16())
+    if((bitmask & 0x0008) != 0) values += ("bellDuration" -> stream.readInt16())
+    if((bitmask & 0x0010) != 0) values += ("led" -> stream.readCard8())
+    if((bitmask & 0x0020) != 0) values += ("ledMode" -> stream.readCard8())
+    if((bitmask & 0x0040) != 0) values += ("key" -> stream.readKeycode())
+    if((bitmask & 0x0080) != 0) values += ("autoRepeatMode" -> stream.readCard8())
+    new ChangeKeyboardControl(Map(values.toStream: _*))
+  }
+}
+
+
+case object GetKeyboardControl extends Request(103)
+
+case class Bell (
+  val percent: Int8
+) extends Request(104)
+
+object Bell {
+  def apply(stream: BinaryInputStream, percent: Card8) = {
+    new Bell(percent.toInt8)
+  }
+}
+
+case class ChangePointerControl (
+  val accelerationNumerator: Int16,
+  val accelerationDenominator: Int16,
+  val threshold: Int16,
+  val doAcceleration: Bool,
+  val doThreshold: Bool
+) extends Request(105)
+
+object ChangePointerControl {
+  def apply(stream: BinaryInputStream) = {
+    val accelerationNumerator = stream.readInt16()
+    val accelerationDenominator = stream.readInt16()
+    val threshold = stream.readInt16()
+    val doAcceleration = stream.readBool()
+    val doThreshold = stream.readBool()
+    new ChangePointerControl(accelerationNumerator,
+      accelerationDenominator, threshold, doAcceleration, doThreshold)
+  }
+}
+
+case object GetPointerControl extends Request(106)
+
+case class SetScreenSaver (
+  val timeout: Int16,
+  val interval: Int16,
+  val preferBlanking: Card8,
+  val allowExposures: Card8
+) extends Request(107)
+
+object SetScreenSaver {
+  def apply(stream: BinaryInputStream) = {
+    val timeout = stream.readInt16()
+    val interval = stream.readInt16()
+    val preferBlanking = stream.readCard8()
+    val allowExposures = stream.readCard8()
+    new SetScreenSaver(timeout, interval, preferBlanking, allowExposures)
+  }
+}
+
+case object GetScreenSaver extends Request(108)
+
+case class ChangeHosts (
+  val mode: Card8,
+  val host: Host
+) extends Request(109)
+
+object ChangeHosts {
+  def apply(stream: BinaryInputStream, mode: Card8) = {
+    val host = stream.readHost()
+    new ChangeHosts(mode, host)
+  }
+}
+
+case object ListHosts extends Request(110)
+
+case class SetAccessControl (
+  val mode: Card8
+) extends Request(111)
+
+object SetAccessControl {
+  def apply(stream: BinaryInputStream, mode: Card8) = {
+    new SetAccessControl(mode)
+  }
+}
+
+case class SetCloseDownMode (
+  val mode: Card8
+) extends Request(112)
+
+object SetCloseDownMode {
+  def apply(stream: BinaryInputStream, mode: Card8) = {
+    new SetCloseDownMode(mode)
+  }
+}
+
+case class KillClient (
+  val resource: Card32
+) extends Request(113)
+
+object KillClient {
+  def apply(stream: BinaryInputStream) = {
+    val resource = stream.readCard32()
+    new KillClient(resource)
+  }
+}
+
+case class RotateProperties (
+  val window: Window,
+  val delta: Int16,
+  val properties: List[Atom]
+) extends Request(114)
+
+object RotateProperties {
+  def apply(stream: BinaryInputStream) = {
+    val window = stream.readWindow()
+    val n = stream.readCard16()
+    val delta = stream.readInt16()
+    val properties = stream.readListOfAtoms(n)
+    new RotateProperties(window, delta, properties)
+  }
+}
+
+case class ForceScreenSaver (
+  val mode: Card8
+) extends Request(115)
+
+object ForceScreenSaver {
+  def apply(stream: BinaryInputStream, mode: Card8) = {
+    new ForceScreenSaver(mode)
+  }
+}
+
+case class SetPointerMapping (
+  val map: List[Card8]
+) extends Request(116)
+
+object SetPointerMapping {
+  def apply(stream: BinaryInputStream, n: Card8) = {
+    val map = stream.readListOfCard8(n)
+    stream.readPad(n)
+    new SetPointerMapping(map)
+  }
+}
+
+case object GetPointerMapping extends Request(117)
+
+case class SetModifierMapping (
+  val keycodes: List[Keycode]
+) extends Request(118)
+
+object SetModifierMapping {
+  def apply(stream: BinaryInputStream, keycodesPerModifier: Card8) = {
+    val modifiersNumber = 8
+    val keycodes = stream.readListOfKeycode(keycodesPerModifier * modifiersNumber)
+    new SetModifierMapping(keycodes)
+  }
+}
+
+case object GetModifierMapping extends Request(119)
+
+case object NoOperation extends Request(127) {
+  def apply(stream: BinaryInputStream) = {
+    val length = stream.readCard16()
+    val n = length - 1
+    stream.skipBytes(n * 4)
+  }
+}
+

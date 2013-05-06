@@ -54,6 +54,17 @@ package types {
     implicit def intvalue8ToBool(c: IntValue) = c.toBool
   }
 
+  case class Str(val value: String) extends Value {
+    type T = String
+    override def byteSize = value.length + 1
+  }
+  object Str {
+    def apply(bytes: Array[Byte]): Str = {
+      Str(new String(bytes))
+    }
+  }
+
+
   abstract sealed class Gravity(override val value: Int) extends IntValue(value) with SingleByte
   abstract sealed class BitGravity(override val value: Int) extends Gravity(value)
   abstract sealed class WindowGravity(override val value: Int) extends Gravity(value)
@@ -265,28 +276,6 @@ package types {
   case class ColorItem(val pixel: Card32, val red: Card16, val green: Card16, val blue: Card16, val flag: Card8)
 
 
-  case class Host(val family: UInt8, val address: String)
-  object Host {
-    def apply(stream: BinaryInputStream) = {
-      val family = stream.readUInt8()
-      stream.skipBytes(1)
-      val addressLength = stream.readUInt16()
-      var address = new Array[Byte](addressLength)
-      stream.read(address, 0, addressLength)
-      stream.readPad(addressLength)
-      new Host(family, new String(address))
-    }
-  }
-
-  case class Str(val value: String) extends Value {
-    type T = String
-    override def byteSize = value.length + 1
-  }
-  object Str {
-    def apply(bytes: Array[Byte]): Str = {
-      Str(new String(bytes))
-    }
-  }
-
+  case class Host(val family: UInt8, val address: Str)
 }
 

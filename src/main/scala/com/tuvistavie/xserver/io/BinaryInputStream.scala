@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.io.DataInputStream
 
 import com.tuvistavie.xserver.protocol.types._
+import com.tuvistavie.xserver.protocol.types.atoms.Atom
 
 import com.tuvistavie.util._
 
@@ -47,6 +48,7 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
   def readInt16(n: Int): Int16 = readSkip[Int16](n, 2)
   def readUInt16(n: Int): UInt16 = readSkip[UInt16](n, 2)
 
+  implicit def readAtom() = readCard32().asAtom
 
   def readBitGravity() = readCard8().asBitGravity
   def readBitGravity(n: Int) = readCard8(n).asBitGravity
@@ -56,7 +58,6 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
   def readSetOfKeyMask() = readCard16().asSetOfKeyMask
   def readSetOfKeyButMask() = readCard16().asSetOfKeyButMask
 
-  def readAtom() = readCard32().asAtom
   def readSetOfEvent() = readCard32().asSetOfEvent
   def readSetOfPointerEvent() = readCard32().asSetOfPointerEvent
   def readSetOfDeviceEvent() = readCard32().asSetOfDeviceEvent
@@ -156,6 +157,15 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
     new ColorItem(pixel, red, green, blue, flag)
   }
 
+  def readHost() = {
+    val family = readCard8()
+    skipBytes(1)
+    val n = readCard16()
+    val address = readString8(n)
+    readPad(n)
+    new Host(family, address)
+  }
+
   def readCard8(): Card8 = readUInt8()
   def readCard8(n: Int) = readUInt8(n)
   def readCard16(): Card16 = readUInt16()
@@ -190,7 +200,9 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
   def readListOfTextItem8(n: Int) = readList[TextItem](n)
   def readListOfTextItem16(n: Int) = readList[TextItem](n)(readTextItem16)
   def readListOfColorItems(n: Int) = readList[ColorItem](n)
+  def readListOfKeycode(n: Int) = readList[Keycode](n)
   def readListOfKeysyms(n: Int) = readList[Keysym](n)
+  def readListOfAtoms(n: Int) = readList[Atom](n)
 }
 
 class BinaryInputStreamLSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream, false) {

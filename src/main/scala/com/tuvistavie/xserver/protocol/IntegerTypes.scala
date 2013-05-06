@@ -37,6 +37,7 @@ object UInt8 extends SingleByte {
 class UInt8(override val value: Int) extends Int8Value(value) {
   def asBitGravity = BitGravity.fromValue(value)
   def asWindowGravity = WindowGravity.fromValue(value)
+  def toInt8 = Int8(value.toByte)
 }
 
 object Int8Value extends SingleByte {
