@@ -9,7 +9,10 @@ import com.tuvistavie.xserver.protocol.types.atoms.Atom
 import com.tuvistavie.util._
 
 
-abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: Boolean) extends DataInputStream(inputStream) {
+abstract class BinaryInputStream(
+  val inputStream: InputStream,
+  val isBigEndian: Boolean
+) extends DataInputStream(inputStream) {
 
   def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T
 
@@ -19,16 +22,7 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
   implicit def readInt8(): Int8 = Int8(readByte())
   implicit def readUInt8(): UInt8 = UInt8(readByte())
   implicit def readInt16(): Int16
-  implicit def readInt16(bigEndian: Boolean): Int16 = {
-    if(bigEndian) Int16(readShort())
-    else Int16(readShort()).swapBytes
-  }
   implicit def readUInt16(): UInt16
-  implicit def readUInt16(bigEndian: Boolean): UInt16 = {
-    if(bigEndian) UInt16(readUnsignedShort())
-    else UInt16(readUnsignedShort()).swapBytes
-
-  }
 
   implicit def readInt32(): Int32
   def readInt32(bigEndian: Boolean): Int32 = {
@@ -205,7 +199,9 @@ abstract class BinaryInputStream(val inputStream: InputStream, val isBigEndian: 
   def readListOfAtoms(n: Int) = readList[Atom](n)
 }
 
-class BinaryInputStreamLSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream, false) {
+class BinaryInputStreamLSB(
+  override val inputStream: InputStream
+) extends BinaryInputStream(inputStream, false) {
 
   override def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T = {
     val value = readVal()
@@ -213,22 +209,24 @@ class BinaryInputStreamLSB(override val inputStream: InputStream) extends Binary
     value
   }
 
-  override def readInt16() = readInt16(false)
-  override def readUInt16() = readUInt16(false)
+  override def readInt16() = Int16(readShort())
+  override def readUInt16() = UInt16(readUnsignedShort())
 
   override def readInt32() = readInt32(false)
   override def readUInt32() = readUInt32(false)
 }
 
-class BinaryInputStreamMSB(override val inputStream: InputStream) extends BinaryInputStream(inputStream, true) {
+class BinaryInputStreamMSB(
+  override val inputStream: InputStream
+) extends BinaryInputStream(inputStream, true) {
 
   override def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T = {
     skipBytes(n - valSize)
     readVal()
   }
 
-  override def readInt16() = readInt16(true)
-  override def readUInt16() = readUInt16(true)
+  override def readInt16() = Int16(readShort()).swapBytes
+  override def readUInt16() = UInt16(readUnsignedShort()).swapBytes
 
   override def readInt32() = readInt32(true)
   override def readUInt32() = readUInt32(true)
