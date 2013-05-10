@@ -15,6 +15,7 @@ abstract class Reply(
       case _ => stream.writeByte(0)
     }
     stream.writeUInt16(sequenceNumber)
+    stream.writeUInt32(length)
   }
 
 

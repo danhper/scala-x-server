@@ -13,6 +13,8 @@ abstract class BinaryOutputStream(
 
   def writeInt16(u: Int16): Unit
   def writeUInt16(u: UInt16): Unit
+  def writeInt32(u: Int32): Unit
+  def writeUInt32(u: Card32): Unit
 
   def fill(byte: Card8, times: Int) = {
     1 to times foreach { _ => outputStream.write(byte) }
