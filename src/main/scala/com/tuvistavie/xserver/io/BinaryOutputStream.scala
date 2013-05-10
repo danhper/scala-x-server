@@ -11,6 +11,9 @@ abstract class BinaryOutputStream(
 
   def writePad(n: IntValue) = fill(0, n.padding)
 
+  def writeInt16(u: Int16): Unit
+  def writeUInt16(u: UInt16): Unit
+
   def fill(byte: Card8, times: Int) = {
     1 to times foreach { _ => outputStream.write(byte) }
   }
