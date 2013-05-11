@@ -20,7 +20,7 @@ abstract class BinaryOutputStream(
   def writeInt16Value(v: Int16Value): Unit
   def writeInt32Value(v: Int32Value): Unit
 
-  def writeAtom(a: Atom) = writeInt32Value(a.toUInt32)
+  implicit def writeAtom(a: Atom) = writeInt32Value(a.toUInt32)
 
   def writeStr(s: Str) = {
     writeByte(s.byteSize)
@@ -48,6 +48,7 @@ abstract class BinaryOutputStream(
   }
 
   def writeCard8List(list: List[Card8]) = writeList[Card8](list)
+  def writeAtomList(list: List[Atom]) = writeList[Atom](list)
 
   def writeInt8 = writeInt8Value _
   def writeUInt8 = writeInt8Value _

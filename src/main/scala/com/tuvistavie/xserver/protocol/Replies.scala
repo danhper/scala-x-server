@@ -123,3 +123,59 @@ case class GetProperty (
     }
   }
 }
+
+case class ListProperties (
+  override val sequenceNumber: Card16,
+  val atoms: List[Atom]
+) extends Reply(None, sequenceNumber, atoms.length) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt32(atoms.length))
+    if(atoms.length > 0) {
+      stream.fill(22)
+      stream.writeAtomList(atoms)
+    }
+  }
+}
+
+case class GetSelectionOwner (
+  override val sequenceNumber: Card16,
+  val owner: Window
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, owner)
+  }
+}
+
+case class GrabPointer (
+  val status: Card8,
+  override val sequenceNumber: Card16
+) extends Reply(Some(status), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+  }
+}
+
+case class GrabKeyboard (
+  val status: Card8,
+  override val sequenceNumber: Card16
+) extends Reply(Some(status), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+  }
+}
+
+case class QueryPointer (
+  val sameScreen: Card8,
+  override val sequenceNumber: Card16,
+  val root: Window,
+  val child: Window,
+  val rootX: Int16,
+  val rootY: Int16,
+  val winX: Int16,
+  val winY: Int16,
+  val mask: SetOfKeyButMask
+) extends Reply(Some(sameScreen), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, root, child, rootX, rootY, winX, winY, mask)
+  }
+}
