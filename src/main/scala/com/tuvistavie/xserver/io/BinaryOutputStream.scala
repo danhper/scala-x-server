@@ -22,6 +22,24 @@ abstract class BinaryOutputStream(
 
   def writeInt8(n: Int8) = writeByte(n)
   def writeUInt8(n: UInt8) = writeByte(n)
+
+  def writeCard8 = writeUInt8 _
+  def writeCard16 = writeUInt16 _
+  def writeCard32 = writeUInt32 _
+  def writeBitmask = writeCard32 _
+  def writeWindow = writeCard32 _
+  def writePixmap = writeCard32 _
+  def writeCursor = writeCard32 _
+  def writeFont = writeCard32 _
+  def writeGContext = writeCard32 _
+  def writeColormap = writeCard32 _
+  def writeDrawable = writeCard32 _
+  def writeFontable = writeCard32 _
+  def writeVisualID = writeCard32 _
+  def writeTimestamp = writeCard32 _
+  def writeKeysym = writeCard32 _
+  def writeKeycode = writeCard8 _
+  def writeButton = writeCard8 _
 }
 
 object BinaryOutputStream {
