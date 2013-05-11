@@ -28,12 +28,18 @@ abstract class BinaryOutputStream(
 class BinaryOutputStreamMSB (
   override val outputStream: DataOutputStream
 ) extends BinaryOutputStream(outputStream, true) {
-
+  override def writeInt16(u: Int16) = writeShort(u)
+  override def writeUInt16(u: Card16) = writeShort(u)
+  override def writeInt32(u: Int32) = writeInt(u)
+  override def writeUInt32(u: Card32) = writeInt(u)
 }
 
 
 class BinaryOutputStreamLSB(
   override val outputStream: DataOutputStream
 ) extends BinaryOutputStream(outputStream, false) {
-
+  override def writeInt16(u: Int16) = writeShort(u.swapBytes)
+  override def writeUInt16(u: Card16) = writeShort(u.swapBytes)
+  override def writeInt32(u: Int32) = writeInt(u.swapBytes)
+  override def writeUInt32(u: Card32) = writeInt(u.swapBytes)
 }
