@@ -4,7 +4,6 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 
 import com.tuvistavie.xserver.io._
-import atoms.Atom
 
 abstract class IntValue(val value: Int) extends Value {
   type T = Int
@@ -51,6 +50,7 @@ object Int16Value extends DoubleByte {
   implicit def intToInt16(i: Int): Int16 = Int16(i)
   implicit def intToUInt16(i: Int): UInt16 = UInt16(i)
   implicit def int16ValueToInt(i: Int16Value): Int = i.value
+  implicit def uint16ToUInt32(i: UInt16) = UInt32(i.value)
 }
 
 

@@ -20,10 +20,14 @@ abstract class BinaryOutputStream(
   def writeInt16Value(v: Int16Value): Unit
   def writeInt32Value(v: Int32Value): Unit
 
+  def writeAtom(a: Atom) = writeInt32Value(a.toUInt32)
+
   def writeStr(s: Str) = {
     writeByte(s.byteSize)
-    write(s.toByteArray, 0, s.byteSize)
+    writeString8(s)
   }
+
+  def writeString8(s: Str) = write(s.toByteArray, 0, s.byteSize)
 
   def writeSet(s: SetOf[_]) = {
     if(s.byteSize == 2) writeCard16(s.toCard16)

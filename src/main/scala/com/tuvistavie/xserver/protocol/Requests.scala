@@ -4,7 +4,6 @@ import scala.collection.mutable
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
 import com.tuvistavie.xserver.protocol.events.Event
-import com.tuvistavie.xserver.protocol.types.atoms.Atom
 
 abstract class Request(val opCode: Card8)
 

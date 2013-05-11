@@ -1,7 +1,6 @@
 package com.tuvistavie.xserver.protocol.events
 
 import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.xserver.protocol.types.atoms.Atom
 
 import com.tuvistavie.xserver.io._
 

@@ -4,7 +4,6 @@ import java.io.InputStream
 import java.io.DataInputStream
 
 import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.xserver.protocol.types.atoms.Atom
 
 import com.tuvistavie.util._
 
@@ -42,7 +41,7 @@ abstract class BinaryInputStream(
   def readInt16(n: Int): Int16 = readSkip[Int16](n, 2)
   def readUInt16(n: Int): UInt16 = readSkip[UInt16](n, 2)
 
-  implicit def readAtom() = readCard32().asAtom
+  def readAtom() = readCard32().asAtom
 
   def readBitGravity() = readCard8().asBitGravity
   def readBitGravity(n: Int) = readCard8(n).asBitGravity
@@ -196,7 +195,7 @@ abstract class BinaryInputStream(
   def readListOfColorItems(n: Int) = readList[ColorItem](n)
   def readListOfKeycode(n: Int) = readList[Keycode](n)
   def readListOfKeysyms(n: Int) = readList[Keysym](n)
-  def readListOfAtoms(n: Int) = readList[Atom](n)
+  def readListOfAtoms(n: Int) = readList[Atom](n)(readAtom)
 }
 
 object BinaryInputStream {
