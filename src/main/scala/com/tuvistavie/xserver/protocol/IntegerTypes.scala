@@ -13,6 +13,10 @@ abstract class IntValue(val value: Int) extends Value {
   def toBool = Bool(value != 0)
 }
 
+object IntValue {
+  implicit def intToIntValue(v: Int) = Int32(v)
+}
+
 abstract class Int8Value(override val value: Int) extends IntValue(value) with SingleByte
 
 object Int8 extends SingleByte {

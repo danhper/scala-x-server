@@ -16,7 +16,7 @@ abstract class BinaryOutputStream(
   }
 
   def writeBool(b: Bool) = writeByte(b.toByte)
-  def writeInt8Value(v: Int8Value): Unit = writeByte(v)
+  implicit def writeInt8Value(v: Int8Value): Unit = writeByte(v)
   def writeInt16Value(v: Int16Value): Unit
   def writeInt32Value(v: Int32Value): Unit
 
@@ -42,6 +42,12 @@ abstract class BinaryOutputStream(
     case s: Str => writeStr(s)
     case s: SetOf[_] => writeSet(s)
   }
+
+  def writeList[T](list: List[T])(implicit writeFun: T => Unit) = {
+    list.foreach { writeFun(_) }
+  }
+
+  def writeCard8List(list: List[Card8]) = writeList[Card8](list)
 
   def writeInt8 = writeInt8Value _
   def writeUInt8 = writeInt8Value _

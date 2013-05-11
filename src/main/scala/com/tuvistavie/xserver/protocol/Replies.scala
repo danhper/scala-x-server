@@ -105,3 +105,21 @@ case class GetAtomName (
     stream.writePad(nameLength)
   }
 }
+
+case class GetProperty (
+  val format: Card8,
+  override val sequenceNumber: Card16,
+  val typeName: Atom,
+  val bytesAfter: Card32,
+  val bytes: List[Card8]
+) extends Reply(Some(format), sequenceNumber, (UInt32(bytes.length).padding + bytes.length) / 4) {
+  override def write(stream: BinaryOutputStream) = {
+    val lengthWithFormat: Card32 = if(format == 0) 0 else (bytes.length * 8) / format
+    super.write(stream, typeName, bytesAfter, lengthWithFormat)
+    if(bytes.length > 0) {
+      stream.fill(12)
+      stream.writeCard8List(bytes)
+      stream.writePad(bytes.length)
+    }
+  }
+}
