@@ -417,7 +417,7 @@ object ChangeProperty {
     stream.skipBytes(3)
     val n = stream.readUInt32() * (format / 8)
     val data = mutable.MutableList[UInt8]()
-    n times { data += stream.readUInt8() }
+    1 to n foreach { _ => data += stream.readUInt8() }
     stream.readPad(UInt32(n))
     new ChangeProperty(mode, window, property, propertyType, format, data.toList)
   }

@@ -9,37 +9,60 @@ abstract class BinaryOutputStream(
   val bigEndian: Boolean
 ) extends DataOutputStream(outputStream) {
 
-  def writePad(n: IntValue) = fill(0, n.padding)
+  def writePad(n: IntValue) = fill(n.padding)
 
-  def writeInt16(u: Int16): Unit
-  def writeUInt16(u: UInt16): Unit
-  def writeInt32(u: Int32): Unit
-  def writeUInt32(u: Card32): Unit
-
-  def fill(byte: Card8, times: Int) = {
-    1 to times foreach { _ => outputStream.write(byte) }
+  def fill(n: Int, value: Int = 0) = {
+    1 to n foreach { _ => outputStream.write(value) }
   }
 
-  def writeInt8(n: Int8) = writeByte(n)
-  def writeUInt8(n: UInt8) = writeByte(n)
+  def writeBool(b: Bool) = writeByte(b.toByte)
+  def writeInt8Value(v: Int8Value): Unit = writeByte(v)
+  def writeInt16Value(v: Int16Value): Unit
+  def writeInt32Value(v: Int32Value): Unit
 
-  def writeCard8 = writeUInt8 _
-  def writeCard16 = writeUInt16 _
-  def writeCard32 = writeUInt32 _
-  def writeBitmask = writeCard32 _
-  def writeWindow = writeCard32 _
-  def writePixmap = writeCard32 _
-  def writeCursor = writeCard32 _
-  def writeFont = writeCard32 _
-  def writeGContext = writeCard32 _
-  def writeColormap = writeCard32 _
-  def writeDrawable = writeCard32 _
-  def writeFontable = writeCard32 _
-  def writeVisualID = writeCard32 _
-  def writeTimestamp = writeCard32 _
-  def writeKeysym = writeCard32 _
-  def writeKeycode = writeCard8 _
-  def writeButton = writeCard8 _
+  def writeStr(s: Str) = {
+    writeByte(s.byteSize)
+    write(s.toByteArray, 0, s.byteSize)
+  }
+
+  def writeSet(s: SetOf[_]) = {
+    if(s.byteSize == 2) writeCard16(s.toCard16)
+    else writeCard32(s.toCard32)
+  }
+
+  def writeValue(v: Value): Unit = v match {
+    case b: Bool => writeBool(b)
+    case i: Int8Value => writeInt8Value(i)
+    case i: Int16Value => writeInt16Value(i)
+    case i: Int32Value => writeInt32Value(i)
+    case s: Str => writeStr(s)
+    case s: SetOf[_] => writeSet(s)
+  }
+
+  def writeInt8 = writeInt8Value _
+  def writeUInt8 = writeInt8Value _
+  def writeInt16 = writeInt16Value _
+  def writeUInt16 = writeInt16Value _
+  def writeInt32 = writeInt32Value _
+  def writeUInt32 = writeInt32Value _
+
+  def writeCard8 = writeUInt8
+  def writeCard16 = writeUInt16
+  def writeCard32 = writeUInt32
+  def writeBitmask = writeCard32
+  def writeWindow = writeCard32
+  def writePixmap = writeCard32
+  def writeCursor = writeCard32
+  def writeFont = writeCard32
+  def writeGContext = writeCard32
+  def writeColormap = writeCard32
+  def writeDrawable = writeCard32
+  def writeFontable = writeCard32
+  def writeVisualID = writeCard32
+  def writeTimestamp = writeCard32
+  def writeKeysym = writeCard32
+  def writeKeycode = writeCard8
+  def writeButton = writeCard8
 }
 
 object BinaryOutputStream {
@@ -52,17 +75,13 @@ object BinaryOutputStream {
 class BinaryOutputStreamMSB (
   override val outputStream: DataOutputStream
 ) extends BinaryOutputStream(outputStream, true) {
-  override def writeInt16(u: Int16) = writeShort(u)
-  override def writeUInt16(u: Card16) = writeShort(u)
-  override def writeInt32(u: Int32) = writeInt(u)
-  override def writeUInt32(u: Card32) = writeInt(u)
+  override def writeInt16Value(v: Int16Value) = writeShort(v)
+  override def writeInt32Value(v: Int32Value) = writeInt(v)
 }
 
 class BinaryOutputStreamLSB(
   override val outputStream: DataOutputStream
 ) extends BinaryOutputStream(outputStream, false) {
-  override def writeInt16(u: Int16) = writeShort(u.swapBytes)
-  override def writeUInt16(u: Card16) = writeShort(u.swapBytes)
-  override def writeInt32(u: Int32) = writeInt(u.swapBytes)
-  override def writeUInt32(u: Card32) = writeInt(u.swapBytes)
+  override def writeInt16Value(v: Int16Value) = writeShort(v.swapBytes)
+  override def writeInt32Value(v: Int32Value) = writeInt(v.swapBytes)
 }

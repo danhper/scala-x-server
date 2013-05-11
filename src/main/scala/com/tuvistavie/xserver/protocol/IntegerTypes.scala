@@ -12,18 +12,9 @@ abstract class IntValue(val value: Int) extends Value {
   def padding = (4 - (value % 4)) % 4
 
   def toBool = Bool(value != 0)
-
 }
 
-abstract class Int8Value(override val value: Int) extends IntValue(value) with SingleByte {
-
-  def write(stream: BinaryOutputStream): Unit = {
-    stream.writeByte(value)
-  }
-
-  def read(data: BinaryInputStream): Unit = {
-  }
-}
+abstract class Int8Value(override val value: Int) extends IntValue(value) with SingleByte
 
 object Int8 extends SingleByte {
   def apply(value: Int) = new Int8(value)
@@ -52,14 +43,6 @@ abstract class Int16Value(override val value: Int) extends IntValue(value) with 
   }
 
   def swapBytes: Int16Value
-
-  def read(data: BinaryInputStream): Unit = {
-  }
-
-  def write(stream: BinaryOutputStream): Unit = {
-    val toWrite = if(stream.bigEndian) value else swapBytes.value
-    stream.writeShort(toWrite)
-  }
 
   def toUInt8 = UInt8(value)
 }
@@ -97,14 +80,6 @@ abstract class Int32Value(override val value: Int) extends IntValue(value) with 
     ((value & 0xFF00) << 8) |
     ((value >> 8) & 0xFF00) |
     ((value >> 24) & 0xFF)
-  }
-
-  def write(stream: BinaryOutputStream): Unit = {
-    val toWrite = if(stream.bigEndian) value else swapBytes.value
-    stream.writeInt(toWrite)
-  }
-
-  def read(data: BinaryInputStream): Unit = {
   }
 
   def toUInt16 = UInt16(value & 0xffff)

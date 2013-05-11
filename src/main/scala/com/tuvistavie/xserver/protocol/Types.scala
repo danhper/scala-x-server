@@ -44,6 +44,7 @@ package types {
 
   case class Bool(override val value: Boolean) extends Value with SingleByte {
     type T = Boolean
+    def toByte: Int = if(value) 1 else 0
   }
 
   object Bool extends SingleByte {
@@ -56,7 +57,8 @@ package types {
 
   case class Str(val value: String) extends Value {
     type T = String
-    override def byteSize = value.length + 1
+    override def byteSize = value.length
+    def toByteArray = value.getBytes()
   }
   object Str {
     def apply(bytes: Array[Byte]): Str = {
@@ -107,15 +109,18 @@ package types {
 
   object WindowGravity {
     def fromValue(value: Int) = value match {
-      case 0 => Forget
+      case 0 => Unmap
       case _ => Gravity.fromValue(value)
     }
   }
 
-  case class SetOfEvent(override val value: Set[EventMask]) extends Value {
-    type T = Set[EventMask]
-    override def byteSize = 4
+  abstract class SetOf[U <: IntValue](override val value: Set[U]) extends Value {
+    type T = Set[U]
+    def toCard16: Card16 = toCard32.toUInt16
+    def toCard32: Card32 = value./: (0) (_|_.value)
   }
+
+  case class SetOfEvent(override val value: Set[EventMask]) extends SetOf[EventMask](value) with FourBytes
 
   object SetOfEvent {
     implicit case object Unused extends EventMask(0xfe000000)
@@ -123,10 +128,7 @@ package types {
     def fromMask(mask: Int) = SetOfEvent(generateMask(mask))
   }
 
-  case class SetOfDeviceEvent(override val value: Set[EventMask]) extends Value {
-    type T = Set[EventMask]
-    override def byteSize = 4
-  }
+  case class SetOfDeviceEvent(override val value: Set[EventMask]) extends SetOf[EventMask](value) with FourBytes
 
   object SetOfDeviceEvent {
     implicit case object Unused extends EventMask(0xffff8003)
@@ -134,10 +136,7 @@ package types {
     def fromMask(mask: Int) = SetOfDeviceEvent(generateMask(mask))
   }
 
-  case class SetOfPointerEvent(override val value: Set[EventMask]) extends Value {
-    type T = Set[EventMask]
-    override def byteSize = 4
-  }
+  case class SetOfPointerEvent(override val value: Set[EventMask]) extends SetOf[EventMask](value) with FourBytes
 
   object SetOfPointerEvent {
     implicit case object Unused extends EventMask(0xffffc0b0)
@@ -203,22 +202,18 @@ package types {
       case ColormapChange.value => ColormapChange
       case OwnerGrabButton.value => OwnerGrabButton
     }
+    implicit def eventMaskToInt(e: EventMask) = e.value
   }
 
-  case class SetOfKeyMask(val value: Set[BaseKeyMask]) extends Value {
-    type T = Set[BaseKeyMask]
-    override def byteSize = 4
-  }
+  case class SetOfKeyMask(override val value: Set[BaseKeyMask]) extends SetOf[BaseKeyMask](value) with DoubleByte
+
   object SetOfKeyMask {
     implicit case object Unused extends BaseKeyMask(0xe000)
     implicit val obj = BaseKeyMask
     def fromMask(mask: Int) = SetOfKeyMask(generateMask(mask))
   }
 
-  case class SetOfKeyButMask(val value: Set[BaseKeyMask]) extends Value {
-    type T = Set[BaseKeyMask]
-    override def byteSize = 4
-  }
+  case class SetOfKeyButMask(override val value: Set[BaseKeyMask]) extends SetOf[BaseKeyMask](value) with DoubleByte
 
   object SetOfKeyButMask {
     implicit case object Unused extends BaseKeyMask(0xff00)
