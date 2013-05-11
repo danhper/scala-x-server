@@ -199,6 +199,13 @@ abstract class BinaryInputStream(
   def readListOfAtoms(n: Int) = readList[Atom](n)
 }
 
+object BinaryInputStream {
+  def apply(stream: DataInputStream, bigEndian: Boolean) = {
+    if(bigEndian) new BinaryInputStreamMSB(stream)
+    else new BinaryInputStreamLSB(stream)
+  }
+}
+
 class BinaryInputStreamLSB(
   override val inputStream: InputStream
 ) extends BinaryInputStream(inputStream, false) {

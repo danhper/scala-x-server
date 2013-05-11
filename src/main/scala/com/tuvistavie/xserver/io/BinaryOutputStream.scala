@@ -22,7 +22,13 @@ abstract class BinaryOutputStream(
 
   def writeInt8(n: Int8) = writeByte(n)
   def writeUInt8(n: UInt8) = writeByte(n)
+}
 
+object BinaryOutputStream {
+  def apply(stream: DataOutputStream, bigEndian: Boolean) = {
+    if(bigEndian) new BinaryOutputStreamMSB(stream)
+    else new BinaryOutputStreamLSB(stream)
+  }
 }
 
 class BinaryOutputStreamMSB (
@@ -33,7 +39,6 @@ class BinaryOutputStreamMSB (
   override def writeInt32(u: Int32) = writeInt(u)
   override def writeUInt32(u: Card32) = writeInt(u)
 }
-
 
 class BinaryOutputStreamLSB(
   override val outputStream: DataOutputStream
