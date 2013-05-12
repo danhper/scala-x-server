@@ -274,6 +274,8 @@ package types {
 
   case class Host(val family: UInt8, val address: Str)
 
+  case class RGB(val red: Card16, val green: Card16, val blue: Card16)
+
   case class FontProp(val name: Atom, val value: Card32)
   case class CharInfo(val leftSideBearing: Int16, val rightSideBearing: Int16,
     val characterWidth: Int16, val ascent: Int16, val descent: Int16,

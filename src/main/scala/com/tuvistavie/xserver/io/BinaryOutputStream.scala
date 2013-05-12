@@ -18,7 +18,7 @@ abstract class BinaryOutputStream(
   def writeBool(b: Bool) = writeByte(b.toByte)
   implicit def writeInt8Value(v: Int8Value): Unit = writeByte(v)
   def writeInt16Value(v: Int16Value): Unit
-  def writeInt32Value(v: Int32Value): Unit
+  implicit def writeInt32Value(v: Int32Value): Unit
 
   implicit def writeAtom(a: Atom) = writeInt32Value(a.toUInt32)
 
@@ -48,6 +48,19 @@ abstract class BinaryOutputStream(
     writeInt16(p.y)
   }
 
+  def writeSize(s: Size) = {
+    writeCard16(s.width)
+    writeCard16(s.height)
+  }
+
+  implicit def writeHost(h: Host) = {
+    writeCard8(h.family)
+    fill(1)
+    writeCard16(h.address.byteSize)
+    writeString8(h.address)
+    writePad(h.address.byteSize)
+  }
+
   implicit def writeTimeCoord(timeCoord: TimeCoord) = {
     writeTimestamp(timeCoord.time)
     writePoint(timeCoord.point)
@@ -67,16 +80,27 @@ abstract class BinaryOutputStream(
     writeCard16(charInfo.attributes)
   }
 
+  implicit def writeRGB(rgb: RGB) = {
+    writeCard16(rgb.red)
+    writeCard16(rgb.green)
+    writeCard16(rgb.blue)
+    fill(2)
+  }
+
   def writeList[T](list: List[T])(implicit writeFun: T => Unit) = {
     list.foreach { writeFun(_) }
   }
 
+  def writeInt8List(list: List[Int8]) = writeList[Int8](list)
   def writeCard8List(list: List[Card8]) = writeList[Card8](list)
+  def writeCard32List(list: List[Card32]) = writeList[Card32](list)
   def writeStrList(list: List[Str]) = writeList[Str](list)
   def writeAtomList(list: List[Atom]) = writeList[Atom](list)
   def writeTimeCoordList(list: List[TimeCoord]) = writeList[TimeCoord](list)
   def writeFontPropList(list: List[FontProp]) = writeList[FontProp](list)
   def writeCharInfoList(list: List[CharInfo]) = writeList[CharInfo](list)
+  def writeRGBList(list: List[RGB]) = writeList[RGB](list)
+  def writeHostList(list: List[Host]) = writeList[Host](list)
 
   def writeInt8(i: Int8) = writeInt8Value(i)
   def writeUInt8(u: UInt8) = writeInt8Value(u)

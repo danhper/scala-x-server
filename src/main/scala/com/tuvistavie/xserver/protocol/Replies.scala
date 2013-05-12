@@ -344,3 +344,285 @@ object ListFontsWithInfo {
     stream.fill(52)
   }
 }
+
+case class GetFontPath (
+  override val sequenceNumber: Card16,
+  val path: List[Str]
+) extends Reply(None, sequenceNumber, (path.length + UInt32(path.length).padding) / 4) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt16(path.length))
+    if(path.length > 0) {
+      stream.fill(22)
+      stream.writeStrList(path)
+      stream.writePad(path.length)
+    }
+  }
+}
+
+case class GetImage (
+  val depth: Card8,
+  override val sequenceNumber: Card16,
+  val visual: VisualID,
+  val imageData: List[Int8]
+) extends Reply(Some(depth), sequenceNumber, (imageData.length + UInt32(imageData.length) / 4)) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, visual)
+    if(imageData.length > 0) {
+      stream.fill(20)
+      stream.writeInt8List(imageData)
+      stream.writePad(imageData.length)
+    }
+  }
+}
+
+case class ListInstalledColormaps (
+  override val sequenceNumber: Card16,
+  val cmaps: List[Colormap]
+) extends Reply(None, sequenceNumber, cmaps.length) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt16(cmaps.length))
+    if(cmaps.length > 0) {
+      stream.fill(22)
+      stream.writeCard32List(cmaps)
+    }
+  }
+}
+
+case class AllocColor (
+  override val sequenceNumber: Card16,
+  val red: Card16,
+  val green: Card16,
+  val blue: Card16,
+  val pixel: Card32
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, red, green, blue, UInt16(0), pixel)
+  }
+}
+
+case class AllocNamedColor (
+  override val sequenceNumber: Card16,
+  val pixel: Card32,
+  val exactRed: Card16,
+  val exactGreen: Card16,
+  val exactBlue: Card16,
+  val visualRed: Card16,
+  val visualGreen: Card16,
+  val visualBlue: Card16
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, pixel, exactRed, exactGreen, exactBlue,
+      visualRed, visualGreen, visualBlue)
+  }
+}
+
+case class AllocColorCells (
+  override val sequenceNumber: Card16,
+  val pixels: List[Card32],
+  val masks: List[Card32]
+) extends Reply(None, sequenceNumber, pixels.length + masks.length) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt16(pixels.length), UInt16(masks.length))
+    if(pixels.length > 0 || masks.length > 0 ) {
+      stream.fill(20)
+      stream.writeCard32List(pixels)
+      stream.writeCard32List(masks)
+    }
+  }
+}
+
+case class AllocColorPlanes (
+  override val sequenceNumber: Card16,
+  val redMask: Card32,
+  val greenMask: Card32,
+  val blueMask: Card32,
+  val pixels: List[Card32]
+) extends Reply(None, sequenceNumber, pixels.length) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt16(pixels.length), UInt16(0), redMask, greenMask, blueMask)
+    if(pixels.length > 0) {
+      stream.fill(8)
+      stream.writeCard32List(pixels)
+    }
+  }
+}
+
+case class QueryColors (
+  override val sequenceNumber: Card16,
+  val colors: List[RGB]
+) extends Reply(None, sequenceNumber, 2 * colors.length) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt16(colors.length))
+    if(colors.length > 0) {
+      stream.fill(22)
+      stream.writeRGBList(colors)
+    }
+  }
+}
+
+case class LookupColor (
+  override val sequenceNumber: Card16,
+  val exactRed: Card16,
+  val exactGreen: Card16,
+  val exactBlue: Card16,
+  val visualRed: Card16,
+  val visualGreen: Card16,
+  val visualBlue: Card16
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, exactRed, exactGreen, exactBlue,
+      visualRed, visualGreen, visualBlue)
+  }
+}
+
+case class QueryBestSize (
+  override val sequenceNumber: Card16,
+  val width: Card16,
+  val height: Card16
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, width, height)
+  }
+}
+
+case class QueryExtension (
+  override val sequenceNumber: Card16,
+  val present: Bool,
+  val majorOpcode: Card8,
+  val firstEvent: Card8,
+  val firstError: Card8
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, present, majorOpcode, firstEvent, firstError)
+  }
+}
+
+case class ListExtensions (
+  override val sequenceNumber: Card16,
+  val names: List[Str]
+) extends Reply(Some(names.length), sequenceNumber, (names.length + UInt32(names.length).padding) / 4) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+    if(names.length > 0) {
+      stream.fill(24)
+      stream.writeStrList(names)
+      stream.writePad(names.length)
+    }
+  }
+}
+
+case class GetKeyboardMaping (
+  val keysymsPerKeycode: Card8,
+  override val sequenceNumber: Card16,
+  val keysyms: List[Keysym]
+) extends Reply(Some(keysymsPerKeycode), sequenceNumber, keysyms.length * keysymsPerKeycode) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+    if(keysyms.length > 0) {
+      stream.fill(24)
+      stream.writeCard32List(keysyms)
+    }
+  }
+}
+
+case class GetKeyboardControl (
+  val globalAutoRepeat: Card8,
+  override val sequenceNumber: Card16,
+  val ledMask: Card32,
+  val keyClickPercent: Card8,
+  val bellPercent: Card8,
+  val bellPitch: Card16,
+  val bellDuration: Card16,
+  val autoRepeats: List[Card8]
+) extends Reply(Some(globalAutoRepeat), sequenceNumber, 5) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, ledMask, keyClickPercent, bellPercent,
+      bellPitch, bellDuration)
+    stream.fill(2)
+    stream.writeCard8List(autoRepeats)
+  }
+}
+
+case class GetPointerControl (
+  override val sequenceNumber: Card16,
+  val accelerationNumerator: Card16,
+  val accelerationDenominator: Card16,
+  val threshold: Card16
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, accelerationNumerator, accelerationDenominator, threshold)
+  }
+}
+
+case class GetScreenSaver (
+  override val sequenceNumber: Card16,
+  val timeout: Card16,
+  val interval: Card16,
+  val preferBlanking: Card8,
+  val allowExposures: Card8
+) extends Reply(None, sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, timeout, interval, preferBlanking, allowExposures)
+  }
+}
+
+case class ListHosts (
+  val mode: Card8,
+  override val sequenceNumber: Card16,
+  val hosts: List[Host]
+) extends Reply(Some(mode), sequenceNumber, hosts.length / 2) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt16(hosts.length))
+    if(hosts.length > 0) {
+      stream.fill(22)
+      stream.writeHostList(hosts)
+    }
+  }
+}
+
+case class SetPointerMapping (
+  val status: Card8,
+  override val sequenceNumber: Card16
+) extends Reply(Some(status), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+  }
+}
+
+case class GetPointerMapping (
+  val status: Card8,
+  override val sequenceNumber: Card16,
+  val map: List[Card8]
+) extends Reply(Some(status), sequenceNumber, (map.length + UInt32(map.length).padding) / 4) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+    if(map.length > 0) {
+      stream.fill(24)
+      stream.writeCard8List(map)
+      stream.writePad(map.length)
+    }
+  }
+}
+
+case class SetModifierMapping (
+  val status: Card8,
+  override val sequenceNumber: Card16
+) extends Reply(Some(status), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+  }
+}
+
+case class GetModifierMapping (
+  val keycodesPerModifier: Card8,
+  override val sequenceNumber: Card16,
+  val keycodes: List[Keycode]
+) extends Reply(Some(keycodesPerModifier), sequenceNumber, 2 * keycodesPerModifier) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+    if(keycodes.length > 0) {
+      stream.fill(24)
+      stream.writeCard8List(keycodes)
+    }
+  }
+}
