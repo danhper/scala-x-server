@@ -179,3 +179,168 @@ case class QueryPointer (
     super.write(stream, root, child, rootX, rootY, winX, winY, mask)
   }
 }
+
+case class GetMotionEvents (
+  override val sequenceNumber: Card16,
+  val events: List[TimeCoord]
+) extends Reply(None, sequenceNumber, events.length * 2) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt32(events.length))
+    if(events.length > 0) {
+      stream.fill(20)
+      stream.writeTimeCoordList(events)
+    }
+  }
+}
+
+case class TranslateCoordinates (
+  val sameScreen: Card8,
+  override val sequenceNumber: Card16,
+  val child: Window,
+  val dstX: Int16,
+  val dstY: Int16
+) extends Reply(Some(sameScreen), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, child, dstX, dstY)
+  }
+}
+
+
+case class GetInputFocus (
+  val revertTo: Card8,
+  override val sequenceNumber: Card16,
+  val focus: Window
+) extends Reply(Some(revertTo), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, focus)
+  }
+}
+
+case class QueryKeyMap (
+  override val sequenceNumber: Card16,
+  val keys: List[Card8]
+) extends Reply(None, sequenceNumber, 2) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, sequenceNumber)
+    stream.writeCard8List(keys)
+  }
+}
+
+case class QueryFont (
+  override val sequenceNumber: Card16,
+  val minBounds: CharInfo,
+  val maxBounds: CharInfo,
+  val minCharOrByte2: Card16,
+  val maxCharOrByte2: Card16,
+  val defaultChar: Card16,
+  val minByte1: Card8,
+  val maxByte1: Card8,
+  val allCharExist: Bool,
+  val fontAscent: Int16,
+  val fontDescent: Int16,
+  val properties: List[FontProp],
+  val charInfos: List[CharInfo]
+) extends Reply(None, sequenceNumber, 7 + 2 * properties.length + 3 * charInfos.length) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+    stream.writeCharInfo(minBounds)
+    stream.fill(4)
+    stream.writeCharInfo(maxBounds)
+    stream.fill(4)
+    stream.writeCard16(minCharOrByte2)
+    stream.writeCard16(maxCharOrByte2)
+    stream.writeCard16(defaultChar)
+    stream.writeCard16(properties.length)
+    stream.writeCard8(minByte1)
+    stream.writeCard8(maxByte1)
+    stream.writeBool(allCharExist)
+    stream.writeInt16(fontAscent)
+    stream.writeInt16(fontDescent)
+    stream.writeCard32(charInfos.length)
+    stream.writeFontPropList(properties)
+    stream.writeCharInfoList(charInfos)
+  }
+}
+
+case class QueryTextExtents (
+  val drawDirection: Card8,
+  override val sequenceNumber: Card16,
+  val fontAscent: Int16,
+  val fontDescent: Int16,
+  val overallAscent: Int16,
+  val overallDescent: Int16,
+  val overallWidth: Int32,
+  val overallHeigth: Int32,
+  val overallLeft: Int32,
+  val overallRight: Int32
+) extends Reply(Some(drawDirection), sequenceNumber, 0) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, fontAscent, fontDescent, overallAscent,
+      overallDescent, overallWidth, overallHeigth, overallLeft, overallRight)
+  }
+}
+
+case class ListFonts (
+  override val sequenceNumber: Card16,
+  val names: List[Str]
+) extends Reply(None, sequenceNumber, (names.length + UInt32(names.length).padding) / 4) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, UInt16(names.length))
+    if(names.length > 0) {
+      stream.fill(22)
+      stream.writeStrList(names)
+      stream.writePad(names.length)
+    }
+  }
+}
+
+case class ListFontsWithInfo (
+  val n: Card8,
+  override val sequenceNumber: Card16,
+  val minBounds: CharInfo,
+  val maxBounds: CharInfo,
+  val minCharOrByte2: Card16,
+  val maxCharOrByte2: Card16,
+  val defaultChar: Card16,
+  val drawDirection: Card8,
+  val minByte1: Card8,
+  val maxByte1: Card8,
+  val allCharExist: Bool,
+  val fontAscent: Int16,
+  val fontDescent: Int16,
+  val repliesHint: Card32,
+  val properties: List[FontProp],
+  val name: Str
+) extends Reply(Some(n), sequenceNumber, 7 + 2 * properties.length + (n.value + n.padding) / 4) {
+  override def write(stream: BinaryOutputStream) = {
+    super.write(stream, List(): _*)
+    stream.writeCharInfo(minBounds)
+    stream.fill(4)
+    stream.writeCharInfo(maxBounds)
+    stream.fill(4)
+    stream.writeCard16(minCharOrByte2)
+    stream.writeCard16(maxCharOrByte2)
+    stream.writeCard16(defaultChar)
+    stream.writeCard16(properties.length)
+    stream.writeCard8(drawDirection)
+    stream.writeCard8(minByte1)
+    stream.writeCard8(maxByte1)
+    stream.writeBool(allCharExist)
+    stream.writeInt16(fontAscent)
+    stream.writeInt16(fontDescent)
+    stream.writeCard32(repliesHint)
+    stream.writeFontPropList(properties)
+    stream.writeStr(name)
+    stream.writePad(n)
+  }
+}
+
+object ListFontsWithInfo {
+  def writeFinal(stream: BinaryOutputStream, sequenceNumber: Card16) = {
+    stream.writeCard8(1)
+    stream.writeCard8(0)
+    stream.writeCard16(sequenceNumber)
+    stream.writeCard32(7)
+    stream.fill(52)
+  }
+}

@@ -22,7 +22,7 @@ abstract class BinaryOutputStream(
 
   implicit def writeAtom(a: Atom) = writeInt32Value(a.toUInt32)
 
-  def writeStr(s: Str) = {
+  implicit def writeStr(s: Str): Unit = {
     writeByte(s.byteSize)
     writeString8(s)
   }
@@ -43,23 +43,52 @@ abstract class BinaryOutputStream(
     case s: SetOf[_] => writeSet(s)
   }
 
+  def writePoint(p: Point) = {
+    writeInt16(p.x)
+    writeInt16(p.y)
+  }
+
+  implicit def writeTimeCoord(timeCoord: TimeCoord) = {
+    writeTimestamp(timeCoord.time)
+    writePoint(timeCoord.point)
+  }
+
+  implicit def writeFontProp(fontProp: FontProp) = {
+    writeAtom(fontProp.name)
+    writeCard32(fontProp.value)
+  }
+
+  implicit def writeCharInfo(charInfo: CharInfo) = {
+    writeInt16(charInfo.leftSideBearing)
+    writeInt16(charInfo.rightSideBearing)
+    writeInt16(charInfo.characterWidth)
+    writeInt16(charInfo.ascent)
+    writeInt16(charInfo.descent)
+    writeCard16(charInfo.attributes)
+  }
+
   def writeList[T](list: List[T])(implicit writeFun: T => Unit) = {
     list.foreach { writeFun(_) }
   }
 
   def writeCard8List(list: List[Card8]) = writeList[Card8](list)
+  def writeStrList(list: List[Str]) = writeList[Str](list)
   def writeAtomList(list: List[Atom]) = writeList[Atom](list)
+  def writeTimeCoordList(list: List[TimeCoord]) = writeList[TimeCoord](list)
+  def writeFontPropList(list: List[FontProp]) = writeList[FontProp](list)
+  def writeCharInfoList(list: List[CharInfo]) = writeList[CharInfo](list)
 
-  def writeInt8 = writeInt8Value _
-  def writeUInt8 = writeInt8Value _
-  def writeInt16 = writeInt16Value _
-  def writeUInt16 = writeInt16Value _
-  def writeInt32 = writeInt32Value _
-  def writeUInt32 = writeInt32Value _
+  def writeInt8(i: Int8) = writeInt8Value(i)
+  def writeUInt8(u: UInt8) = writeInt8Value(u)
+  def writeInt16(i: Int16) = writeInt16Value(i)
+  def writeUInt16(u: UInt16) = writeInt16Value(u)
+  def writeInt32(i: Int32) = writeInt32Value(i)
+  def writeUInt32(u: UInt32) = writeInt32Value(u)
 
-  def writeCard8 = writeUInt8
-  def writeCard16 = writeUInt16
-  def writeCard32 = writeUInt32
+  def writeCard8 = writeUInt8 _
+  def writeCard16 = writeUInt16 _
+  def writeCard32 = writeUInt32 _
+
   def writeBitmask = writeCard32
   def writeWindow = writeCard32
   def writePixmap = writeCard32
