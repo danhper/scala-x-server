@@ -1,5 +1,6 @@
 package com.tuvistavie.xserver.io
 
+import scala.collection.mutable.ListBuffer
 import java.io.InputStream
 import java.io.DataInputStream
 
@@ -55,14 +56,10 @@ abstract class BinaryInputStream(
   def readSetOfPointerEvent() = readCard32().asSetOfPointerEvent
   def readSetOfDeviceEvent() = readCard32().asSetOfDeviceEvent
 
-
-
-  def readList[T](n: Int)(implicit readVal: () => T) = {
-    def loopRead(n: Int, list: List[T]): List[T] = n match {
-      case 0 => list reverse
-      case _ => loopRead(n - 1, readVal() :: list)
-    }
-    loopRead(n, List())
+  def readList[T](n: Int)(implicit readVal: () => T): List[T] = {
+    val b = new ListBuffer[T]
+    1 to n foreach { _ => b += readVal() }
+    b.toList
   }
 
   implicit def readStr(): Str = {
