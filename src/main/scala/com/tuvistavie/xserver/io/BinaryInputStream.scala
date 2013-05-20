@@ -115,7 +115,7 @@ abstract class BinaryInputStream(
 
   implicit def readTextItem8(): TextItem = {
     val n = readCard8()
-    if(n == 255) {
+    if(n.value == 255) {
       val font = readFont(true)
       new TextItemBytes(font)
     } else {
@@ -127,7 +127,7 @@ abstract class BinaryInputStream(
 
   def readTextItem16(): TextItem = {
     val n = readCard8()
-    if(n == 255) {
+    if(n.value == 255) {
       val font = readFont(true)
       new TextItemBytes(font)
     } else {

@@ -114,7 +114,7 @@ case class GetProperty (
   val bytes: List[Card8]
 ) extends Reply(Some(format), sequenceNumber, (UInt32(bytes.length).padding + bytes.length) / 4) {
   override def write(stream: BinaryOutputStream) = {
-    val lengthWithFormat: Card32 = if(format == 0) 0 else (bytes.length * 8) / format
+    val lengthWithFormat: Card32 = if(format.value == 0) 0 else (bytes.length * 8) / format
     super.write(stream, typeName, bytesAfter, lengthWithFormat)
     if(bytes.length > 0) {
       stream.fill(12)

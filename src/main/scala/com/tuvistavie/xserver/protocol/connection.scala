@@ -19,7 +19,7 @@ object Connection {
     val d = stream.readCard16()
     stream.skip(2)
     // check for protocol version and no authentication
-    protocolMajorVersion == 11 && protocolMinorVersion == 0 && n == 0 && d == 0
+    protocolMajorVersion.value == 11 && protocolMinorVersion.value == 0 && n.value == 0 && d.value == 0
   }
 }
 
