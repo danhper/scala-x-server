@@ -1,6 +1,9 @@
 package com.tuvistavie.xserver.protocol.requests
 
+import scala.language.implicitConversions
+import scala.language.postfixOps
 import scala.collection.mutable
+
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
 import com.tuvistavie.xserver.protocol.events.Event

@@ -28,6 +28,7 @@
   )
   :compile-deps (
     "/home/daniel/.m2/repository/junit/junit/4.8.2/junit-4.8.2.jar"
+    "/home/daniel/.m2/repository/com/typesafe/akka/akka-actor_2.10/2.1.4/akka-actor_2.10-2.1.4.jar"
     "/home/daniel/.m2/repository/net/liftweb/lift-json_2.9.1/2.5-M4/lift-json_2.9.1-2.5-M4.jar"
   )
   :runtime-deps (

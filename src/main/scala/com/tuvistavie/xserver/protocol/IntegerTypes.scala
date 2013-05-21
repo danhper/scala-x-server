@@ -1,5 +1,7 @@
 package com.tuvistavie.xserver.protocol.types
 
+import scala.language.implicitConversions
+
 import java.io.DataInputStream
 import java.io.DataOutputStream
 

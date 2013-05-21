@@ -1,11 +1,12 @@
 package com.tuvistavie.xserver.io
 
+import scala.language.implicitConversions
 import scala.collection.mutable.ListBuffer
+
 import java.io.InputStream
 import java.io.DataInputStream
 
 import com.tuvistavie.xserver.protocol.types._
-
 import com.tuvistavie.util._
 
 

@@ -1,7 +1,10 @@
 package com.tuvistavie.xserver.io
 
+import scala.language.implicitConversions
+
 import java.io.OutputStream
 import java.io.DataOutputStream
+
 import com.tuvistavie.xserver.protocol.types._
 
 abstract class BinaryOutputStream(
