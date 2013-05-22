@@ -24,9 +24,7 @@ class ClientConnectionManager(socket: IO.SocketHandle) extends Actor {
         case 'l' => new Client(socket) with LittleEndian
         case 'B' => new Client(socket) with BigEndian
         case _ => throw new ProtocolException(socket,
-          new ConnectionError(1, 11, 0) {
-            val byteOrder = BigEndian
-          }
+          new ConnectionError(1, 11, 0) with LittleEndian
         )
       }
       it flatMap ( _ => client.handleMessages )
