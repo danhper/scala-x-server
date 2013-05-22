@@ -1,6 +1,5 @@
 package com.tuvistavie.xserver.protocol.types
 
-
 abstract class Value extends KnownSize {
   type T
   val value: T

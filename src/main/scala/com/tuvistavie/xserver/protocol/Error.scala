@@ -1,7 +1,28 @@
 package com.tuvistavie.xserver.protocol.errors
 
+import akka.util.ByteString
+
+import com.tuvistavie.xserver.protocol.ByteSerializable
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
+
+abstract class BaseError extends ByteSerializable
+
+abstract case class ConnectionError (
+  length: Byte,
+  majorVersion: Short,
+  minorVersion: Short
+) extends BaseError {
+  def toBytes = {
+    var frameBuilder = ByteString.newBuilder
+    frameBuilder.putByte(length)
+    frameBuilder.putShort(majorVersion)
+    frameBuilder.putShort(minorVersion)
+    frameBuilder result
+  }
+
+}
+
 
 abstract class Error (
   val code: Card8,

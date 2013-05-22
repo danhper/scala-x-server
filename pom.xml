@@ -64,6 +64,8 @@
             <arg>-unchecked</arg>
             <arg>-deprecation</arg>
             <arg>-feature</arg>
+            <arg>-feature</arg>
+            <arg>-language:postfixOps</arg>
           </args>
         </configuration>
         <executions>
