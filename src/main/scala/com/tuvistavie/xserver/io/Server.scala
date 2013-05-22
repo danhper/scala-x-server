@@ -17,7 +17,7 @@ class Server(displayNumber: Int) extends Actor {
 
   def receive() = {
     case NewClient(server) => {
-
+      server.accept()(context.system.actorOf(Props[ClientManager]))
     }
   }
 }
