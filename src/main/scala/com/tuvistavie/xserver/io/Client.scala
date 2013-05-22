@@ -26,7 +26,7 @@ class ClientManager extends Actor {
         case 'l' => new Client(handle.get) with LittleEndian
         case 'B' => new Client(handle.get) with BigEndian
         case _ => throw new ProtocolException(handle.get,
-          new ConnectionError(1, 11, 0) with LittleEndian
+          new ConnectionError("invalid endian") with LittleEndian
         )
       }
       it flatMap ( _ => client.handleMessages )

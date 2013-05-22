@@ -22,9 +22,10 @@ class IntSerializer extends CustomSerializer[IntValue](format => (
 
 object App {
   def main(args: Array[String]) = {
-    implicit val formats = Serialization.formats(NoTypeHints) + new IntSerializer
+    // implicit val formats = Serialization.formats(NoTypeHints) + new IntSerializer
 
-    val foo = Person("foo", 8, 7, 4)
-    println(write(foo))
+    // val foo = Person("foo", 8, 7, 4)
+    // println(write(foo))
+    println(util.Properties.settings.getInt("protocol.major-version"))
   }
 }

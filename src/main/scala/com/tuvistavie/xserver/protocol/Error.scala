@@ -6,23 +6,27 @@ import com.tuvistavie.xserver.protocol.ByteSerializable
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
 
+import com.tuvistavie.xserver.util.IntWithPad._
+import com.tuvistavie.xserver.util.ExtendedByteStringBuilder._
+import com.tuvistavie.xserver.util.Properties.{settings => Config}
+
 abstract class BaseError extends ByteSerializable
 
 abstract case class ConnectionError (
-  length: Byte,
-  majorVersion: Short,
-  minorVersion: Short
+  message: String
 ) extends BaseError {
   def toBytes = {
     var frameBuilder = ByteString.newBuilder
-    frameBuilder.putByte(length)
-    frameBuilder.putShort(majorVersion)
-    frameBuilder.putShort(minorVersion)
+    val n = message.length
+    frameBuilder.putByte(n.toByte)
+    frameBuilder.putShort(Config.getInt("protocol.major-version"))
+    frameBuilder.putShort(Config.getInt("protocol.minor-version"))
+    frameBuilder.putShort((n.withPadding) / 4)
+    frameBuilder.putBytes(message.getBytes)
+    frameBuilder.writePadding(n)
     frameBuilder result
   }
-
 }
-
 
 abstract class Error (
   val code: Card8,
