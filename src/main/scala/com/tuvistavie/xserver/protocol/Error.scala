@@ -12,8 +12,10 @@ import com.tuvistavie.xserver.util.Properties.{settings => Config}
 
 abstract class BaseError extends ByteSerializable
 
-abstract case class ConnectionError (
+case class ConnectionError (
   message: String
+) (
+  implicit val endian: java.nio.ByteOrder
 ) extends BaseError {
   def toBytes = {
     var frameBuilder = ByteString.newBuilder

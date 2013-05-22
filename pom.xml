@@ -73,6 +73,7 @@
             <arg>-feature</arg>
             <arg>-feature</arg>
             <arg>-language:postfixOps</arg>
+            <arg>-language:implicitConversions</arg>
           </args>
         </configuration>
         <executions>

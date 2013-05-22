@@ -1,7 +1,5 @@
 package com.tuvistavie.xserver.protocol
 
-import scala.language.implicitConversions
-
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.util.Enumerable
 

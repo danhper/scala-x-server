@@ -1,7 +1,5 @@
 package com.tuvistavie.xserver.protocol.events
 
-import scala.language.postfixOps
-
 import com.tuvistavie.xserver.protocol.types._
 import com.tuvistavie.xserver.io._
 
