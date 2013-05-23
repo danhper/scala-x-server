@@ -7,10 +7,8 @@ import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.protocol.errors.{ BaseError, ConnectionError }
 import com.tuvistavie.xserver.util.IntWithPad._
 import com.tuvistavie.xserver.util.Properties.{ settings => Config }
-
-class ProtocolException(sender: IO.SocketHandle, error: BaseError) extends RuntimeException {
-  sender.write(error.toBytes)
-}
+import com.tuvistavie.xserver.protocol.Connection
+import com.tuvistavie.xserver.protocol.misc.ProtocolException
 
 class ClientManager extends Actor with Logging {
   import IO._
@@ -30,6 +28,9 @@ class ClientManager extends Actor with Logging {
 
   def handleMessages: Actor.Receive = {
     case Read(socket, bytes) => it(Chunk(bytes))
+    case Closed(socket: SocketHandle, cause) => {
+      logger.info("client socket has been closed: {}", cause)
+    }
   }
 }
 
@@ -45,36 +46,29 @@ object Client extends Logging {
     }
     case _ => {
       logger.error(s"invalid endian info received: ${endian}")
-      throw new ProtocolException(socket,
-          new ConnectionError("invalid endian") (java.nio.ByteOrder.LITTLE_ENDIAN)
-          )
+      throw new ProtocolException(ConnectionError("invalid endian") (java.nio.ByteOrder.LITTLE_ENDIAN))(socket)
     }
   }
 }
 
-abstract class Client(socket: IO.SocketHandle) extends Logging {
+abstract class Client(handle: IO.SocketHandle) extends Logging {
   import IO._
 
   implicit val endian: java.nio.ByteOrder
+  implicit val socket: SocketHandle = handle
 
   def handleConnection: Iteratee[Unit] = {
     for {
-      info <- take(12)
-      iterator = info.iterator
-      byteOrder = iterator.getByte
-      _ = iterator.getByte
-      majorVersion = iterator.getShort
-      minorVersion = iterator.getShort
-      n = iterator.getShort
-      d = iterator.getShort
+      connection <- Connection.readConnectionInfo()
     } yield {
-      logger.debug(s"major version: ${majorVersion}")
-      if(majorVersion != Config.getInt("protocol.major-version")
-        || minorVersion != Config.getInt("protocol.minor-version")) {
-        throw new ProtocolException(socket, new ConnectionError("invalid protocol version"))
-      }
-      if(n != 0 || d != 0) {
-        throw new ProtocolException(socket, new ConnectionError("authentication not supported by server"))
+      connection match {
+        case Connection(_, _, None, None) => {
+          socket write Connection.getOkResponse()
+          logger.debug("sent ok response for connection")
+        }
+        case Connection(_, _, _, _) => {
+          throw new ProtocolException(ConnectionError("authentication not supported by server"))
+        }
       }
     }
   }
