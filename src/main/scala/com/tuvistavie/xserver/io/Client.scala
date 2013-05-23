@@ -1,7 +1,8 @@
 package com.tuvistavie.xserver.io
 
 import akka.actor.{Actor, IO}
-import akka.event.Logging
+
+import com.typesafe.scalalogging.slf4j.Logging
 
 import com.tuvistavie.xserver.protocol.errors.{ BaseError, ConnectionError }
 import com.tuvistavie.xserver.util.IntWithPad._
@@ -11,13 +12,14 @@ class ProtocolException(sender: IO.SocketHandle, error: BaseError) extends Runti
   sender.write(error.toBytes)
 }
 
-class ClientManager extends Actor {
+class ClientManager extends Actor with Logging {
   import IO._
 
   val it = new IterateeRefAsync(Iteratee.unit)(context.dispatcher)
 
   def receive = {
     case Read(handle, bytes) => {
+      logger.debug(s"received client first packet ${bytes}")
       val client = Client(handle.asSocket, bytes.head.toChar)
       it(Chunk(bytes))
       context become(handleMessages)
@@ -31,20 +33,27 @@ class ClientManager extends Actor {
   }
 }
 
-object Client {
+object Client extends Logging {
   def apply(socket: IO.SocketHandle, endian: Char) = endian match {
-    case 'l' => new Client(socket) with LittleEndian
-    case 'B' => new Client(socket) with BigEndian
-    case _ => throw new ProtocolException(socket,
+    case 'l' => {
+      logger.debug("initializing new client with little endian")
+      new Client(socket) with LittleEndian
+    }
+    case 'B' => {
+      logger.debug("initializing new client with big endian")
+      new Client(socket) with BigEndian
+    }
+    case _ => {
+      logger.error(s"invalid endian info received: ${endian}")
+      throw new ProtocolException(socket,
           new ConnectionError("invalid endian") (java.nio.ByteOrder.LITTLE_ENDIAN)
           )
+    }
   }
 }
 
-abstract class Client(socket: IO.SocketHandle) {
+abstract class Client(socket: IO.SocketHandle) extends Logging {
   import IO._
-
-  val log = Logging(Server.system, "Client")
 
   implicit val endian: java.nio.ByteOrder
 
@@ -59,8 +68,7 @@ abstract class Client(socket: IO.SocketHandle) {
       n = iterator.getShort
       d = iterator.getShort
     } yield {
-      println(majorVersion)
-      log.debug("major version = {}", majorVersion)
+      logger.debug(s"major version: ${majorVersion}")
       if(majorVersion != Config.getInt("protocol.major-version")
         || minorVersion != Config.getInt("protocol.minor-version")) {
         throw new ProtocolException(socket, new ConnectionError("invalid protocol version"))
