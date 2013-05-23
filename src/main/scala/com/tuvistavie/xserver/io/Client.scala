@@ -15,32 +15,28 @@ class ClientManager extends Actor {
 
   val it = new IterateeRefAsync(Iteratee.unit)(context.dispatcher)
 
-  private var handle: Option[SocketHandle] = None
-
-  it flatMap { _ => initializeConnection }
-
-  def initializeConnection: Iteratee[Unit] = {
-    for {
-      a <- take(2)
-    } yield {
-      val endian = a.iterator.getByte.toChar
-      val client: Client = endian match {
-        case 'l' => new Client(handle.get) with LittleEndian
-        case 'B' => new Client(handle.get) with BigEndian
-        case _ => throw new ProtocolException(handle.get,
-          new ConnectionError("invalid endian") (java.nio.ByteOrder.LITTLE_ENDIAN)
-        )
-      }
+  def receive = {
+    case Read(handle, bytes) => {
+      val client = Client(handle.asSocket, bytes.head.toChar)
+      it(Chunk(bytes))
+      context become(handleMessages)
       it flatMap ( _ => client.handleConnection )
       it flatMap ( _ => client.handleMessages )
     }
   }
 
-  def receive() = {
-    case Read(socket, bytes) => {
-      if(handle == None) handle = Some(socket.asSocket)
-      it(Chunk(bytes))
-    }
+  def handleMessages: Actor.Receive = {
+    case Read(socket, bytes) => it(Chunk(bytes))
+  }
+}
+
+object Client {
+  def apply(socket: IO.SocketHandle, endian: Char) = endian match {
+    case 'l' => new Client(socket) with LittleEndian
+    case 'B' => new Client(socket) with BigEndian
+    case _ => throw new ProtocolException(socket,
+          new ConnectionError("invalid endian") (java.nio.ByteOrder.LITTLE_ENDIAN)
+          )
   }
 }
 
@@ -49,15 +45,20 @@ abstract class Client(socket: IO.SocketHandle) {
 
   implicit val endian: java.nio.ByteOrder
 
+  println(endian)
+
   def handleConnection: Iteratee[Unit] = {
     for {
-      info <- take(10)
+      info <- take(12)
       iterator = info.iterator
+      byteOrder = iterator.getByte
+      _ = iterator.getByte
       majorVersion = iterator.getShort
       minorVersion = iterator.getShort
       n = iterator.getShort
       d = iterator.getShort
     } yield {
+      println(majorVersion)
       if(majorVersion != Config.getInt("protocol.major-version")
         || minorVersion != Config.getInt("protocol.minor-version")) {
         throw new ProtocolException(socket, new ConnectionError("invalid protocol version"))
