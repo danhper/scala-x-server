@@ -1,7 +1,6 @@
 package com.tuvistavie.xserver.protocol
 
 import com.tuvistavie.xserver.io._
-import com.tuvistavie.util.Enumerable
 
 package object types {
   type Card8 = UInt8
@@ -21,6 +20,10 @@ package object types {
   type Keysym = Card32
   type Keycode = Card8
   type Button = Card8
+
+  trait Enumerable[T] {
+    def fromValue(value: Int): T
+  }
 
   def generateMaskSet[T](mask: Int, obj: Enumerable[T]): Set[T] = {
     def generate(mask: Int, currentVal: Int, set: Set[T]): Set[T] = {

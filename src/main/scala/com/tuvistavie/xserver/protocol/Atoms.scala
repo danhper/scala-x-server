@@ -1,12 +1,10 @@
 package com.tuvistavie.xserver.protocol.types
 
-import com.tuvistavie.util.Enumerable
-
 abstract sealed class Atom(override val value: Int) extends UInt32(value) {
   def toUInt32 = UInt32(value)
 }
 
-object Atom extends Enumerable[Atom] {
+object Atom {
   import atoms._
   def fromValue(value: Int) = value match {
     case Primary.value => Primary

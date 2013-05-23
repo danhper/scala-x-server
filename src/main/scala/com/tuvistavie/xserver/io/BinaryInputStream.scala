@@ -7,8 +7,6 @@ import java.io.InputStream
 import java.io.DataInputStream
 
 import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.util._
-
 
 abstract class BinaryInputStream(
   val inputStream: InputStream,
