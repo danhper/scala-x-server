@@ -1,9 +1,11 @@
 package com.tuvistavie.xserver
 
 import io.Server
+import util.Properties.{ settings => Config }
 
 object App {
   def main(args: Array[String]) = {
-    Server.startUp(1)
+    val displayNumber = Config.getInt("server.default-display")
+    Server.startUp(displayNumber)
   }
 }

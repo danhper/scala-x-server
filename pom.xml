@@ -75,6 +75,12 @@
             <arg>-language:postfixOps</arg>
             <arg>-language:implicitConversions</arg>
           </args>
+          <launchers>
+            <launcher>
+              <id>ServerLauncher</id>
+              <mainClass>com.tuvistavie.xserver.App</mainClass>
+            </launcher>
+          </launchers>
         </configuration>
         <executions>
           <execution>

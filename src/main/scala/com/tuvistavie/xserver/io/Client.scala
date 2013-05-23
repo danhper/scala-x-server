@@ -1,6 +1,7 @@
 package com.tuvistavie.xserver.io
 
 import akka.actor.{Actor, IO}
+import akka.event.Logging
 
 import com.tuvistavie.xserver.protocol.errors.{ BaseError, ConnectionError }
 import com.tuvistavie.xserver.util.IntWithPad._
@@ -43,9 +44,9 @@ object Client {
 abstract class Client(socket: IO.SocketHandle) {
   import IO._
 
-  implicit val endian: java.nio.ByteOrder
+  val log = Logging(Server.system, "Client")
 
-  println(endian)
+  implicit val endian: java.nio.ByteOrder
 
   def handleConnection: Iteratee[Unit] = {
     for {
@@ -59,6 +60,7 @@ abstract class Client(socket: IO.SocketHandle) {
       d = iterator.getShort
     } yield {
       println(majorVersion)
+      log.debug("major version = {}", majorVersion)
       if(majorVersion != Config.getInt("protocol.major-version")
         || minorVersion != Config.getInt("protocol.minor-version")) {
         throw new ProtocolException(socket, new ConnectionError("invalid protocol version"))
