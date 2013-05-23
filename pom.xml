@@ -35,6 +35,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-slf4j_2.10</artifactId>
+      <version>2.1.4</version>
+    </dependency>
+
+    <dependency>
       <groupId>net.liftweb</groupId>
       <artifactId>lift-json_2.10</artifactId>
       <version>2.5-RC6</version>
@@ -54,7 +60,7 @@
 
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.5</version>
     </dependency>
 
