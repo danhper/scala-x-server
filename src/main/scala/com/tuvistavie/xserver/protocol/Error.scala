@@ -39,7 +39,7 @@ abstract class Error (
 )
 
 object ErrorFactory {
-  def makeError[T](stream: BinaryInputStream, factory: (Card16, Option[Card32], Card16, Card8) => T) = {
+  def makeError[A](stream: BinaryInputStream, factory: (Card16, Option[Card32], Card16, Card8) => A) = {
     val sequenceNumber = stream.readCard16()
     val badValue = stream.readCard32()
     val minorOpCode = stream.readCard16()
@@ -48,7 +48,7 @@ object ErrorFactory {
     factory(sequenceNumber, Some(badValue), minorOpCode, majorOpCode)
   }
 
-  def makeError[T](stream: BinaryInputStream, factory: (Card16, Card16, Card8) => T) = {
+  def makeError[A](stream: BinaryInputStream, factory: (Card16, Card16, Card8) => A) = {
     val sequenceNumber = stream.readCard16()
     stream.skipBytes(4)
     val minorOpCode = stream.readCard16()

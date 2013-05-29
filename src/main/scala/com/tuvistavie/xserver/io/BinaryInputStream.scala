@@ -13,7 +13,7 @@ abstract class BinaryInputStream(
   val isBigEndian: Boolean
 ) extends DataInputStream(inputStream) {
 
-  def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T
+  def readSkip[A <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => A): A
 
   def readPad(n: IntValue) = skipBytes(n.padding)
 
@@ -55,8 +55,8 @@ abstract class BinaryInputStream(
   def readSetOfPointerEvent() = readCard32().asSetOfPointerEvent
   def readSetOfDeviceEvent() = readCard32().asSetOfDeviceEvent
 
-  def readList[T](n: Int)(implicit readVal: () => T): List[T] = {
-    val b = new ListBuffer[T]
+  def readList[A](n: Int)(implicit readVal: () => A): List[A] = {
+    val b = new ListBuffer[A]
     1 to n foreach { _ => b += readVal() }
     b.toList
   }
@@ -205,7 +205,7 @@ class BinaryInputStreamLSB(
   override val inputStream: InputStream
 ) extends BinaryInputStream(inputStream, false) {
 
-  override def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T = {
+  override def readSkip[A <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => A): A = {
     val value = readVal()
     skipBytes(n - valSize)
     value
@@ -222,7 +222,7 @@ class BinaryInputStreamMSB(
   override val inputStream: InputStream
 ) extends BinaryInputStream(inputStream, true) {
 
-  override def readSkip[T <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => T): T = {
+  override def readSkip[A <: KnownSize](n: Int, valSize: Int)(implicit readVal: () => A): A = {
     skipBytes(n - valSize)
     readVal()
   }

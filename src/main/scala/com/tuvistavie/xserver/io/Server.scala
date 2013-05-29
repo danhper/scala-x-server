@@ -1,12 +1,11 @@
 package com.tuvistavie.xserver.io
 
-import akka.actor.{ Actor, IO, IOManager, ActorLogging, Props, ActorSystem }
+import akka.actor.{ Actor, ActorRef, IO, IOManager, ActorLogging, Props, ActorSystem, Terminated }
 import akka.util.{ ByteString, ByteStringBuilder }
 import java.net.InetSocketAddress
-
 import com.tuvistavie.xserver.util.Properties.{settings => Config}
 
-class Server(displayNumber: Int) extends Actor with ActorLogging {
+private class Server(displayNumber: Int) extends Actor with ActorLogging {
   import IO._
 
   val port = displayNumber + Config.getInt("server.base-port")
@@ -18,16 +17,35 @@ class Server(displayNumber: Int) extends Actor with ActorLogging {
 
   def receive() = {
     case NewClient(server) => {
-      server.accept()(context.system.actorOf(Props[ClientManager]))
+      val child = context.actorOf(Props[ClientManager])
+      server.accept()(child)
       log.debug("new client connected")
+    }
+    case ClientConnectionAdded(socket, client) => {
+      Server.clientsBySocket += (socket -> client)
+      log.debug("client connection added")
+    }
+    case ClientConnectionClosed(socket) => {
+      Server.clientsBySocket -= socket
+      log.debug("client connection closed")
     }
   }
 }
 
 object Server {
   val system = ActorSystem("Server")
+  private var _ref: Option[ActorRef] = None
+  def ref = _ref.get
 
-  def startUp(displayNumber: Int) {
-    system.actorOf(Props(new Server(displayNumber)))
+  private var clientsBySocket = Map[IO.Handle, Client]()
+  private var clientsById = Map[IO.Handle, Client]()
+
+  private var currentId = 0
+
+  def startUp(displayNumber: Int) = _ref match {
+    case None => {
+      _ref = Some(system.actorOf(Props(new Server(displayNumber))))
+    }
+    case Some(_) => throw new InstantiationError("Server is already running")
   }
 }

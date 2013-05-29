@@ -59,7 +59,10 @@ object Connection extends Logging {
   def getOkResponse()(implicit endian: java.nio.ByteOrder): ByteString = {
     val builder = ByteString.newBuilder
     builder.putByte(1) // success
-    builder.fill(1)
+    builder.fill(1) // skip
+    builder.putShort(Config.getInt("protocol.major-version"))
+    builder.putShort(Config.getInt("protocol.minor-version"))
+    builder.putInt(Config.getInt("server.info.release-number"))
     builder result
   }
 }

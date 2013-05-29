@@ -10,15 +10,19 @@ import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 import com.tuvistavie.xserver.protocol.Connection
 import com.tuvistavie.xserver.protocol.misc.ProtocolException
 
+case class ClientConnectionAdded(socket: IO.Handle, client: Client)
+case class ClientConnectionClosed(socket: IO.Handle)
+
 class ClientManager extends Actor with Logging {
   import IO._
 
   val it = new IterateeRefAsync(Iteratee.unit)(context.dispatcher)
 
   def receive = {
-    case Read(handle, bytes) => {
+    case Read(socket, bytes) => {
       logger.debug(s"received client first packet ${bytes}")
-      val client = Client(handle.asSocket, bytes.head.toChar)
+      val client = Client(socket.asSocket, bytes.head.toChar)
+      context.parent ! ClientConnectionAdded(socket, client)
       it(Chunk(bytes))
       context become(handleMessages)
       it flatMap ( _ => client.handleConnection )
@@ -28,8 +32,10 @@ class ClientManager extends Actor with Logging {
 
   def handleMessages: Actor.Receive = {
     case Read(socket, bytes) => it(Chunk(bytes))
-    case Closed(socket: SocketHandle, cause) => {
+    case Closed(socket, cause) => {
       logger.info("client socket has been closed: {}", cause)
+      context.parent ! ClientConnectionClosed(socket)
+      context.stop(self)
     }
   }
 }
