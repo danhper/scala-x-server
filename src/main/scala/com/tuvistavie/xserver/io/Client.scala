@@ -11,17 +11,18 @@ import com.tuvistavie.xserver.protocol.Connection
 import com.tuvistavie.xserver.protocol.misc.ProtocolException
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
-case class ClientConnectionClosed(socket: IO.Handle)
+case class ClientConnectionClosed(id: Int)
 
-class ClientManager extends Actor with Logging {
+class ClientManager(private val id: Int) extends Actor with Logging {
   import IO._
 
   val it = new IterateeRefAsync(Iteratee.unit)(context.dispatcher)
+  private var client: Option[Client] = None
 
   def receive = {
     case Read(socket, bytes) => {
       logger.debug(s"received client first packet ${bytes}")
-      val client = Client(socket.asSocket, bytes.head.toChar)
+      val client = Client(id, socket.asSocket, bytes.head.toChar)
       context.parent ! ClientConnectionAdded(socket, client)
       it(Chunk(bytes))
       context become(handleMessages)
@@ -34,21 +35,21 @@ class ClientManager extends Actor with Logging {
     case Read(socket, bytes) => it(Chunk(bytes))
     case Closed(socket, cause) => {
       logger.info("client socket has been closed: {}", cause)
-      context.parent ! ClientConnectionClosed(socket)
+      context.parent ! ClientConnectionClosed(id)
       context.stop(self)
     }
   }
 }
 
 object Client extends Logging {
-  def apply(socket: IO.SocketHandle, endian: Char) = endian match {
+  def apply(id: Int, socket: IO.SocketHandle, endian: Char) = endian match {
     case 'l' => {
       logger.debug("initializing new client with little endian")
-      new Client(socket) with LittleEndian
+      new Client(id, socket) with LittleEndian
     }
     case 'B' => {
       logger.debug("initializing new client with big endian")
-      new Client(socket) with BigEndian
+      new Client(id, socket) with BigEndian
     }
     case _ => {
       logger.error(s"invalid endian info received: ${endian}")
@@ -57,7 +58,7 @@ object Client extends Logging {
   }
 }
 
-abstract class Client(handle: IO.SocketHandle) extends Logging {
+abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
   import IO._
 
   implicit val endian: java.nio.ByteOrder

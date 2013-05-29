@@ -4,6 +4,7 @@ import akka.actor.{ Actor, ActorRef, IO, IOManager, ActorLogging, Props, ActorSy
 import akka.util.{ ByteString, ByteStringBuilder }
 import java.net.InetSocketAddress
 import com.tuvistavie.xserver.util.Properties.{settings => Config}
+import com.typesafe.scalalogging.slf4j.Logging
 
 private class Server(displayNumber: Int) extends Actor with ActorLogging {
   import IO._
@@ -17,30 +18,43 @@ private class Server(displayNumber: Int) extends Actor with ActorLogging {
 
   def receive() = {
     case NewClient(server) => {
-      val child = context.actorOf(Props[ClientManager])
+      val child = context.actorOf(Props(new ClientManager(Server.currentId)))
       server.accept()(child)
       log.debug("new client connected")
     }
     case ClientConnectionAdded(socket, client) => {
-      Server.clientsBySocket += (socket -> client)
-      log.debug("client connection added")
+      Server.addClient(client)
     }
-    case ClientConnectionClosed(socket) => {
-      Server.clientsBySocket -= socket
-      log.debug("client connection closed")
+    case ClientConnectionClosed(clientId) => {
+      Server.removeClient(clientId)
     }
   }
 }
 
-object Server {
+object Server extends Logging {
   val system = ActorSystem("Server")
+
   private var _ref: Option[ActorRef] = None
   def ref = _ref.get
 
-  private var clientsBySocket = Map[IO.Handle, Client]()
-  private var clientsById = Map[IO.Handle, Client]()
+  private[this] var clientsById = Map[Int, Client]()
+  private var _currentId = 0
+  private def currentId = _currentId
 
-  private var currentId = 0
+  private def addClient(client: Client) {
+    clientsById += (currentId -> client)
+    logger.debug(s"added client with id: ${currentId}")
+    _currentId += 1
+  }
+
+  private def removeClient(clientId: Int) {
+    clientsById -= clientId
+    logger.debug(s"removed client with id: ${clientId}")
+  }
+
+  def getClient(clientId: Int) {
+    clientsById get(clientId)
+  }
 
   def startUp(displayNumber: Int) = _ref match {
     case None => {
