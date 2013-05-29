@@ -52,8 +52,10 @@ object Server extends Logging {
     logger.debug(s"removed client with id: ${clientId}")
   }
 
-  def getClient(clientId: Int) {
-    clientsById get(clientId)
+  def getClient(clientId: Int): Client = clientsById get (clientId) match {
+    case None => throw new NoSuchElementException("no client with id " + clientId)
+    case Some(c) => c
+
   }
 
   def startUp(displayNumber: Int) = _ref match {
