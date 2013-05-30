@@ -20,8 +20,9 @@ private class Server(displayNumber: Int) extends Actor with ActorLogging {
   def receive() = {
     case NewClient(server) => {
       val child = context.actorOf(Props(new ClientManager(Server.currentId)))
-      server.accept()(child)
-      log.debug("new client connected")
+      var socket = server.accept()(child)
+      log.info("new client connected with uuid: {}", socket.uuid)
+
     }
     case ClientConnectionAdded(socket, client) => {
       Server.addClient(client)
@@ -60,8 +61,7 @@ object Server extends Logging {
 
   def startUp(displayNumber: Int) = _ref match {
     case None => {
-      val server = new Server(displayNumber)
-      _ref = Some(system.actorOf(Props(server), "mainServer"))
+      _ref = Some(system.actorOf(Props(new Server(displayNumber)), "mainServer"))
     }
     case Some(_) => throw new InstantiationError("Server is already running")
   }

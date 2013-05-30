@@ -36,8 +36,8 @@ object Connection extends Logging {
       n = iterator.getShort
       d = iterator.getShort
     } yield {
-      val serverMajorVersion = Config.getInt("protocol.major-version")
-      val serverMinorVersion = Config.getInt("protocol.minor-version")
+      val serverMajorVersion = Config.getInt("server.protocol.major-version")
+      val serverMinorVersion = Config.getInt("server.protocol.minor-version")
       (majorVersion, minorVersion) match {
         case (serverMajorVersion, serverMinorVersion) => {
           logger.debug(s"initializing connection with X major version = ${majorVersion}")
@@ -62,13 +62,15 @@ object Connection extends Logging {
     val builder = ByteString.newBuilder
     builder.putByte(1) // success
     builder.fill(1) // skip
-    builder.putShort(Config.getInt("protocol.major-version"))
-    builder.putShort(Config.getInt("protocol.minor-version"))
+    builder.putShort(Config.getInt("server.protocol.major-version"))
+    builder.putShort(Config.getInt("server.protocol.minor-version"))
     builder.putInt(Config.getInt("server.info.release-number"))
     builder.putInt(clientId << ServerInfo.clientOffset) // resource id base
     builder.putInt(ServerInfo.clientMask)
-    builder.putInt(Config.getInt("server.settings.motion-buffer-size"))
+    builder.putInt(Config.getInt("server.misc.motion-buffer-size"))
     builder.putShort(Config.getString("server.info.vendor").length)
+    builder.putShort(Config.getInt("server.misc.maximum-request-length"))
+    builder.putByte(Config.getInt("server.display.number-of-screens").toByte)
     builder result
   }
 }

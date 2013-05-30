@@ -6,7 +6,6 @@ import com.typesafe.scalalogging.slf4j.Logging
 
 import com.tuvistavie.xserver.protocol.errors.{ BaseError, ConnectionError }
 import com.tuvistavie.xserver.util.IntWithPad._
-import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 import com.tuvistavie.xserver.protocol.Connection
 import com.tuvistavie.xserver.protocol.misc.ProtocolException
 
@@ -34,7 +33,7 @@ class ClientManager(private val id: Int) extends Actor with Logging {
   def handleMessages: Actor.Receive = {
     case Read(socket, bytes) => it(Chunk(bytes))
     case Closed(socket, cause) => {
-      logger.info("client socket has been closed: {}", cause)
+      logger.info("client socket with uuid {} has been closed: {}", socket.uuid, cause)
       context.parent ! ClientConnectionClosed(id)
       context.stop(self)
     }

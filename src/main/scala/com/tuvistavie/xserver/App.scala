@@ -5,7 +5,7 @@ import util.Properties.{ settings => Config }
 
 object App {
   def main(args: Array[String]) = {
-    val displayNumber = Config.getInt("server.default-display")
+    val displayNumber = Config.getInt("server.display.default")
     Server.startUp(displayNumber)
   }
 }
