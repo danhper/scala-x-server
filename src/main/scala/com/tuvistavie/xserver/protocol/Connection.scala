@@ -11,8 +11,10 @@ import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 import errors.ConnectionError
 import misc.ProtocolException
 
+import com.tuvistavie.xserver.model.ServerInfo
 
-case class Connection(
+
+case class Connection (
   majorVersion: Int,
   minorVersion: Int,
   authProtocolName: Option[String],
@@ -56,13 +58,17 @@ object Connection extends Logging {
     }
   }
 
-  def getOkResponse()(implicit endian: java.nio.ByteOrder): ByteString = {
+  def getOkResponse(clientId: Int)(implicit endian: java.nio.ByteOrder): ByteString = {
     val builder = ByteString.newBuilder
     builder.putByte(1) // success
     builder.fill(1) // skip
     builder.putShort(Config.getInt("protocol.major-version"))
     builder.putShort(Config.getInt("protocol.minor-version"))
     builder.putInt(Config.getInt("server.info.release-number"))
+    builder.putInt(clientId << ServerInfo.clientOffset) // resource id base
+    builder.putInt(ServerInfo.clientMask)
+    builder.putInt(Config.getInt("server.settings.motion-buffer-size"))
+    builder.putShort(Config.getString("server.info.vendor").length)
     builder result
   }
 }

@@ -1,9 +1,10 @@
 package com.tuvistavie.xserver.io
 
-import akka.actor.{ Actor, ActorRef, IO, IOManager, ActorLogging, Props, ActorSystem, Terminated }
+import akka.actor.{ Actor, ActorRef, IO, IOManager, Props }
+import akka.actor.{ ActorLogging, ActorSystem, Terminated }
 import akka.util.{ ByteString, ByteStringBuilder }
 import java.net.InetSocketAddress
-import com.tuvistavie.xserver.util.Properties.{settings => Config}
+import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 import com.typesafe.scalalogging.slf4j.Logging
 
 private class Server(displayNumber: Int) extends Actor with ActorLogging {
@@ -55,12 +56,12 @@ object Server extends Logging {
   def getClient(clientId: Int): Client = clientsById get (clientId) match {
     case None => throw new NoSuchElementException("no client with id " + clientId)
     case Some(c) => c
-
   }
 
   def startUp(displayNumber: Int) = _ref match {
     case None => {
-      _ref = Some(system.actorOf(Props(new Server(displayNumber))))
+      val server = new Server(displayNumber)
+      _ref = Some(system.actorOf(Props(server), "mainServer"))
     }
     case Some(_) => throw new InstantiationError("Server is already running")
   }

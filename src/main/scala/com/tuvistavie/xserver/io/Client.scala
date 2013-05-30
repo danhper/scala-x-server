@@ -70,7 +70,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     } yield {
       connection match {
         case Connection(_, _, None, None) => {
-          socket write Connection.getOkResponse()
+          socket write Connection.getOkResponse(id)
           logger.debug("sent ok response for connection")
         }
         case Connection(_, _, _, _) => {
