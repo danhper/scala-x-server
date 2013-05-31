@@ -21,6 +21,11 @@ class ExtendedByteStringBuilder(builder: ByteStringBuilder) {
   def writePadding(n: Int) {
     fill(n.padding)
   }
+
+  def putBoolean(b: Boolean) {
+    if(b) builder.putByte(0)
+    else builder.putByte(1)
+  }
 }
 
 object ExtendedByteStringBuilder {
