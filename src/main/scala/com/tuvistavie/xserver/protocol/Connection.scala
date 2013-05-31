@@ -7,8 +7,7 @@ import com.tuvistavie.xserver.util.{ ExtendedByteIterator, ExtendedByteStringBui
 import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 import errors.ConnectionError
 import misc.ProtocolException
-import com.tuvistavie.xserver.model.ServerInfo
-import com.tuvistavie.xserver.model.PixmapFormat
+import com.tuvistavie.xserver.model.{ ServerInfo, PixmapFormat, Keyboard }
 
 
 case class Connection (
@@ -73,6 +72,14 @@ object Connection extends Logging {
     builder.putByte(Config.getInt("server.bitmap.byte-order").toByte)
     builder.putByte(Config.getInt("server.bitmap.scanline-unit").toByte)
     builder.putByte(Config.getInt("server.bitmap.scanline-pad").toByte)
-    builder result
+    builder.putByte(Keyboard.minCode.toByte)
+    builder.putByte(Keyboard.maxCode.toByte)
+    builder.fill(4)
+    builder.putBytes(Config.getString("server.info.vendor").getBytes())
+    builder.writePadding(Config.getString("server.info.vendor").length)
+    val serverInfo = builder.result
+    val pixmapFormats: ByteString = PixmapFormat.formats map { _.toByteString } reduce (_++_)
+
+    serverInfo ++ pixmapFormats
   }
 }
