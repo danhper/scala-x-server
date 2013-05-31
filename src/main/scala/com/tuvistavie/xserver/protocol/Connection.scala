@@ -2,16 +2,13 @@ package com.tuvistavie.xserver.protocol
 
 import akka.actor.IO
 import akka.util.ByteString
-
 import com.typesafe.scalalogging.slf4j.Logging
-
 import com.tuvistavie.xserver.util.{ ExtendedByteIterator, ExtendedByteStringBuilder}
-
 import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 import errors.ConnectionError
 import misc.ProtocolException
-
 import com.tuvistavie.xserver.model.ServerInfo
+import com.tuvistavie.xserver.model.PixmapFormat
 
 
 case class Connection (
@@ -71,6 +68,11 @@ object Connection extends Logging {
     builder.putShort(Config.getString("server.info.vendor").length)
     builder.putShort(Config.getInt("server.misc.maximum-request-length"))
     builder.putByte(Config.getInt("server.display.number-of-screens").toByte)
+    builder.putByte(PixmapFormat.formats.length.toByte)
+    builder.putByte(Config.getInt("server.image.byte-order").toByte)
+    builder.putByte(Config.getInt("server.bitmap.byte-order").toByte)
+    builder.putByte(Config.getInt("server.bitmap.scanline-unit").toByte)
+    builder.putByte(Config.getInt("server.bitmap.scanline-pad").toByte)
     builder result
   }
 }
