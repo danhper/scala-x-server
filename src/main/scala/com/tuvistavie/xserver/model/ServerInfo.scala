@@ -11,6 +11,5 @@ object ServerInfo {
 
   val clientOffset = bitsForResources
   val clientMask = ((1 << bitsForClients) - 1) << bitsForResources
-
-
+  val idMask = (1 << bitsForResources) - 1
 }

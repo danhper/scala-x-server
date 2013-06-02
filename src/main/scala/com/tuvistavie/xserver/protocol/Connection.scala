@@ -62,7 +62,7 @@ object Connection extends Logging {
     builder.putShort(Config.getInt("server.protocol.minor-version"))
     builder.putInt(Config.getInt("server.info.release-number"))
     builder.putInt(clientId << ServerInfo.clientOffset) // resource id base
-    builder.putInt(ServerInfo.clientMask)
+    builder.putInt(ServerInfo.idMask)
     builder.putInt(Config.getInt("server.misc.motion-buffer-size"))
     builder.putShort(Config.getString("server.info.vendor").length)
     builder.putShort(Config.getInt("server.misc.maximum-request-length"))

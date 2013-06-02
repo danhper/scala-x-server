@@ -48,9 +48,9 @@ class Screen (
 }
 
 object Screen {
-  val root: Screen = getRootFromConfig
+  val main: Screen = getFromConfig
 
-  private[this] def getRootFromConfig = {
+  private[this] def getFromConfig = {
     new Screen(1,2,3)
   }
 }
