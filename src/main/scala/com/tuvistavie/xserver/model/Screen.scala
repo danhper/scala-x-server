@@ -3,6 +3,7 @@ package com.tuvistavie.xserver.model
 import akka.util.ByteString
 import com.tuvistavie.xserver.util.ExtendedByteStringBuilder
 import com.tuvistavie.xserver.util.Computations
+import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 
 class Screen (
   val root: Int,
@@ -22,6 +23,8 @@ class Screen (
 ) {
   def widthInMm: Int = Computations.pixelsToMillimeters(widthInPixels)
   def heightInMm: Int = Computations.pixelsToMillimeters(heightInPixels)
+
+  def lengthInBytes: Int = 0
 
   def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     import ExtendedByteStringBuilder._
@@ -51,7 +54,9 @@ object Screen {
   val main: Screen = getFromConfig
 
   private[this] def getFromConfig = {
-    new Screen(1,2,3)
+    new Screen(
+      Config.getInt("server.screen.root-id")
+    )
   }
 }
 
@@ -62,10 +67,10 @@ class Depth (
   def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     import ExtendedByteStringBuilder._
     val builder = ByteString.newBuilder
-    builder.putByte(depth toByte)
-    builder.fill(1)
-    builder.putShort(visuals.length toShort)
-    builder.fill(4)
+    builder putByte(depth toByte)
+    builder fill(1)
+    builder putShort(visuals.length toShort)
+    builder fill(4)
     val visualsByteString = visuals map { _.toByteString } reduce (_++_)
     builder.result ++ visualsByteString
   }
@@ -83,14 +88,14 @@ class VisualType (
   def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     import ExtendedByteStringBuilder._
     val builder = ByteString.newBuilder
-    builder.putInt(visualId)
-    builder.putByte(colorClass.id toByte)
-    builder.putByte(bitsPerRgbValue toByte)
-    builder.putShort(colorMapEntries toShort)
-    builder.putInt(redMask)
-    builder.putInt(greenMask)
-    builder.putInt(blueMask)
-    builder.fill(4)
+    builder putInt(visualId)
+    builder putByte(colorClass.id toByte)
+    builder putByte(bitsPerRgbValue toByte)
+    builder putShort(colorMapEntries toShort)
+    builder putInt(redMask)
+    builder putInt(greenMask)
+    builder putInt(blueMask)
+    builder fill(4)
     builder result
   }
 }

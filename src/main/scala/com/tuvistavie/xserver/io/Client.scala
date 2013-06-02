@@ -5,7 +5,6 @@ import akka.actor.{Actor, IO}
 import com.typesafe.scalalogging.slf4j.Logging
 
 import com.tuvistavie.xserver.protocol.errors.{ BaseError, ConnectionError }
-import com.tuvistavie.xserver.util.IntWithPad._
 import com.tuvistavie.xserver.protocol.Connection
 import com.tuvistavie.xserver.protocol.misc.ProtocolException
 
@@ -21,12 +20,12 @@ class ClientManager(private val id: Int) extends Actor with Logging {
   def receive = {
     case Read(socket, bytes) => {
       logger.debug(s"received client first packet ${bytes}")
-      val client = Client(id, socket.asSocket, bytes.head.toChar)
+      val client = Client(id, socket asSocket, bytes.head toChar)
       context.parent ! ClientConnectionAdded(socket, client)
       it(Chunk(bytes))
       context become(handleMessages)
-      it flatMap ( _ => client.handleConnection )
-      it flatMap ( _ => client.handleMessages )
+      it flatMap ( _ => client handleConnection )
+      it flatMap ( _ => client handleMessages )
     }
   }
 

@@ -11,7 +11,7 @@ object Resource {
 
   def canAllocate(id: Int) = !allocated.contains(id)
 
-  def isAllocated(id: Int) = allocated.contains(id)
+  def isAllocated(id: Int) = allocated contains(id)
 
   def allocate(id: Int, resource: Resource): Boolean = {
     if(canAllocate(id)) {
