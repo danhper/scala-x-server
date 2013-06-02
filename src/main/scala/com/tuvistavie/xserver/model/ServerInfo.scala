@@ -3,7 +3,6 @@ package com.tuvistavie.xserver.model
 import com.tuvistavie.xserver.util.Properties.{ settings => Config }
 
 object ServerInfo {
-
   val bitsForResources = 22
   val bitsForClients = 7
 

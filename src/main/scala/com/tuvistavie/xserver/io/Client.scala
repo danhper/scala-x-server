@@ -72,8 +72,9 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
           socket write Connection.getOkResponse(id)
           logger.debug("sent ok response for connection")
         }
-        case Connection(_, _, _, _) => {
-          throw new ProtocolException(ConnectionError("authentication not supported by server"))
+        case _ => {
+          socket write ConnectionError("authentication not supported").toBytes
+          logger.debug("refused connection needing auth")
         }
       }
     }

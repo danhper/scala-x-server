@@ -55,6 +55,7 @@ object Connection extends Logging {
   }
 
   def getOkResponse(clientId: Int)(implicit endian: java.nio.ByteOrder): ByteString = {
+    import com.tuvistavie.xserver.util.Conversion._
     val builder = ByteString.newBuilder
     builder.putByte(1) // success
     builder.fill(1) // skip
@@ -66,14 +67,14 @@ object Connection extends Logging {
     builder.putInt(Config.getInt("server.misc.motion-buffer-size"))
     builder.putShort(Config.getString("server.info.vendor").length)
     builder.putShort(Config.getInt("server.misc.maximum-request-length"))
-    builder.putByte(Config.getInt("server.display.number-of-screens").toByte)
-    builder.putByte(PixmapFormat.formats.length.toByte)
-    builder.putByte(Config.getInt("server.image.byte-order").toByte)
-    builder.putByte(Config.getInt("server.bitmap.byte-order").toByte)
-    builder.putByte(Config.getInt("server.bitmap.scanline-unit").toByte)
-    builder.putByte(Config.getInt("server.bitmap.scanline-pad").toByte)
-    builder.putByte(Keyboard.minCode.toByte)
-    builder.putByte(Keyboard.maxCode.toByte)
+    builder.putByte(Config.getInt("server.display.number-of-screens"))
+    builder.putByte(PixmapFormat.formats.length)
+    builder.putByte(Config.getInt("server.image.byte-order"))
+    builder.putByte(Config.getInt("server.bitmap.byte-order"))
+    builder.putByte(Config.getInt("server.bitmap.scanline-unit"))
+    builder.putByte(Config.getInt("server.bitmap.scanline-pad"))
+    builder.putByte(Keyboard.minCode)
+    builder.putByte(Keyboard.maxCode)
     builder.fill(4)
     builder.putBytes(Config.getString("server.info.vendor").getBytes())
     builder.writePadding(Config.getString("server.info.vendor").length)
