@@ -84,7 +84,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     for {
       a <- take(1)
     } yield {
-      println(a)
+      logger.debug(s"handling ${a}")
     }
   }
 }

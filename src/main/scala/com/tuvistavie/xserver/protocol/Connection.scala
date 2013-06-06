@@ -64,6 +64,7 @@ object Connection extends Logging {
       + Screen.main.lengthInBytes
       ) / 4
     )
+    logger.debug(s"calculated reply length: ${replyLength}")
     val builder = ByteString.newBuilder
     builder putByte(1) // success
     builder fill(1) // skip
@@ -77,6 +78,7 @@ object Connection extends Logging {
     builder putShort(Config.getString("server.info.vendor") length)
     builder putShort(Config.getInt("server.misc.maximum-request-length"))
     builder putByte(Config.getInt("server.display.number-of-screens"))
+    logger.debug(s"${PixmapFormat.formats.length} pixmap formats")
     builder putByte(PixmapFormat.formats.length)
     builder putByte(Config.getInt("server.image.byte-order"))
     builder putByte(Config.getInt("server.bitmap.byte-order"))

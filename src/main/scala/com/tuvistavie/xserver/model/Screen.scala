@@ -26,7 +26,7 @@ class Screen (
   def widthInMm: Int = Computations.pixelsToMillimeters(widthInPixels)
   def heightInMm: Int = Computations.pixelsToMillimeters(heightInPixels)
 
-  def lengthInBytes: Int = 0
+  def lengthInBytes: Int = 40 + allowedDepths.map(_.lengthInBytes).sum
 
   def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     import ExtendedByteStringBuilder._
@@ -79,6 +79,8 @@ class Depth (
   val depth: Int,
   val visuals: List[VisualType]
 ) {
+  def lengthInBytes = 8 + visuals.map(_.lengthInBytes).sum
+
   def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     import ExtendedByteStringBuilder._
     val builder = ByteString.newBuilder
@@ -100,6 +102,8 @@ class VisualType (
   val greenMask: Int,
   val blueMask: Int
 ) {
+  def lengthInBytes = 24
+
   def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     import ExtendedByteStringBuilder._
     val builder = ByteString.newBuilder
