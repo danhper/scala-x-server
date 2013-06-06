@@ -29,22 +29,22 @@ class Screen (
   def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     import ExtendedByteStringBuilder._
     val builder = ByteString.newBuilder
-    builder.putInt(root)
-    builder.putInt(colorMap)
-    builder.putInt(whitePixel)
-    builder.putInt(blackPixel)
-    builder.putInt(currentInputMasks)
-    builder.putShort(widthInPixels)
-    builder.putShort(heightInPixels)
-    builder.putShort(widthInMm)
-    builder.putShort(heightInMm)
-    builder.putShort(minInstalledMaps)
-    builder.putShort(maxInstalledMaps)
-    builder.putInt(rootVisual)
-    builder.putByte(backingStores.id().toByte)
-    builder.putBoolean(saveUnder)
-    builder.putByte(rootDepth.toByte)
-    builder.putByte(allowedDepths.length.toByte)
+    builder putInt(root)
+    builder putInt(colorMap)
+    builder putInt(whitePixel)
+    builder putInt(blackPixel)
+    builder putInt(currentInputMasks)
+    builder putShort(widthInPixels)
+    builder putShort(heightInPixels)
+    builder putShort(widthInMm)
+    builder putShort(heightInMm)
+    builder putShort(minInstalledMaps)
+    builder putShort(maxInstalledMaps)
+    builder putInt(rootVisual)
+    builder putByte(backingStores.id().toByte)
+    builder putBoolean(saveUnder)
+    builder putByte(rootDepth.toByte)
+    builder putByte(allowedDepths.length.toByte)
     val depths = allowedDepths map { _.toByteString } reduce (_++_)
     builder.result ++ depths
   }
@@ -55,7 +55,20 @@ object Screen {
 
   private[this] def getFromConfig = {
     new Screen(
-      Config.getInt("server.screen.root-id")
+      Config.getInt("server.screen.root-id"),
+      2,
+      0xff,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      BackingStores.Never,
+      false,
+      0,
+      List()
     )
   }
 }

@@ -4,7 +4,7 @@ import akka.actor.{Actor, IO}
 
 import com.typesafe.scalalogging.slf4j.Logging
 
-import com.tuvistavie.xserver.protocol.errors.{ BaseError, ConnectionError }
+import com.tuvistavie.xserver.protocol.errors.ConnectionError
 import com.tuvistavie.xserver.protocol.Connection
 import com.tuvistavie.xserver.protocol.misc.ProtocolException
 
@@ -68,8 +68,9 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     } yield {
       connection match {
         case Connection(_, _, None, None) => {
-          socket write Connection.getOkResponse(id)
-          logger.debug("sent ok response for connection")
+          val response = Connection.getOkResponse(id)
+          logger.debug(s"sending ok response to client ${id} with length of ${response.length}")
+          socket write response
         }
         case _ => {
           socket write ConnectionError("authentication not supported").toBytes

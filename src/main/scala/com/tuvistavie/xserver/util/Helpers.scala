@@ -28,17 +28,17 @@ class ExtendedByteIterator(iterator: ByteIterator) {
   import Conversions._
 
   def skip(n: Int) {
-    (1 to n) foreach { _ => iterator.getByte}
+    (1 to n) foreach { _ => iterator getByte }
   }
 
   def skipPadding(n: Int) {
-    skip(n.padding)
+    skip(n padding)
   }
 
   def getString(n: Int): String = {
     val byteArray: Array[Byte] = new Array[Byte](n)
     iterator.getBytes(byteArray)
-    byteArray.toString()
+    byteArray toString
   }
 }
 

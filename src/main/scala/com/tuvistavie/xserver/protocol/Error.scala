@@ -6,7 +6,7 @@ import com.tuvistavie.xserver.protocol.ByteSerializable
 import com.tuvistavie.xserver.io._
 import com.tuvistavie.xserver.protocol.types._
 
-import com.tuvistavie.xserver.util.IntWithPad._
+import com.tuvistavie.xserver.util.Conversions._
 import com.tuvistavie.xserver.util.ExtendedByteStringBuilder._
 import com.tuvistavie.xserver.util.Properties.{settings => Config}
 
