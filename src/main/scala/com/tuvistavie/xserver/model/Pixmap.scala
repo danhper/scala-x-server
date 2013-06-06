@@ -1,16 +1,17 @@
 package com.tuvistavie.xserver.model
 
 import com.tuvistavie.xserver.util.Properties.{ settings => Config }
+import com.typesafe.scalalogging.slf4j.Logging
 import com.typesafe.config.ConfigValue
 import java.util.HashMap
 import akka.util.ByteString
 import com.tuvistavie.xserver.util.ExtendedByteStringBuilder
 
-class PixmapFormat(
+class PixmapFormat (
   val depth: Int,
   val bitPerPixel: Int,
   val scanLinePad: Int
-) {
+) extends Logging {
   def toByteString: ByteString = {
     import ExtendedByteStringBuilder._
     val builder = ByteString.newBuilder

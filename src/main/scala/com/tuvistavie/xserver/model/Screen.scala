@@ -1,6 +1,8 @@
 package com.tuvistavie.xserver.model
 
 import akka.util.ByteString
+import com.typesafe.scalalogging.slf4j.Logging
+
 import com.tuvistavie.xserver.util.ExtendedByteStringBuilder
 import com.tuvistavie.xserver.util.Computations
 import com.tuvistavie.xserver.util.Properties.{ settings => Config }
@@ -20,7 +22,7 @@ class Screen (
   val saveUnder: Boolean,
   val rootDepth: Int,
   val allowedDepths: List[Depth]
-) {
+) extends Logging {
   def widthInMm: Int = Computations.pixelsToMillimeters(widthInPixels)
   def heightInMm: Int = Computations.pixelsToMillimeters(heightInPixels)
 
@@ -45,7 +47,7 @@ class Screen (
     builder putBoolean(saveUnder)
     builder putByte(rootDepth.toByte)
     builder putByte(allowedDepths.length.toByte)
-    val depths = allowedDepths map { _.toByteString } reduce (_++_)
+    val depths: ByteString = (ByteString.empty /: allowedDepths.map { _.toByteString }) (_++_)
     builder.result ++ depths
   }
 }

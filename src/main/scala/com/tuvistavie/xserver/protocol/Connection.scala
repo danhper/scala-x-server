@@ -70,7 +70,7 @@ object Connection extends Logging {
     builder putShort(Config.getInt("server.protocol.major-version"))
     builder putShort(Config.getInt("server.protocol.minor-version"))
     builder putShort(replyLength)
-    builder putInt(Config.getInt("server.info.release-number"))
+    builder putInt(Config.getInt("server.info.release-version"))
     builder putInt(clientId << ServerInfo.clientOffset) // resource id base
     builder putInt(ServerInfo.idMask)
     builder putInt(Config.getInt("server.misc.motion-buffer-size"))
@@ -89,7 +89,7 @@ object Connection extends Logging {
     builder writePadding(Config.getString("server.info.vendor") length)
     val serverInfo = builder result
     val pixmapFormats: ByteString = PixmapFormat.formats map { _ toByteString } reduce (_++_)
-    val screenInfo = Screen.main toByteString
+    val screenInfo = Screen.main toByteString;
 
     serverInfo ++ pixmapFormats ++ screenInfo
   }
