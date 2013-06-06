@@ -56,6 +56,7 @@ object Screen {
   val main: Screen = getFromConfig
 
   private[this] def getFromConfig = {
+    // TODO: change to real values
     new Screen(
       Config.getInt("server.screen.root-id"),
       2,
