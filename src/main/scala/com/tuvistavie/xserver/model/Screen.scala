@@ -47,7 +47,7 @@ class Screen (
     builder putBoolean(saveUnder)
     builder putByte(rootDepth.toByte)
     builder putByte(allowedDepths.length.toByte)
-    val depths: ByteString = (ByteString.empty /: allowedDepths.map { _.toByteString }) (_++_)
+    val depths: ByteString = (ByteString.empty /: allowedDepths.map(_.toByteString)) (_++_)
     builder.result ++ depths
   }
 }
@@ -88,7 +88,7 @@ class Depth (
     builder fill(1)
     builder putShort(visuals.length toShort)
     builder fill(4)
-    val visualsByteString = visuals map { _.toByteString } reduce (_++_)
+    val visualsByteString = (ByteString.empty /: visuals.map(_.toByteString)) (_++_)
     builder.result ++ visualsByteString
   }
 }

@@ -90,8 +90,8 @@ object Connection extends Logging {
     builder putBytes(Config.getString("server.info.vendor") getBytes)
     builder writePadding(Config.getString("server.info.vendor") length)
     val serverInfo = builder result
-    val pixmapFormats: ByteString = PixmapFormat.formats map { _ toByteString } reduce (_++_)
-    val screenInfo = Screen.main toByteString;
+    val pixmapFormats = (ByteString.empty /: PixmapFormat.formats.map(_ toByteString)) (_++_)
+    val screenInfo = Screen.main toByteString
 
     serverInfo ++ pixmapFormats ++ screenInfo
   }
