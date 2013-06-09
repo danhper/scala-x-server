@@ -55,7 +55,7 @@ object Connection extends Logging {
   }
 
   def getOkResponse(clientId: Int)(implicit endian: java.nio.ByteOrder): ByteString = {
-    import com.tuvistavie.xserver.util.Conversions._
+    import com.tuvistavie.xserver.backend.util.Conversions._
     val replyLength = (
       8
     + 2 * PixmapFormat.formats.length
