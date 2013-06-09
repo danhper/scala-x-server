@@ -17,8 +17,9 @@ object Application extends Controller with UnixAuthentication {
   }
 
   def doLogin() = Action { implicit request =>
-    val (user, password) = loginForm.bindFromRequest.get
-    Ok(views.html.index("Your new application is ready."))
+    loginForm.bindFromRequest.fold (
+      formWithErrors => BadRequest(views.html.login()),
+      b => Redirect(com.tuvistavie.xserver.frontend.controllers.routes.Application.index)
+    )
   }
-
 }
