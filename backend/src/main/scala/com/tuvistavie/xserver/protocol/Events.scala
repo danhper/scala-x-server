@@ -1,7 +1,7 @@
-package com.tuvistavie.xserver.protocol.events
+package com.tuvistavie.xserver.backend.protocol.events
 
-import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.xserver.io._
+import com.tuvistavie.xserver.backend.protocol.types._
+import com.tuvistavie.xserver.backend.io._
 
 abstract class Event(val code: Int8)
 

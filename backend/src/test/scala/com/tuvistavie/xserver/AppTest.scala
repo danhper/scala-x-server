@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver
+package com.tuvistavie.xserver.backend
 
 import org.junit.Test
 import org.junit.Assert._

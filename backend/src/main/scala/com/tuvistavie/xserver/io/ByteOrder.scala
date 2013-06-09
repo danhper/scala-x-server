@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.io
+package com.tuvistavie.xserver.backend.io
 
 abstract sealed trait ByteOrder {
   implicit val endian: java.nio.ByteOrder

@@ -1,8 +1,8 @@
-package com.tuvistavie.xserver
+package com.tuvistavie.xserver.backend
 
 import io.Server
 import util.Properties.{ settings => Config }
-import com.tuvistavie.xserver.model.PixmapFormat
+import com.tuvistavie.xserver.backend.model.PixmapFormat
 
 object App {
   def main(args: Array[String]) = {

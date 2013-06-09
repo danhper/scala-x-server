@@ -82,7 +82,7 @@
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
-          <mainClass>com.tuvistavie.xserver.App</mainClass>
+          <mainClass>com.tuvistavie.xserver.backend.App</mainClass>
         </configuration>
       </plugin>
 

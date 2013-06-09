@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.io
+package com.tuvistavie.xserver.backend.io
 
 import scala.language.implicitConversions
 import scala.collection.mutable.ListBuffer
@@ -6,7 +6,7 @@ import scala.collection.mutable.ListBuffer
 import java.io.InputStream
 import java.io.DataInputStream
 
-import com.tuvistavie.xserver.protocol.types._
+import com.tuvistavie.xserver.backend.protocol.types._
 
 abstract class BinaryInputStream(
   val inputStream: InputStream,

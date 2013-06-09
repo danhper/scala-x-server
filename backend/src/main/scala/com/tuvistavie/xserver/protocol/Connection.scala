@@ -1,13 +1,13 @@
-package com.tuvistavie.xserver.protocol
+package com.tuvistavie.xserver.backend.protocol
 
 import akka.actor.IO
 import akka.util.ByteString
 import com.typesafe.scalalogging.slf4j.Logging
-import com.tuvistavie.xserver.util.{ ExtendedByteIterator, ExtendedByteStringBuilder}
-import com.tuvistavie.xserver.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, ExtendedByteStringBuilder}
+import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
 import errors.ConnectionError
 import misc.ProtocolException
-import com.tuvistavie.xserver.model.{ ServerInfo, PixmapFormat, Keyboard, Screen }
+import com.tuvistavie.xserver.backend.model.{ ServerInfo, PixmapFormat, Keyboard, Screen }
 
 
 case class Connection (

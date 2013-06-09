@@ -1,8 +1,8 @@
-package com.tuvistavie.xserver.protocol
+package com.tuvistavie.xserver.backend.protocol
 
 import akka.util.ByteString
 
-import com.tuvistavie.xserver.io.ByteOrder
+import com.tuvistavie.xserver.backend.io.ByteOrder
 
 trait ByteSerializable {
   implicit val endian: java.nio.ByteOrder

@@ -1,11 +1,11 @@
-package com.tuvistavie.xserver.io
+package com.tuvistavie.xserver.backend.io
 
 import scala.language.implicitConversions
 
 import java.io.OutputStream
 import java.io.DataOutputStream
 
-import com.tuvistavie.xserver.protocol.types._
+import com.tuvistavie.xserver.backend.protocol.types._
 
 abstract class BinaryOutputStream(
   val outputStream: OutputStream,

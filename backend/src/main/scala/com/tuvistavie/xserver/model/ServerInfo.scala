@@ -1,6 +1,6 @@
-package com.tuvistavie.xserver.model
+package com.tuvistavie.xserver.backend.model
 
-import com.tuvistavie.xserver.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
 
 object ServerInfo {
   val bitsForResources = 22

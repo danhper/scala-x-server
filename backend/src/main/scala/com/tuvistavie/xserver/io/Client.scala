@@ -1,12 +1,12 @@
-package com.tuvistavie.xserver.io
+package com.tuvistavie.xserver.backend.io
 
 import akka.actor.{Actor, IO}
 
 import com.typesafe.scalalogging.slf4j.Logging
 
-import com.tuvistavie.xserver.protocol.errors.ConnectionError
-import com.tuvistavie.xserver.protocol.Connection
-import com.tuvistavie.xserver.protocol.misc.ProtocolException
+import com.tuvistavie.xserver.backend.protocol.errors.ConnectionError
+import com.tuvistavie.xserver.backend.protocol.Connection
+import com.tuvistavie.xserver.backend.protocol.misc.ProtocolException
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
 case class ClientConnectionClosed(id: Int)

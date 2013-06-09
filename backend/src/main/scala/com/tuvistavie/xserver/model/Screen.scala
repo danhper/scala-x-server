@@ -1,11 +1,11 @@
-package com.tuvistavie.xserver.model
+package com.tuvistavie.xserver.backend.model
 
 import akka.util.ByteString
 import com.typesafe.scalalogging.slf4j.Logging
 
-import com.tuvistavie.xserver.util.ExtendedByteStringBuilder
-import com.tuvistavie.xserver.util.Computations
-import com.tuvistavie.xserver.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.ExtendedByteStringBuilder
+import com.tuvistavie.xserver.backend.util.Computations
+import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
 
 class Screen (
   val root: Int,

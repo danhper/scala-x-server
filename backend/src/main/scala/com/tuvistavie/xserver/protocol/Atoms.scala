@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.protocol.types
+package com.tuvistavie.xserver.backend.protocol.types
 
 abstract sealed class Atom(override val value: Int) extends UInt32(value) {
   def toUInt32 = UInt32(value)

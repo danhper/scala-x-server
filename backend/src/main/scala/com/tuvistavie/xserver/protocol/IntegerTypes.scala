@@ -1,9 +1,9 @@
-package com.tuvistavie.xserver.protocol.types
+package com.tuvistavie.xserver.backend.protocol.types
 
 import java.io.DataInputStream
 import java.io.DataOutputStream
 
-import com.tuvistavie.xserver.io._
+import com.tuvistavie.xserver.backend.io._
 
 abstract class IntValue(val value: Int) extends Value {
   type T = Int

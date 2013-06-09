@@ -1,6 +1,6 @@
-package com.tuvistavie.xserver.protocol
+package com.tuvistavie.xserver.backend.protocol
 
-import com.tuvistavie.xserver.io._
+import com.tuvistavie.xserver.backend.io._
 
 package object types {
   type Card8 = UInt8

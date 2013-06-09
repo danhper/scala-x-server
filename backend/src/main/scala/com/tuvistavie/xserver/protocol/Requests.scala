@@ -1,10 +1,10 @@
-package com.tuvistavie.xserver.protocol.requests
+package com.tuvistavie.xserver.backend.protocol.requests
 
 import scala.collection.mutable
 
-import com.tuvistavie.xserver.io._
-import com.tuvistavie.xserver.protocol.types._
-import com.tuvistavie.xserver.protocol.events.Event
+import com.tuvistavie.xserver.backend.io._
+import com.tuvistavie.xserver.backend.protocol.types._
+import com.tuvistavie.xserver.backend.protocol.events.Event
 
 abstract class Request(val opCode: Card8)
 

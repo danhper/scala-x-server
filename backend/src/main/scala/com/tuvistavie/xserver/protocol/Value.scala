@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.protocol.types
+package com.tuvistavie.xserver.backend.protocol.types
 
 abstract class Value extends KnownSize {
   type T

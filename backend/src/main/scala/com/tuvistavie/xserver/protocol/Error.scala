@@ -1,14 +1,14 @@
-package com.tuvistavie.xserver.protocol.errors
+package com.tuvistavie.xserver.backend.protocol.errors
 
 import akka.util.ByteString
 
-import com.tuvistavie.xserver.protocol.ByteSerializable
-import com.tuvistavie.xserver.io._
-import com.tuvistavie.xserver.protocol.types._
+import com.tuvistavie.xserver.backend.protocol.ByteSerializable
+import com.tuvistavie.xserver.backend.io._
+import com.tuvistavie.xserver.backend.protocol.types._
 
-import com.tuvistavie.xserver.util.Conversions._
-import com.tuvistavie.xserver.util.ExtendedByteStringBuilder._
-import com.tuvistavie.xserver.util.Properties.{settings => Config}
+import com.tuvistavie.xserver.backend.util.Conversions._
+import com.tuvistavie.xserver.backend.util.ExtendedByteStringBuilder._
+import com.tuvistavie.xserver.backend.util.Properties.{settings => Config}
 
 abstract class BaseError extends ByteSerializable
 

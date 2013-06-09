@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.model
+package com.tuvistavie.xserver.backend.model
 
 class Keyboard private (val keymap: Keymap) {
 

@@ -1,7 +1,7 @@
-package com.tuvistavie.xserver.protocol.reply
+package com.tuvistavie.xserver.backend.protocol.reply
 
-import com.tuvistavie.xserver.io._
-import com.tuvistavie.xserver.protocol.types._
+import com.tuvistavie.xserver.backend.io._
+import com.tuvistavie.xserver.backend.protocol.types._
 
 abstract class Reply(
   val data: Option[Card8],

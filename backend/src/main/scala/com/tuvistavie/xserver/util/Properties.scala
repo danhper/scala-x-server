@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.util
+package com.tuvistavie.xserver.backend.util
 
 import com.typesafe.config.ConfigFactory
 

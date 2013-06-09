@@ -1,11 +1,11 @@
-package com.tuvistavie.xserver.model
+package com.tuvistavie.xserver.backend.model
 
-import com.tuvistavie.xserver.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
 import com.typesafe.scalalogging.slf4j.Logging
 import com.typesafe.config.ConfigValue
 import java.util.HashMap
 import akka.util.ByteString
-import com.tuvistavie.xserver.util.ExtendedByteStringBuilder
+import com.tuvistavie.xserver.backend.util.ExtendedByteStringBuilder
 
 class PixmapFormat (
   val depth: Int,
