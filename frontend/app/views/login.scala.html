@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>X in Browser | Login</title>
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+  <script>
+    window.onload = function() {
+      var inputs = document.getElementsByTagName("input");
+      for(var i = 0; i < inputs.length; i++) {
+        inputs[i].onkeyup = function(e) {
+          var keycode = e.which || e.keyCode;
+          if(keycode == 13) {
+            var form = document.getElementById("login-form");
+            form.submit();
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body>
+  <div id="login-box">
+  @helper.form(action = com.tuvistavie.xserver.frontend.controllers.routes.Application.doLogin(), 'id -> "login-form") {
+      <table>
+        <tr>
+          <td>
+            <label for="username">
+              Username
+            </label>
+          </td>
+          <td>
+            <input type="text" id="username" name="username">
+          </td>
+        </tr>
+        <td>
+          <label for="password">
+            Password
+          </label>
+        </td>
+        <td>
+          <input type="password" id="password" name="password">
+        </td>
+      </table>
+    }
+  </div>
+</body>
+</html>

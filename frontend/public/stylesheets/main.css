@@ -1,3 +1,18 @@
 body {
   background-image: url("/assets/images/background.jpg");
 }
+
+#login-box {
+  background: url("/assets/images/panel.png") no-repeat;
+  margin-left: 200px;
+  margin-top: 400px;
+  min-height: 300px;
+  padding-top: 150px;
+  padding-left: 200px;
+  color: #eeeeee;
+  font-weight: bold;
+}
+
+#login-box table td {
+  text-align: right;
+}
