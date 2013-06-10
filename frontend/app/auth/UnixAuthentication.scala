@@ -5,10 +5,11 @@ import play.api.Play
 import scala.sys.process.Process
 
 trait UnixAuthentication extends PasswordAuthentication {
-  def authenticate(username: String, password: String): Boolean = {
+  override def authenticate(username: String, password: String): Option[User] = {
     val authPath = Play.current.configuration.getString("misc.nix-password-checker-path").get
     val pb = Process(authPath, Seq(username, password))
     val exitCode: Int = pb.!
-    exitCode == 0
+    if(exitCode == 0) Some(User(1, ""))
+    else None
   }
 }
