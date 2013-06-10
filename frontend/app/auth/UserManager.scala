@@ -8,27 +8,30 @@ import sun.misc.BASE64Encoder
 case class User(id: Int, token: String)
 
 object UserManager {
-  val current = new UserManager with Sha512Hasher
+  val current = new UserManager {
+    val hasher = new Sha512Hasher
+  }
 
 }
 
-trait UserManager extends Hasher {
+trait UserManager {
+  protected val hasher: Hasher
+
   private val maxUsers = Play.current.configuration.getInt("application.max_connections").get
-  private var currentId = 1
   private var users = Map[String, User]()
-  private var availableIds = Array.fill(maxUsers)(true)
+  private val availableIds: Array[Boolean] = Array.fill(maxUsers)(true)
 
   def canCreateUser = availableIds.exists(_ == true)
   def findUserByToken(token: String) = users.get(token)
 
   def createUser(username: String, password: String): User = {
-    val id = availableIds.indexWhere(_ == true)
-    val token = hash(username + password)
+    val id = availableIds.indexOf(true)
+    availableIds(id) = false
+    val token = hasher.hash(username + password)
     val user = User(id, token)
     users += (token -> user)
     user
   }
-
 }
 
 trait Hasher {
@@ -40,6 +43,6 @@ trait Hasher {
   }
 }
 
-trait Sha512Hasher extends Hasher {
+class Sha512Hasher extends Hasher {
   override val hashAlgorithm = "SHA-512"
 }
