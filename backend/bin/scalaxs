@@ -18,6 +18,22 @@
 # These settings can be modified to fit the needs of your application
 # Optimized for use with version 3.5.17 of the Wrapper.
 
+preStart() {
+    if [ $PIDDIR_CREATED = true ]; then
+        if [ ! -d "$PIDDIR" ]; then
+            mkdir "$PIDDIR"
+        fi
+    fi
+}
+
+postStop() {
+    if [ $PIDDIR_CREATED = true ]; then
+        if [ -d "$PIDDIR" ]; then
+            rm -r "$PIDDIR"
+        fi
+    fi
+}
+
 # Application
 APP_NAME="scalaxs"
 APP_LONG_NAME="Scala X server"
@@ -31,8 +47,9 @@ WRAPPER_CONF="../conf/wrapper.conf"
 PRIORITY=
 
 # Location of the pid file.
-PIDDIR="."  # for development
+PIDDIR="./$RUN_USER"  # for development
 #PIDDIR=/var/run  # for production
+PIDDIR_CREATED=true
 
 # FIXED_COMMAND tells the script to use a hard coded action rather than
 # expecting the first parameter of the command line to be the command.
@@ -1516,6 +1533,7 @@ docommand() {
             ;;
 
         'start')
+            preStart
             if [ "$DIST_OS" = "macosx" -a -f "/Library/LaunchDaemons/${APP_PLIST}" ] ; then
                 macosxstart
             elif [ "$DIST_OS" = "linux" -a -f "/etc/init/${APP_NAME}.conf" ] ; then
@@ -1532,6 +1550,7 @@ docommand() {
         'stop')
             checkUser "" "$COMMAND"
             stopit "0"
+            postStop
             ;;
 
         'restart')

@@ -10,7 +10,9 @@ object Application extends Controller with UnixAuthentication {
 
   def index = Action { implicit request =>
     session.get("auth-token") match {
-      case Some(tok) => Ok(views.html.index("Your new application is ready."))
+      case Some(tok) => {
+        Ok(views.html.index("Your new application is ready."))
+      }
       case None => {
         val loginRoute = com.tuvistavie.xserver.frontend.controllers.routes.Application.login
         Redirect(loginRoute)
