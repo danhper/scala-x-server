@@ -9,7 +9,7 @@ trait UnixAuthentication extends PasswordAuthentication {
     val authPath = Play.current.configuration.getString("misc.nix-password-checker-path").get
     val pb = Process(authPath, Seq(username, password))
     val exitCode: Int = pb.!
-    if(exitCode == 0) Some(User(1, ""))
+    if(exitCode == 0) Some(UserManager.current.createUser(username, password))
     else None
   }
 }

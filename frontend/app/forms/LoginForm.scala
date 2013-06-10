@@ -9,8 +9,6 @@ package object forms {
     tuple(
       "username" -> text,
       "password" -> text
-    ) verifying ("wrong username or password", result => result match {
-      case (username, password) => true
-    })
+    )
   )
 }
