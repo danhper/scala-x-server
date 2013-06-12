@@ -8,7 +8,7 @@ import com.tuvistavie.xserver.backend.protocol.types._
 
 import com.tuvistavie.xserver.backend.util.Conversions._
 import com.tuvistavie.xserver.backend.util.ExtendedByteStringBuilder._
-import com.tuvistavie.xserver.backend.util.Properties.{settings => Config}
+import com.tuvistavie.xserver.backend.util.Config
 
 abstract class BaseError extends ByteSerializable
 

@@ -4,7 +4,7 @@ import akka.actor.IO
 import akka.util.ByteString
 import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, ExtendedByteStringBuilder}
-import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.Config
 import errors.ConnectionError
 import misc.ProtocolException
 import com.tuvistavie.xserver.backend.model.{ ServerInfo, PixmapFormat, Keyboard, Screen }
