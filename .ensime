@@ -43,6 +43,7 @@
     "/opt/play-framework/repository/local/org.javassist/javassist/3.16.1-GA/jars/javassist.jar"
     "/opt/play-framework/repository/local/play/play-exceptions/2.1.0/jars/play-exceptions.jar"
     "/opt/play-framework/repository/local/play/templates_2.10/2.1.0/jars/templates_2.10.jar"
+    "/opt/play-framework/repository/local/play/play-test_2.10/2.1.0/jars/play-test_2.10.jar"
     "/opt/play-framework/repository/local/com.github.scala-incubator.io/scala-io-file_2.10/0.4.2/jars/scala-io-file_2.10.jar"
     "/opt/play-framework/repository/local/com.github.scala-incubator.io/scala-io-core_2.10/0.4.2/jars/scala-io-core_2.10.jar"
     "/opt/play-framework/repository/local/com.jsuereth/scala-arm_2.10/1.3/jars/scala-arm_2.10.jar"
@@ -90,7 +91,9 @@
     "/opt/play-framework/repository/local/tyrex/tyrex/1.0.1/jars/tyrex.jar"
     "/opt/play-framework/repository/local/play/anorm_2.10/2.1.0/jars/anorm_2.10.jar"
     "/home/daniel/.m2/repository/com/github/scopt/scopt_2.10/3.0.0/scopt_2.10-3.0.0.jar"
+    "/opt/play-framework/repository/local/org.specs2/specs2_2.9.2/1.12.3/jars/specs2_2.9.2.jar"
   )
+
   :runtime-deps (
     "/opt/play-framework/framework/sbt/boot/scala-2.10.0/lib/scala-library.jar"
     "/opt/play-framework/repository/local/play/play_2.10/2.1.0/jars/play_2.10.jar"
