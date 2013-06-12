@@ -8,9 +8,9 @@ object BridgeManager {
   private var bridges = Map[Int, Bridge]()
 
   def create(user: User): Bridge = {
-    val bridge = new Bridge()
+    val bridge = new Bridge(user.name)
     bridges += (user.id -> bridge)
-    bridge.launch(user.id + 2, user.name)
+    bridge.launch(user.id + 2)
     bridge
   }
 }
