@@ -70,6 +70,12 @@
       <version>1.0.1</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.scopt</groupId>
+      <artifactId>scopt_2.10</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -102,7 +108,11 @@
           <launchers>
             <launcher>
               <id>ServerLauncher</id>
-              <mainClass>com.tuvistavie.xserver.App</mainClass>
+              <mainClass>com.tuvistavie.xserver.backend.App</mainClass>
+              <args>
+                <arg>-n</arg>
+                <arg>2</arg>
+              </args>
             </launcher>
           </launchers>
         </configuration>

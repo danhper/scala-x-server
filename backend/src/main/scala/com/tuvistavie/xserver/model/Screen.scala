@@ -5,7 +5,7 @@ import com.typesafe.scalalogging.slf4j.Logging
 
 import com.tuvistavie.xserver.backend.util.ExtendedByteStringBuilder
 import com.tuvistavie.xserver.backend.util.Computations
-import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.Config
 
 class Screen (
   val root: Int,

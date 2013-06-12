@@ -1,12 +1,16 @@
 package com.tuvistavie.xserver.backend
 
 import io.Server
-import util.Properties.{ settings => Config }
+import util.{ Config, InitSettings }
 import com.tuvistavie.xserver.backend.model.PixmapFormat
 
 object App {
   def main(args: Array[String]) = {
-    val displayNumber = Config.getInt("server.display.default")
+    val initSettings = InitSettings.parse(args) match {
+      case Some(s) => s
+      case None => sys.exit(1)
+    }
+    val displayNumber = initSettings.displayNumber
     Server.startUp(displayNumber)
   }
 }

@@ -4,7 +4,7 @@ import akka.actor.{ Actor, ActorRef, IO, IOManager, Props }
 import akka.actor.{ ActorLogging, ActorSystem, Terminated }
 import akka.util.{ ByteString, ByteStringBuilder }
 import java.net.InetSocketAddress
-import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.Config
 import com.typesafe.scalalogging.slf4j.Logging
 
 private class Server(displayNumber: Int) extends Actor with ActorLogging {

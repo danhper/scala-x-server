@@ -1,6 +1,6 @@
 package com.tuvistavie.xserver.backend.model
 
-import com.tuvistavie.xserver.backend.util.Properties.{ settings => Config }
+import com.tuvistavie.xserver.backend.util.Config
 import com.typesafe.scalalogging.slf4j.Logging
 import com.typesafe.config.ConfigValue
 import java.util.HashMap
