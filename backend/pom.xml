@@ -146,7 +146,7 @@
             <manifest>
               <classpathPrefix>lib/</classpathPrefix>
               <addClasspath>true</addClasspath>
-              <mainClass>com.tuvistavie.xserver.App</mainClass>
+              <mainClass>com.tuvistavie.xserver.backend.App</mainClass>
             </manifest>
           </archive>
         </configuration>
