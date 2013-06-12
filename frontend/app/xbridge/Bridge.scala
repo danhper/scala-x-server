@@ -8,13 +8,9 @@ class Bridge (
   private var initialized = false
 
   def launch(id: Int, username: String): Unit = {
-    val backendBinaryPath = Play.current.configuration.getString("paths.backend")
-    val command = "RUN_USER=%s ./%s -- -i %d".format(
-      username, backendBinaryPath, id
-    )
-    val process = Process(command)
+    val backendBinaryPath = Play.current.configuration.getString("paths.backend").get
+    val process = Process(Seq(backendBinaryPath, "start", "--", "-n", id.toString), None, "RUN_USER" -> username)
     process.run()
   }
-
 }
 

@@ -5,7 +5,7 @@ import play.api.Play
 import java.security.MessageDigest
 import sun.misc.BASE64Encoder
 
-case class User(id: Int, token: String)
+case class User(id: Int, name: String, token: String)
 
 object UserManager {
   val current = new UserManager {
@@ -28,7 +28,7 @@ trait UserManager {
     val id = availableIds.indexOf(true)
     availableIds(id) = false
     val token = hasher.hash(username + password)
-    val user = User(id, token)
+    val user = User(id, username, token)
     users += (token -> user)
     user
   }
