@@ -4,8 +4,11 @@ import scala.sys.addShutdownHook
 import scala.sys.process.Process
 import akka.actor.{ Actor, ActorRef, ActorLogging }
 import play.api.Play
-
+import play.api.libs.json.JsValue
+import play.api.libs.iteratee.Concurrent
 import com.tuvistavie.xserver.bridge.messages.Register
+import com.tuvistavie.xserver.frontend.util.Config
+import play.api.libs.iteratee.Enumerator
 
 class Bridge (
   val id: Int,
@@ -17,6 +20,8 @@ class Bridge (
 
   private val binPath = Play.current.configuration.getString("paths.backend").get
   private val clientBasePort = Play.current.configuration.getInt("xbridge-server.client.base-port").get
+
+  val wsEnumerator = Enumerator.imperative[JsValue]()
 
   override def preStart() {
     log.debug("starting actor with path {}", self.path.toString)

@@ -1,7 +1,7 @@
 package com.tuvistavie.xserver.frontend.auth
 
 import play.api.Play
-import play.api.mvc.{ Request, AnyContent }
+import play.api.mvc.{ RequestHeader, AnyContent }
 import scala.sys.process.Process
 
 import com.tuvistavie.xserver.frontend.util.Config
@@ -38,7 +38,7 @@ trait SimpleTokenAuthentication extends TokenAuthentication {
 
 abstract class LoginManager extends PasswordAuthentication with TokenAuthentication {
 
-  def login(implicit request: Request[AnyContent]): Option[User] = {
+  def login(implicit request: RequestHeader): Option[User] = {
     request.session get(Config.getString("auth.token-name")) flatMap { authenticate _ }
   }
 }

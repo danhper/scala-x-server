@@ -1,12 +1,13 @@
 package com.tuvistavie.xserver.frontend.controllers
 
-import play.api._
-import play.api.mvc._
-
+import play.api.{ Play, Mode }
+import play.api.mvc.{ Controller, Action, WebSocket }
+import play.api.libs.json.{ JsValue, JsObject, JsString }
 import com.tuvistavie.xserver.bridge.BridgeManager
-import com.tuvistavie.xserver.frontend.forms._
+import com.tuvistavie.xserver.frontend.forms.loginForm
 import com.tuvistavie.xserver.frontend.auth.{ NixLoginManager, DummyLoginManager }
 import com.tuvistavie.xserver.frontend.util.Config
+import play.api.libs.iteratee.{ Done, Input, Enumerator }
 
 object Application extends Controller {
   implicit val app = Play.current
@@ -45,5 +46,20 @@ object Application extends Controller {
         }
       }
     )
+  }
+
+  def connect = WebSocket.using[JsValue] { implicit request =>
+    loginManager.login match {
+      case Some(s) => {
+        val iteratee = Done[JsValue,Unit]((),Input.EOF)
+        val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString("foobar")))).andThen(Enumerator.enumInput(Input.EOF))
+        (iteratee,enumerator)
+      }
+      case None => {
+        val iteratee = Done[JsValue,Unit]((),Input.EOF)
+        val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString("foobar")))) >>> Enumerator.eof
+        (iteratee,enumerator)
+      }
+    }
   }
 }
