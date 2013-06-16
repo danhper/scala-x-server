@@ -4,7 +4,7 @@ import akka.actor.{ Actor, ActorRef, IO, IOManager, Props }
 import akka.actor.{ ActorLogging, ActorSystem, Terminated }
 import akka.util.{ ByteString, ByteStringBuilder }
 import java.net.InetSocketAddress
-import com.tuvistavie.xserver.backend.util.Config
+import com.tuvistavie.xserver.backend.util.{ RuntimeConfig, Config }
 import com.typesafe.scalalogging.slf4j.Logging
 
 private class Server(displayNumber: Int) extends Actor with ActorLogging {
@@ -36,8 +36,7 @@ private class Server(displayNumber: Int) extends Actor with ActorLogging {
 object Server extends Logging {
   val system = ActorSystem("Server")
 
-  private var _ref: Option[ActorRef] = None
-  def ref = _ref.get
+  val ref = system.actorOf(Props(new Server(RuntimeConfig.displayNumber)), "mainServer")
 
   private[this] var clientsById = Map[Int, Client]()
   private var _currentId = 0
@@ -59,10 +58,7 @@ object Server extends Logging {
     case Some(c) => c
   }
 
-  def startUp(displayNumber: Int) = _ref match {
-    case None => {
-      _ref = Some(system.actorOf(Props(new Server(displayNumber)), "mainServer"))
-    }
-    case Some(_) => throw new InstantiationError("Server is already running")
+  def run() {
+    logger.info(s"initializing server with actor ${ref.toString}")
   }
 }
