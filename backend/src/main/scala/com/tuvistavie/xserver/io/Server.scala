@@ -17,7 +17,7 @@ private class Server(displayNumber: Int) extends Actor with ActorLogging {
     log.info("Server started on port {} ", port)
   }
 
-  def receive() = {
+  def receive = {
     case NewClient(server) => {
       val child = context.actorOf(Props(new ClientManager(Server.currentId)))
       var socket = server.accept()(child)
