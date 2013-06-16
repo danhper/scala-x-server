@@ -4,6 +4,7 @@ import play.api.Play
 
 import scala.sys.process.Process
 
+
 trait PasswordAuthentication {
   def authenticate(username: String, password: String): Option[User]
 }
@@ -12,13 +13,13 @@ trait TokenAuthentication {
   def authenticate(token: String): Option[User]
 }
 
-class DummyPasswordAuthentication extends PasswordAuthentication {
+trait DummyPasswordAuthentication extends PasswordAuthentication {
   override def authenticate(username: String, password: String) = {
     Some(UserManager.current.createUser(username, password))
   }
 }
 
-class UnixAuthentication extends PasswordAuthentication {
+trait UnixAuthentication extends PasswordAuthentication {
   override def authenticate(username: String, password: String): Option[User] = {
     val authPath = Play.current.configuration.getString("paths.nix-password-checker").get
     val pb = Process(authPath, Seq(username, password))
@@ -28,8 +29,17 @@ class UnixAuthentication extends PasswordAuthentication {
   }
 }
 
-class SimpleTokenAuthentication extends TokenAuthentication {
+trait SimpleTokenAuthentication extends TokenAuthentication {
   override def authenticate(token: String): Option[User] = {
     UserManager.current.findUserByToken(token)
   }
 }
+
+trait LoginManager {
+  def authenticate(token: String): Option[User]
+  def authenticate(username: String, password: String): Option[User]
+}
+
+object DummyLoginManager extends LoginManager with DummyPasswordAuthentication with SimpleTokenAuthentication
+
+object NixLoginManager extends LoginManager with UnixAuthentication with SimpleTokenAuthentication
