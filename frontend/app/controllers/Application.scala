@@ -24,7 +24,7 @@ object Application extends Controller {
     loginManager.login match {
       case Some(user) => {
         BridgeManager.create(user)
-        Ok(views.html.index("Your new application is ready."))
+        Ok(views.html.index())
       }
       case None => Redirect(loginRoute)
     }
