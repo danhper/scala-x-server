@@ -14,14 +14,9 @@ object UserManager {
   val current = new UserManager {
     implicit val app = Play.current
 
-    val hasher = Play.mode match {
-      case Mode.Prod => Sha512Hasher
-      case _ => NoOpHasher
-    }
-
-    val tokenGenerator = Play.mode match {
-      case Mode.Prod => RandomTokenGenerator
-      case _ => SimpleTokenGenerator
+    val (hasher, tokenGenerator) = Play.mode match {
+      case Mode.Prod => (Sha512Hasher, RandomTokenGenerator)
+      case _ => (NoOpHasher, SimpleTokenGenerator)
     }
   }
 }
