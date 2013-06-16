@@ -6,6 +6,8 @@ import scala.util.Random
 import java.security.MessageDigest
 import sun.misc.BASE64Encoder
 
+import com.tuvistavie.xserver.frontend.util.Config
+
 case class User(id: Int, name: String, token: String)
 
 object UserManager {
@@ -28,7 +30,7 @@ trait UserManager {
   protected val hasher: Hasher
   protected val tokenGenerator: TokenGenerator
 
-  private val maxUsers = Play.current.configuration.getInt("application.max_connections").get
+  private val maxUsers = Config.getInt("application.max_connections")
   private var users = Map[String, User]()
   private val availableIds: Array[Boolean] = Array.fill(maxUsers)(true)
 
@@ -57,7 +59,7 @@ class SimpleTokenGenerator extends TokenGenerator {
 
 class RandomTokenGenerator extends TokenGenerator {
   override def generateToken(username: String, password: String): String = {
-    val randomString = Random.nextString(Play.current.configuration.getInt("auth.random-string-length").get)
+    val randomString = Random.nextString(Config.getInt("auth.random-string-length"))
     val timeStamp = (System.currentTimeMillis.toString)
     username + randomString + timeStamp + password
   }
