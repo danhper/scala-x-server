@@ -10,7 +10,7 @@ object BridgeManager {
   val system = ActorSystem("XBridgeServer", ConfigFactory.load.getConfig("xbridge-server"))
 
   def create(user: User): Boolean = {
-    val actor = system.actorOf(Props(new Bridge(user.id, user.name)), "bridgeServer")
+    val actor = system.actorOf(Props(new Bridge(user.id, user.name)), s"bridgeServer-${user.id}")
     bridges += (user.id -> actor)
     true
   }

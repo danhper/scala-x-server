@@ -15,9 +15,9 @@
   </properties>
 
   <modules>
-    <module>scalaxs-frontend</module>
-    <module>scalaxs-backend</module>
-    <module>scalaxs-bridge</module>
+    <module>frontend</module>
+    <module>backend</module>
+    <module>bridge</module>
   </modules>
 
   <build>
