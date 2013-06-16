@@ -40,6 +40,10 @@ trait UserManager {
     users += (token -> user)
     user
   }
+
+  def removeUser(id: Int) {
+
+  }
 }
 
 trait TokenGenerator {

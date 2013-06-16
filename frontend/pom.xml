@@ -84,6 +84,7 @@
           <play2Home>/opt/play-framework</play2Home>
         </configuration>
       </plugin>
+
      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

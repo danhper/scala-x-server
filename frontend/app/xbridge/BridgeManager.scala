@@ -1,21 +1,25 @@
 package com.tuvistavie.xserver.bridge
 
+import scala.concurrent.Future
 import play.api.Logger
-import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props, PoisonPill }
 import com.typesafe.config.ConfigFactory
 import akka.pattern.ask
 import scala.concurrent.duration._
 import akka.util.Timeout
-import play.api.libs.iteratee.Enumerator
-import play.api.libs.json.JsValue
+import play.api.libs.json.{ JsValue, JsObject, JsString }
 import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.iteratee.{ Iteratee, Done, Input, Enumerator }
 
 
 import com.tuvistavie.xserver.frontend.auth.User
 
+
 case class Connect(user: Option[User])
-case class Connected(bridge: Bridge)
+case class Connected(enumerator: Enumerator[JsValue])
 case class CannotConnect(error: String)
+case class JsonMessage(message: JsValue)
+case object Stop
 
 
 object BridgeManager {
@@ -23,8 +27,6 @@ object BridgeManager {
   private implicit val timeout = Timeout(1 second)
 
   private val system = ActorSystem("XBridgeServer", ConfigFactory.load.getConfig("xbridge-server"))
-
-  private val default = system.actorOf(Props[BridgeManager])
 
   def create(user: User): Boolean = {
     val actorName = s"bridgeServer-${user.id}"
@@ -34,20 +36,23 @@ object BridgeManager {
     true
   }
 
-  def connect(user: Option[User]) = (default ? Connect(user)) map {
-    case Connected(bridge) => {
-    }
-  }
-}
-
-class BridgeManager extends Actor {
-
-  def receive = {
-    case Connect(userOpt) => {
-      userOpt flatMap { u => BridgeManager.bridges.get(u.id) } match {
-        case None =>
+  def connect(userOpt: Option[User]) = userOpt flatMap { u => bridges get(u.id) } match {
+    case Some(bridge) => {
+      (bridge ? Connect(userOpt)).map {
+        case Connected(enumerator) => {
+          val iteratee = Iteratee.foreach[JsValue] { event =>
+            bridge ! JsonMessage(event)
+          }.mapDone { _ =>
+            bridge ! PoisonPill
+          }
+          (iteratee, enumerator)
+        }
       }
     }
+    case None => {
+      val iteratee = Done[JsValue, Unit]((),Input.EOF)
+      val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString("foobar")))) >>> Enumerator.eof
+      Future(iteratee,enumerator)
+    }
   }
-
 }

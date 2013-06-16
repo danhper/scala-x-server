@@ -6,9 +6,11 @@ import akka.actor.{ Actor, ActorRef, ActorLogging }
 import play.api.Play
 import play.api.libs.json.JsValue
 import play.api.libs.iteratee.Concurrent
+import play.api.libs.iteratee.Enumerator
+
+import com.tuvistavie.xserver.frontend.auth.UserManager
 import com.tuvistavie.xserver.bridge.messages.Register
 import com.tuvistavie.xserver.frontend.util.Config
-import play.api.libs.iteratee.Enumerator
 
 class Bridge (
   val id: Int,
@@ -21,7 +23,9 @@ class Bridge (
   private val binPath = Play.current.configuration.getString("paths.backend").get
   private val clientBasePort = Play.current.configuration.getInt("xbridge-server.client.base-port").get
 
-  val wsEnumerator = Enumerator.imperative[JsValue]()
+  val wsEnumerator = Concurrent.unicast[JsValue]{ c =>
+    log.debug(s"created enumerator ${self.toString}")
+  }
 
   override def preStart() {
     log.debug("starting actor with path {}", self.path.toString)
@@ -34,6 +38,7 @@ class Bridge (
   override def postStop() {
     stopBridge()
     shutdownHook.remove()
+    UserManager.current.removeUser(id)
   }
 
   private def stopBridge() {

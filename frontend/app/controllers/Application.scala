@@ -30,7 +30,6 @@ object Application extends Controller {
     }
   }
 
-
   def login = Action {
     Ok(views.html.login())
   }
@@ -39,7 +38,7 @@ object Application extends Controller {
     loginForm.bindFromRequest.fold (
       formWithErrors => BadRequest(views.html.login()), {
         case (username, password) => loginManager.authenticate(username, password) match {
-          case Some(user) => Redirect(indexRoute).withSession(
+          case Some(user) => Redirect(indexRoute).withSession (
               Config.getString("auth.token-name") -> user.token
             )
           case None => BadRequest(views.html.login())
@@ -48,18 +47,7 @@ object Application extends Controller {
     )
   }
 
-  def connect = WebSocket.using[JsValue] { implicit request =>
-    loginManager.login match {
-      case Some(s) => {
-        val iteratee = Done[JsValue,Unit]((),Input.EOF)
-        val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString("foobar")))).andThen(Enumerator.enumInput(Input.EOF))
-        (iteratee,enumerator)
-      }
-      case None => {
-        val iteratee = Done[JsValue,Unit]((),Input.EOF)
-        val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString("foobar")))) >>> Enumerator.eof
-        (iteratee,enumerator)
-      }
-    }
+  def connect = WebSocket.async[JsValue] { implicit request =>
+    BridgeManager.connect(loginManager.login)
   }
 }
