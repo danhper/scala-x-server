@@ -12,7 +12,7 @@ object App {
       case None => sys.exit(1)
     }
     val displayNumber = initSettings.displayNumber
-    BridgeClient.register(displayNumber)
+    BridgeClient.register()
     Server.startUp(displayNumber)
   }
 }

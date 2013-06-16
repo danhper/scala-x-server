@@ -3,7 +3,7 @@ package com.tuvistavie.xserver.frontend.controllers
 import play.api._
 import play.api.mvc._
 
-import com.tuvistavie.xserver.frontend.xbridge.BridgeManager
+import com.tuvistavie.xserver.bridge.BridgeManager
 import com.tuvistavie.xserver.frontend.forms._
 import com.tuvistavie.xserver.frontend.auth.{ NixLoginManager, DummyLoginManager }
 

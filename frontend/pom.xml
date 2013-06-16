@@ -35,6 +35,7 @@
       <version>${play.version}</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>play</groupId>
       <artifactId>play-test_2.10</artifactId>
@@ -48,6 +49,24 @@
       <artifactId>play-java_2.10</artifactId>
       <version>${play.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-actor_2.10</artifactId>
+      <version>2.1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.typesafe.akka</groupId>
+      <artifactId>akka-remote_2.10</artifactId>
+      <version>2.1.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.tuvistavie</groupId>
+      <artifactId>xserver-bridge</artifactId>
+      <version>0.1</version>
     </dependency>
   </dependencies>
 

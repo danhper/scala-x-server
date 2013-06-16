@@ -12,7 +12,7 @@ object InitSettings  {
     opt[Int]('n', "display-number") required() valueName("<display-number>") action { (x, c) =>
       c.copy(displayNumber = x)
     } validate { x =>
-      if(x > 0) success else failure("Value <display-number> must be >0")
+      if(x >= 0) success else failure("Value <display-number> must be >=0")
     } text("display number for the X server")
 
     help("help") text("prints this usage text")

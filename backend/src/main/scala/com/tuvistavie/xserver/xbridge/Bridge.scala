@@ -17,5 +17,5 @@ object BridgeClient {
 
   private val server = system.actorFor(Config.getString("bridge.server.path"))
 
-  def register(id: Int) = server ! Register(id, ref)
+  def register() = server ! Register(ref)
 }

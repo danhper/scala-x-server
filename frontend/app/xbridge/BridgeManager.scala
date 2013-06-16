@@ -1,24 +1,17 @@
-package com.tuvistavie.xserver.frontend.xbridge
+package com.tuvistavie.xserver.bridge
+
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
+import com.typesafe.config.ConfigFactory
 
 import com.tuvistavie.xserver.frontend.auth.User
 
-import akka.actor.Actor
-
 object BridgeManager {
-  private var bridges = Map[Int, Bridge]()
+  private var bridges = Map[Int, ActorRef]()
+  val system = ActorSystem("XBridgeServer", ConfigFactory.load.getConfig("xbridge-server"))
 
-  def create(user: User): Bridge = {
-    val bridge = new Bridge(user.name)
-    bridges += (user.id -> bridge)
-    bridge.launch(user.id + 2)
-    bridge
+  def create(user: User): Boolean = {
+    val actor = system.actorOf(Props(new Bridge(user.id, user.name)), "bridgeServer")
+    bridges += (user.id -> actor)
+    true
   }
-}
-
-class BridgeManager (
-) extends Actor {
-  def receive: Actor.Receive = {
-    case foo =>
-  }
-
 }
