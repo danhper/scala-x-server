@@ -35,10 +35,7 @@ trait SimpleTokenAuthentication extends TokenAuthentication {
   }
 }
 
-trait LoginManager {
-  def authenticate(token: String): Option[User]
-  def authenticate(username: String, password: String): Option[User]
-}
+abstract class LoginManager extends PasswordAuthentication with TokenAuthentication
 
 object DummyLoginManager extends LoginManager with DummyPasswordAuthentication with SimpleTokenAuthentication
 
