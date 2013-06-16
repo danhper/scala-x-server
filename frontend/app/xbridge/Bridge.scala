@@ -12,6 +12,12 @@ import com.tuvistavie.xserver.frontend.auth.UserManager
 import com.tuvistavie.xserver.bridge.messages.Register
 import com.tuvistavie.xserver.frontend.util.Config
 
+case object Connect
+case class Connected(enumerator: Enumerator[JsValue])
+case class CannotConnect(error: String)
+case class JsonMessage(message: JsValue)
+
+
 class Bridge (
   val id: Int,
   username: String
@@ -54,6 +60,9 @@ class Bridge (
     case Connect => {
       sender ! Connected(wsEnumerator)
       log.debug("websocket connection accepted")
+    }
+    case JsonMessage(message) => {
+      log.debug("received message " + message.toString)
     }
   }
 }

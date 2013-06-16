@@ -10,6 +10,9 @@
     var chatSocket = new WS("@com.tuvistavie.xserver.frontend.controllers.routes.Application.connect.webSocketURL()");
     chatSocket.onopen = function() {
       console.log("foo");
+      chatSocket.send(JSON.stringify({
+        foo: "bar"
+      }));
     };
   </script>
 </head>

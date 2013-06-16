@@ -15,13 +15,6 @@ import play.api.libs.iteratee.{ Iteratee, Done, Input, Enumerator }
 import com.tuvistavie.xserver.frontend.auth.User
 
 
-case object Connect
-case class Connected(enumerator: Enumerator[JsValue])
-case class CannotConnect(error: String)
-case class JsonMessage(message: JsValue)
-case object Stop
-
-
 object BridgeManager {
   private var bridges = Map[Int, ActorRef]()
   private implicit val timeout = Timeout(1 second)
