@@ -26,6 +26,7 @@
   :source-roots (
     "/home/daniel/Documents/projects/scala-x-server/frontend"
     "/home/daniel/Documents/projects/scala-x-server/backend/src"
+    "/home/daniel/Documents/projects/scala-x-server/bridge/src"
   )
   :compile-deps (
     "/home/daniel/.m2/repository/junit/junit/4.8.2/junit-4.8.2.jar"
@@ -92,6 +93,9 @@
     "/opt/play-framework/repository/local/play/anorm_2.10/2.1.0/jars/anorm_2.10.jar"
     "/home/daniel/.m2/repository/com/github/scopt/scopt_2.10/3.0.0/scopt_2.10-3.0.0.jar"
     "/opt/play-framework/repository/local/org.specs2/specs2_2.9.2/1.12.3/jars/specs2_2.9.2.jar"
+    "/home/daniel/Documents/projects/scala-x-server/frontend/target/scala-2.10/classes"
+    "/home/daniel/Documents/projects/scala-x-server/backend/target/scala-2.10/classes"
+    "/home/daniel/Documents/projects/scala-x-server/bridge/target/scala-2.10/classes"
   )
 
   :runtime-deps (
@@ -148,7 +152,8 @@
     "/opt/play-framework/repository/local/tyrex/tyrex/1.0.1/jars/tyrex.jar"
     "/opt/play-framework/repository/local/play/anorm_2.10/2.1.0/jars/anorm_2.10.jar"
     "/home/daniel/Documents/projects/scala-x-server/frontend/target/scala-2.10/classes"
-    "/home/daniel/Documents/projects/scala-x-server/frontend/target/scala-2.10/classes"
+    "/home/daniel/Documents/projects/scala-x-server/backend/target/scala-2.10/classes"
+    "/home/daniel/Documents/projects/scala-x-server/bridge/target/scala-2.10/classes"
     "/home/daniel/.m2/repository/junit/junit/4.8.2/junit-4.8.2.jar"
   )
   :target "/home/daniel/Documents/projects/scala-x-server/target"

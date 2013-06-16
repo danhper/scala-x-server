@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.tuvistavie</groupId>
-  <artifactId>xserver-backend</artifactId>
+  <artifactId>xserver-bridge</artifactId>
   <packaging>jar</packaging>
 
-  <name>scalaxs-backend</name>
+  <name>scalaxs-bridge</name>
   <url>http://github.com/tuvistavie/scala-x-server</url>
 
   <parent>
@@ -21,12 +21,6 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>com.tuvistavie</groupId>
-      <artifactId>xserver-bridge</artifactId>
-      <version>0.1</version>
-    </dependency>
-
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
@@ -46,42 +40,6 @@
       <version>2.1.4</version>
     </dependency>
 
-    <dependency>
-      <groupId>com.typesafe.akka</groupId>
-      <artifactId>akka-slf4j_2.10</artifactId>
-      <version>2.1.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.typesafe</groupId>
-      <artifactId>config</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.5</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.5</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.typesafe</groupId>
-      <artifactId>scalalogging-slf4j_2.10</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.scopt</groupId>
-      <artifactId>scopt_2.10</artifactId>
-      <version>3.0.0</version>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -94,7 +52,6 @@
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
-          <mainClass>com.tuvistavie.xserver.backend.App</mainClass>
         </configuration>
       </plugin>
 
@@ -111,16 +68,6 @@
             <arg>-language:postfixOps</arg>
             <arg>-language:implicitConversions</arg>
           </args>
-          <launchers>
-            <launcher>
-              <id>ServerLauncher</id>
-              <mainClass>com.tuvistavie.xserver.backend.App</mainClass>
-              <args>
-                <arg>-n</arg>
-                <arg>2</arg>
-              </args>
-            </launcher>
-          </launchers>
         </configuration>
         <executions>
           <execution>
@@ -146,13 +93,11 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.4</version>
         <configuration>
-          <finalName>scalaxs</finalName>
           <archive>
             <index>true</index>
             <manifest>
               <classpathPrefix>lib/</classpathPrefix>
               <addClasspath>true</addClasspath>
-              <mainClass>com.tuvistavie.xserver.backend.App</mainClass>
             </manifest>
           </archive>
         </configuration>

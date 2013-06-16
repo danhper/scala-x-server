@@ -1,20 +1,21 @@
-package com.tuvistavie.xserver.backend.xbridge
+package com.tuvistavie.xserver.bridge
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, ActorLogging, Props }
 
 import com.tuvistavie.xserver.backend.util.Config
+import messages.Register
 
-class Bridge extends Actor with ActorLogging {
+class BridgeClient extends Actor with ActorLogging {
   def receive = {
     case foo =>
   }
 }
 
-object Bridge {
+object BridgeClient {
   val system = ActorSystem("XBridgeClient")
-  val ref = system.actorOf(Props[Bridge], "bridge")
+  val ref = system.actorOf(Props[BridgeClient], "bridge")
 
-  private val server = system.actorFor(Config.getString("bridge.remote.path"))
+  private val server = system.actorFor(Config.getString("bridge.server.path"))
 
-  def register = server ! ref
+  def register(id: Int) = server ! Register(id, ref)
 }

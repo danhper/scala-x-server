@@ -3,6 +3,7 @@ package com.tuvistavie.xserver.backend
 import io.Server
 import util.{ Config, InitSettings }
 import com.tuvistavie.xserver.backend.model.PixmapFormat
+import com.tuvistavie.xserver.bridge.BridgeClient
 
 object App {
   def main(args: Array[String]) = {
@@ -11,6 +12,7 @@ object App {
       case None => sys.exit(1)
     }
     val displayNumber = initSettings.displayNumber
+    BridgeClient.register(displayNumber)
     Server.startUp(displayNumber)
   }
 }
