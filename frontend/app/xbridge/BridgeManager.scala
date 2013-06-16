@@ -15,7 +15,7 @@ import play.api.libs.iteratee.{ Iteratee, Done, Input, Enumerator }
 import com.tuvistavie.xserver.frontend.auth.User
 
 
-case class Connect(user: Option[User])
+case object Connect
 case class Connected(enumerator: Enumerator[JsValue])
 case class CannotConnect(error: String)
 case class JsonMessage(message: JsValue)
@@ -38,7 +38,7 @@ object BridgeManager {
 
   def connect(userOpt: Option[User]) = userOpt flatMap { u => bridges get(u.id) } match {
     case Some(bridge) => {
-      (bridge ? Connect(userOpt)).map {
+      (bridge ? Connect).map {
         case Connected(enumerator) => {
           val iteratee = Iteratee.foreach[JsValue] { event =>
             bridge ! JsonMessage(event)

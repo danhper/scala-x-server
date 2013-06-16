@@ -51,8 +51,9 @@ class Bridge (
       remoteBridge = Some(actor)
       log.debug("registered actor {}", actor.toString)
     }
-    case _ if !initialized => {
-      throw new RuntimeException("message received before registration")
+    case Connect => {
+      sender ! Connected(wsEnumerator)
+      log.debug("websocket connection accepted")
     }
   }
 }
