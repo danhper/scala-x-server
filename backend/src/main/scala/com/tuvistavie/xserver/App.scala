@@ -1,6 +1,7 @@
 package com.tuvistavie.xserver.backend
 
 import io.Server
+
 import util.{ Config, RuntimeConfig, InitSettings, loadRuntimeConfig }
 import com.tuvistavie.xserver.backend.model.PixmapFormat
 import com.tuvistavie.xserver.bridge.{ BridgeClient, DummyBridgeClient }

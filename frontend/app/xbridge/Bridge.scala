@@ -41,7 +41,7 @@ class Bridge (
     log.debug("starting actor with path {}", self.path.toString)
     val port = s"wrapper.java.additional.2=-Dbridge.akka.remote.netty.port=${clientBasePort + id}"
     val args = List("start", port, "--", "-n", id.toString)
-    val process = Process(binPath :: args, None, "RUN_USER" -> username)
+    val process = Process(binPath :: args, None, "RUN_AS_USER" -> username)
     process.run()
   }
 

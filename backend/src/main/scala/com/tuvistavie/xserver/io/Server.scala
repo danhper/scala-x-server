@@ -1,11 +1,13 @@
 package com.tuvistavie.xserver.backend.io
 
+import java.net.InetSocketAddress
+
 import akka.actor.{ Actor, ActorRef, IO, IOManager, Props }
 import akka.actor.{ ActorLogging, ActorSystem, Terminated }
 import akka.util.{ ByteString, ByteStringBuilder }
-import java.net.InetSocketAddress
-import com.tuvistavie.xserver.backend.util.{ RuntimeConfig, Config }
 import com.typesafe.scalalogging.slf4j.Logging
+
+import com.tuvistavie.xserver.backend.util.{ RuntimeConfig, Config }
 
 private class Server(displayNumber: Int) extends Actor with ActorLogging {
   import IO._
@@ -59,6 +61,7 @@ object Server extends Logging {
   }
 
   def run() {
-    logger.debug("server started")
+    val currentUser = System.getProperty("user.name")
+    logger.debug(s"starting server as ${currentUser}")
   }
 }
