@@ -4,7 +4,7 @@ import scala.sys.addShutdownHook
 import scala.sys.process.Process
 import akka.actor.{ Actor, ActorRef, ActorLogging }
 import play.api.Play
-import play.api.libs.json.JsValue
+import play.api.libs.json.{ JsValue, JsObject, JsString }
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.iteratee.Enumerator
 
@@ -22,6 +22,7 @@ class Bridge (
   val id: Int,
   username: String
 ) extends Actor with ActorLogging {
+
   private var initialized = false
   private val shutdownHook = addShutdownHook(stopBridge)
   private var remoteBridge: Option[ActorRef] = None
@@ -31,7 +32,10 @@ class Bridge (
 
   val wsEnumerator = Concurrent.unicast[JsValue]{ c =>
     log.debug(s"created enumerator ${self.toString}")
+    channel = Some(c)
   }
+  private var channel: Option[Concurrent.Channel[JsValue]] = None
+  private lazy val wsChannel: Concurrent.Channel[JsValue] = channel.get
 
   override def preStart() {
     log.debug("starting actor with path {}", self.path.toString)
@@ -63,6 +67,7 @@ class Bridge (
     }
     case JsonMessage(message) => {
       log.debug("received message " + message.toString)
+      wsChannel.push(JsObject(Seq("maybe" -> JsString("it works!"))))
     }
   }
 }
