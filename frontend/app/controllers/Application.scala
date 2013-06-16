@@ -3,11 +3,12 @@ package com.tuvistavie.xserver.frontend.controllers
 import play.api.{ Play, Mode }
 import play.api.mvc.{ Controller, Action, WebSocket }
 import play.api.libs.json.{ JsValue, JsObject, JsString }
+import play.api.libs.iteratee.{ Done, Input, Enumerator }
+
 import com.tuvistavie.xserver.bridge.BridgeManager
 import com.tuvistavie.xserver.frontend.forms.loginForm
 import com.tuvistavie.xserver.frontend.auth.{ NixLoginManager, DummyLoginManager }
 import com.tuvistavie.xserver.frontend.util.Config
-import play.api.libs.iteratee.{ Done, Input, Enumerator }
 
 object Application extends Controller {
   implicit val app = Play.current

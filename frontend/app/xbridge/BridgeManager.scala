@@ -1,16 +1,15 @@
 package com.tuvistavie.xserver.bridge
 
 import scala.concurrent.Future
-import play.api.Logger
-import akka.actor.{ Actor, ActorRef, ActorSystem, Props, PoisonPill }
+import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.pattern.ask
-import scala.concurrent.duration._
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props, PoisonPill }
 import akka.util.Timeout
+import play.api.Logger
 import play.api.libs.json.{ JsValue, JsObject, JsString }
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{ Iteratee, Done, Input, Enumerator }
-
 
 import com.tuvistavie.xserver.frontend.auth.User
 

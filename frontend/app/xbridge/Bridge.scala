@@ -31,7 +31,7 @@ class Bridge (
   private val clientBasePort = Play.current.configuration.getInt("xbridge-server.client.base-port").get
 
   val wsEnumerator = Concurrent.unicast[JsValue]{ c =>
-    log.debug(s"created enumerator ${self.toString}")
+    log.debug(s"created enumerator ${self.toString} with channel ${c.toString}")
     channel = Some(c)
   }
   private var channel: Option[Concurrent.Channel[JsValue]] = None

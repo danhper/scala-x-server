@@ -1,7 +1,6 @@
 package com.tuvistavie.xserver.frontend.auth
 
 import play.api.{ Play, Mode }
-
 import scala.util.Random
 import java.security.MessageDigest
 import sun.misc.BASE64Encoder
