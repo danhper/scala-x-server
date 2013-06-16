@@ -15,13 +15,13 @@ object UserManager {
     implicit val app = Play.current
 
     val hasher = Play.mode match {
-      case Mode.Prod => new Sha512Hasher
-      case _ => new NoOpHasher
+      case Mode.Prod => Sha512Hasher
+      case _ => NoOpHasher
     }
 
     val tokenGenerator = Play.mode match {
-      case Mode.Prod => new RandomTokenGenerator
-      case _ => new SimpleTokenGenerator
+      case Mode.Prod => RandomTokenGenerator
+      case _ => SimpleTokenGenerator
     }
   }
 }
@@ -51,13 +51,13 @@ trait TokenGenerator {
   def generateToken(username: String, password: String): String
 }
 
-class SimpleTokenGenerator extends TokenGenerator {
+object SimpleTokenGenerator extends TokenGenerator {
   override def generateToken(username: String, password: String): String = {
     username + password
   }
 }
 
-class RandomTokenGenerator extends TokenGenerator {
+object RandomTokenGenerator extends TokenGenerator {
   override def generateToken(username: String, password: String): String = {
     val randomString = Random.nextString(Config.getInt("auth.random-string-length"))
     val timeStamp = (System.currentTimeMillis.toString)
@@ -69,7 +69,7 @@ trait Hasher {
   def hash(str: String): String
 }
 
-class NoOpHasher extends Hasher {
+object NoOpHasher extends Hasher {
   override def hash(str: String) = str
 }
 
@@ -82,6 +82,6 @@ trait DigestHasher extends Hasher {
   }
 }
 
-class Sha512Hasher extends DigestHasher {
+object Sha512Hasher extends DigestHasher {
   override val hashAlgorithm = "SHA-512"
 }
