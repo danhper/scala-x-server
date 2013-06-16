@@ -20,6 +20,7 @@ case class ConnectionError (
   def toBytes = {
     var frameBuilder = ByteString.newBuilder
     val n = message.length
+    frameBuilder.putByte(0) // error
     frameBuilder.putByte(n.toByte)
     frameBuilder.putShort(Config.getInt("server.protocol.major-version"))
     frameBuilder.putShort(Config.getInt("server.protocol.minor-version"))

@@ -72,9 +72,9 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
           logger.debug(s"sending ok response to client ${id} with length of ${response.length}")
           socket write response
         }
-        case _ => {
-          socket write ConnectionError("authentication not supported").toBytes
-          logger.debug("refused connection needing auth")
+        case Connection(_, _, Some(protocol), _) => {
+          socket write ConnectionError("authentication not supported\n").toBytes
+          logger.debug(s"refused connection needing auth: ${protocol}")
         }
       }
     }

@@ -38,7 +38,7 @@ class ExtendedByteIterator(iterator: ByteIterator) {
   def getString(n: Int): String = {
     val byteArray: Array[Byte] = new Array[Byte](n)
     iterator.getBytes(byteArray)
-    byteArray toString
+    new String(byteArray)
   }
 }
 

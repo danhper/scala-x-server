@@ -3,7 +3,8 @@ package com.tuvistavie.xserver.backend.protocol
 import akka.actor.IO
 import akka.util.ByteString
 import com.typesafe.scalalogging.slf4j.Logging
-import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, ExtendedByteStringBuilder}
+import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, ExtendedByteStringBuilder, Conversions }
+import Conversions._
 import com.tuvistavie.xserver.backend.util.Config
 import errors.ConnectionError
 import misc.ProtocolException
@@ -29,8 +30,11 @@ object Connection extends Logging {
       _ = iterator.skip(2)
       majorVersion = iterator.getShort
       minorVersion = iterator.getShort
-      n = iterator.getShort
-      d = iterator.getShort
+      n = iterator.getShort.toInt
+      d = iterator.getShort.toInt
+      _ = iterator.skip(2)
+      extraInfo <- take(n.withPadding + d.withPadding)
+      extraIterator = extraInfo.iterator
     } yield {
       val serverMajorVersion = Config.getInt("server.protocol.major-version")
       val serverMinorVersion = Config.getInt("server.protocol.minor-version")
@@ -38,11 +42,11 @@ object Connection extends Logging {
         case (serverMajorVersion, serverMinorVersion) => {
           logger.debug(s"initializing connection with X major version = ${majorVersion}")
           if(n > 0) {
-            logger.debug("authentication required")
-            val authProtocolName = iterator.getString(n)
-            iterator.skipPadding(n)
-            val authProtocolData = iterator.getString(d)
-            iterator.skipPadding(d)
+            logger.debug(s"authentication required: length ${n})")
+            val authProtocolName = extraIterator.getString(n)
+            extraIterator.skipPadding(n.withPadding)
+            val authProtocolData = extraIterator.getString(d)
+            extraIterator.skipPadding(d.padding)
             Connection(majorVersion, minorVersion, Some(authProtocolName), Some(authProtocolData))
           } else {
             logger.debug("no authentication")

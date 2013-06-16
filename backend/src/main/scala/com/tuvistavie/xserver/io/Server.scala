@@ -10,7 +10,7 @@ import com.typesafe.scalalogging.slf4j.Logging
 private class Server(displayNumber: Int) extends Actor with ActorLogging {
   import IO._
 
-  val port = displayNumber + Config.getInt("server.base-port")
+  val port = Config.getInt("server.base-port") + displayNumber + Config.getInt("server.display.offset")
 
   override def preStart {
     IOManager(context.system) listen new InetSocketAddress(port)
@@ -59,6 +59,6 @@ object Server extends Logging {
   }
 
   def run() {
-    logger.debug(s"netty port ${Config.getInt("bridge.akka.remote.netty.port")}")
+    logger.debug("server started")
   }
 }
