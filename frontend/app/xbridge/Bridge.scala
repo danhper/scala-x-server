@@ -16,9 +16,12 @@ class Bridge (
   private var remoteBridge: Option[ActorRef] = None
 
   private val binPath = Play.current.configuration.getString("paths.backend").get
+  private val clientBasePort = Play.current.configuration.getInt("xbridge-server.client.base-port").get
 
   override def preStart() {
-    val args = List("start", "--", "-n", id.toString)
+    log.info("starting actor with path {}", self.path.toString)
+    val port = s"wrapper.java.additional.2=-Dbridge.akka.remote.netty.port=${clientBasePort + id}"
+    val args = List("start", port, "--", "-n", id.toString)
     val process = Process(binPath :: args, None, "RUN_USER" -> username)
     process.run()
   }
@@ -36,6 +39,7 @@ class Bridge (
     case Register(actor) => {
       initialized = true
       remoteBridge = Some(actor)
+      log.info("registered actor {}", actor.toString)
     }
     case _ if !initialized => {
       throw new RuntimeException("message received before registration")

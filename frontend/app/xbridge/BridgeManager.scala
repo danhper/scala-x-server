@@ -1,5 +1,6 @@
 package com.tuvistavie.xserver.bridge
 
+import play.api.Logger
 import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import com.typesafe.config.ConfigFactory
 
@@ -10,7 +11,9 @@ object BridgeManager {
   val system = ActorSystem("XBridgeServer", ConfigFactory.load.getConfig("xbridge-server"))
 
   def create(user: User): Boolean = {
-    val actor = system.actorOf(Props(new Bridge(user.id, user.name)), s"bridgeServer-${user.id}")
+    val actorName = s"bridgeServer-${user.id}"
+    Logger.debug(s"starting actor ${actorName}")
+    val actor = system.actorOf(Props(new Bridge(user.id, user.name)), actorName)
     bridges += (user.id -> actor)
     true
   }

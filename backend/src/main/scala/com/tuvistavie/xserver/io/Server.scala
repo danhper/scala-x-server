@@ -59,6 +59,6 @@ object Server extends Logging {
   }
 
   def run() {
-    logger.info(s"initializing server with actor ${ref.toString}")
+    logger.debug(s"netty port ${Config.getInt("bridge.akka.remote.netty.port")}")
   }
 }

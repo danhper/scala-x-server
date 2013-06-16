@@ -19,7 +19,7 @@
 # Optimized for use with version 3.5.17 of the Wrapper.
 
 preStart() {
-    if [ $PIDDIR_CREATED = true ]; then
+    if [ "$RUN_USER" != "" ]; then
         if [ ! -d "$PIDDIR" ]; then
             mkdir "$PIDDIR"
         fi
@@ -27,7 +27,7 @@ preStart() {
 }
 
 postStop() {
-    if [ $PIDDIR_CREATED = true ]; then
+    if [ "$RUN_USER" != "" ]; then
         if [ -d "$PIDDIR" ]; then
             rm -r "$PIDDIR"
         fi
@@ -49,7 +49,6 @@ PRIORITY=
 # Location of the pid file.
 PIDDIR="./$RUN_USER"  # for development
 #PIDDIR=/var/run  # for production
-PIDDIR_CREATED=true
 
 # FIXED_COMMAND tells the script to use a hard coded action rather than
 # expecting the first parameter of the command line to be the command.
