@@ -1,7 +1,8 @@
 package com.tuvistavie.xserver.backend.util
 
 case class InitSettings (
-  displayNumber: Int = 1
+  displayNumber: Int = 1,
+  standAlone: Boolean = false
 )
 
 object InitSettings  {
@@ -14,6 +15,10 @@ object InitSettings  {
     } validate { x =>
       if(x >= 0) success else failure("Value <display-number> must be >=0")
     } text("display number for the X server")
+
+    opt[Unit]('s', "stand-alone") action { (_, c) =>
+      c.copy(standAlone = true)
+    } text("disable remote actors")
 
     help("help") text("prints this usage text")
   }

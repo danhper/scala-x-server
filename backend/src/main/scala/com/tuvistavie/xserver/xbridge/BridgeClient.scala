@@ -8,21 +8,30 @@ import com.typesafe.scalalogging.slf4j.Logging
 
 import messages.Register
 
+trait BridgeClientLike {
+  def register(): Unit
+}
+
 class BridgeClient extends Actor with ActorLogging {
   def receive = {
     case foo =>
   }
 }
 
-object BridgeClient extends Logging {
+object BridgeClient extends Logging with BridgeClientLike {
   val system = ActorSystem("XBridgeClient", ConfigFactory.load.getConfig("bridge"))
   val ref = system.actorOf(Props[BridgeClient], "bridge-" + RuntimeConfig.displayNumber)
 
   private val serverPath = Config.getString("bridge.server.path").format(RuntimeConfig.displayNumber)
-  private val server = system.actorFor(serverPath)
+  private lazy val server = system.actorFor(serverPath)
 
-  def register() = {
+  override def register() {
     logger.debug(s"registering to actor with path ${serverPath}")
     server ! Register(ref)
+  }
+}
+
+object DummyBridgeClient extends BridgeClientLike {
+  override def register() {
   }
 }

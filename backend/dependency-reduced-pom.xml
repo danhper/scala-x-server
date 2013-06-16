@@ -58,6 +58,7 @@
               <args>
                 <arg>-n</arg>
                 <arg>2</arg>
+                <arg>-s</arg>
               </args>
             </launcher>
           </launchers>
