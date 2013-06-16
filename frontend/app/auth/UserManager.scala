@@ -10,7 +10,7 @@ case class User(id: Int, name: String, token: String)
 
 object UserManager {
   val current = new UserManager {
-    import Play.current
+    implicit val app = Play.current
 
     val hasher = Play.mode match {
       case Mode.Prod => new Sha512Hasher

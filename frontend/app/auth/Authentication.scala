@@ -12,7 +12,13 @@ trait TokenAuthentication {
   def authenticate(token: String): Option[User]
 }
 
-trait UnixAuthentication extends PasswordAuthentication {
+class DummyPasswordAuthentication extends PasswordAuthentication {
+  override def authenticate(username: String, password: String) = {
+    Some(UserManager.current.createUser(username, password))
+  }
+}
+
+class UnixAuthentication extends PasswordAuthentication {
   override def authenticate(username: String, password: String): Option[User] = {
     val authPath = Play.current.configuration.getString("paths.nix-password-checker").get
     val pb = Process(authPath, Seq(username, password))
@@ -22,7 +28,7 @@ trait UnixAuthentication extends PasswordAuthentication {
   }
 }
 
-trait SimpleTokenAuthentication extends TokenAuthentication {
+class SimpleTokenAuthentication extends TokenAuthentication {
   override def authenticate(token: String): Option[User] = {
     UserManager.current.findUserByToken(token)
   }

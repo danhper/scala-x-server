@@ -5,9 +5,16 @@ import play.api.mvc._
 
 import com.tuvistavie.xserver.frontend.xbridge.BridgeManager
 import com.tuvistavie.xserver.frontend.forms._
-import com.tuvistavie.xserver.frontend.auth.{ UnixAuthentication, SimpleTokenAuthentication }
+import com.tuvistavie.xserver.frontend.auth.{ UnixAuthentication, SimpleTokenAuthentication, DummyPasswordAuthentication }
 
-object Application extends Controller with UnixAuthentication with SimpleTokenAuthentication {
+object Application extends Controller {
+  implicit val app = Play.current
+
+  val passwordAuth = Play.mode match {
+    case Mode.Prod => new UnixAuthentication
+    case _ => new DummyPasswordAuthentication
+  }
+  val tokenAuth = new SimpleTokenAuthentication
 
   val indexRoute = com.tuvistavie.xserver.frontend.controllers.routes.Application.index
   val loginRoute = com.tuvistavie.xserver.frontend.controllers.routes.Application.login
@@ -16,7 +23,7 @@ object Application extends Controller with UnixAuthentication with SimpleTokenAu
   def index = Action { implicit request =>
     session.get(tokenName) match {
       case Some(tok) => {
-        authenticate(tok) match {
+        tokenAuth.authenticate(tok) match {
           case Some(user) => {
             BridgeManager.create(user)
             Ok(views.html.index("Your new application is ready."))
@@ -35,7 +42,7 @@ object Application extends Controller with UnixAuthentication with SimpleTokenAu
   def doLogin() = Action { implicit request =>
     loginForm.bindFromRequest.fold (
       formWithErrors => BadRequest(views.html.login()), {
-        case (username, password) => authenticate(username, password) match {
+        case (username, password) => passwordAuth.authenticate(username, password) match {
           case Some(user) => Redirect(indexRoute).withSession(
               tokenName -> user.token
             )

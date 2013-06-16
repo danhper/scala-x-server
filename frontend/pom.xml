@@ -9,8 +9,10 @@
     <name>scalaxs-frontend</name>
     <url>http://github.com/tuvistavie/scala-x-server</url>
 
+
     <properties>
         <play.version>2.1.0</play.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
         <repositories>
