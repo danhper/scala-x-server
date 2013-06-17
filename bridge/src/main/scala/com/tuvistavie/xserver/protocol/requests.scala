@@ -18,15 +18,23 @@ object Request extends Logging {
   import request._
 
   def getRequest(opCode: Int)(implicit endian: java.nio.ByteOrder, socket: SocketHandle): Iteratee[Request] = {
+    logger.debug(s"${opCode}")
     for {
       header <- take(3)
       iterator = header.iterator
       data = iterator.getByte
-      requestLength = iterator.getShort
-      request <- generators(opCode).parseRequest(requestLength, data)
+      length = (iterator.getShort - 1) * 4  // in bytes without header length
+      _ = logger.debug(s"handling request with opcode ${opCode} and length ${length}")
+      request <- getRequestContent(opCode, length, data)
     } yield {
-      logger.debug(s"handling request with opcode ${opCode} and length ${requestLength}")
       request
+    }
+  }
+
+  def getRequestContent(opCode: Int, length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    generators.get(opCode) match {
+      case Some(g) => g.parseRequest(length, data)
+      case None => Iteratee(BadRequest)
     }
   }
 
@@ -46,7 +54,7 @@ package request {
     val name: String
   ) extends Request(98)
 
-  object QueryExtension extends RequestGenerator {
+  object QueryExtension extends RequestGenerator with Logging {
     override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
       for {
         request <- take(length)

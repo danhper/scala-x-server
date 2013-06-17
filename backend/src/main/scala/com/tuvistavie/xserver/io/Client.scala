@@ -79,16 +79,14 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     }
   }
 
-  def handleMessages: Iteratee[Unit] = repeat {
+  def handleMessages: Iteratee[Unit] = {
+    logger.debug("starting to parse request")
     for {
       a <- take(1)
       firstByte = a.head
+      request <- Request.getRequest(firstByte)
     } yield {
-      firstByte match {
-        case 0 =>
-        case _ => Request.getRequest(firstByte)
-      }
-      logger.debug(s"handling ${a}")
+      logger.debug(s"parsed request ${request}")
     }
   }
 }
