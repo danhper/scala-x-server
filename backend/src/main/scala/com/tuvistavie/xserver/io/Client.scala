@@ -1,12 +1,11 @@
 package com.tuvistavie.xserver.backend.io
 
 import akka.actor.{Actor, IO}
-
 import com.typesafe.scalalogging.slf4j.Logging
-
 import com.tuvistavie.xserver.backend.protocol.errors.ConnectionError
 import com.tuvistavie.xserver.backend.protocol.Connection
 import com.tuvistavie.xserver.backend.protocol.misc.ProtocolException
+import com.tuvistavie.xserver.protocol.Request
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
 case class ClientConnectionClosed(id: Int)
@@ -83,7 +82,12 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
   def handleMessages: Iteratee[Unit] = repeat {
     for {
       a <- take(1)
+      firstByte = a.head
     } yield {
+      firstByte match {
+        case 0 =>
+        case _ => Request.getRequest(firstByte)
+      }
       logger.debug(s"handling ${a}")
     }
   }
