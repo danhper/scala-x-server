@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.backend.protocol
+package com.tuvistavie.xserver.protocol
 
 import akka.actor.IO
 import akka.util.ByteString
@@ -6,8 +6,8 @@ import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, ExtendedByteStringBuilder, Conversions }
 import Conversions._
 import com.tuvistavie.xserver.backend.util.Config
-import errors.ConnectionError
-import misc.ProtocolException
+import error.ConnectionError
+import com.tuvistavie.xserver.protocol.error.ProtocolException
 import com.tuvistavie.xserver.backend.model.{ ServerInfo, PixmapFormat, Keyboard, Screen }
 
 

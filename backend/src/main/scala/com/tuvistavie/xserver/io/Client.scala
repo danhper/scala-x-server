@@ -2,10 +2,8 @@ package com.tuvistavie.xserver.backend.io
 
 import akka.actor.{Actor, IO}
 import com.typesafe.scalalogging.slf4j.Logging
-import com.tuvistavie.xserver.backend.protocol.errors.ConnectionError
-import com.tuvistavie.xserver.backend.protocol.Connection
-import com.tuvistavie.xserver.backend.protocol.misc.ProtocolException
-import com.tuvistavie.xserver.protocol.{ Request, Reply, HasReply, HasLocalReply, ReplyBuilder, XError }
+import com.tuvistavie.xserver.protocol.error.{ ConnectionError, ProtocolException, XError }
+import com.tuvistavie.xserver.protocol.{ Request, Reply, HasReply, HasLocalReply, ReplyBuilder, Connection }
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
 case class ClientConnectionClosed(id: Int)
@@ -50,7 +48,7 @@ object Client extends Logging {
     }
     case _ => {
       logger.error(s"invalid endian info received: ${endian}")
-      throw new ProtocolException(ConnectionError("invalid endian") (java.nio.ByteOrder.LITTLE_ENDIAN))(socket)
+      throw new ProtocolException(ConnectionError("invalid endian") (java.nio.ByteOrder.LITTLE_ENDIAN))
     }
   }
 }
