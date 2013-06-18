@@ -84,7 +84,7 @@ package request {
         drawable = iterator.getInt
         bitMask = iterator.getInt
       } yield {
-
+        BadRequest
       }
     }
   }
