@@ -5,7 +5,7 @@ import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.backend.protocol.errors.ConnectionError
 import com.tuvistavie.xserver.backend.protocol.Connection
 import com.tuvistavie.xserver.backend.protocol.misc.ProtocolException
-import com.tuvistavie.xserver.protocol.Request
+import com.tuvistavie.xserver.protocol.{ Request, Reply, HasReply, HasLocalReply, ReplyBuilder }
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
 case class ClientConnectionClosed(id: Int)
@@ -79,14 +79,21 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     }
   }
 
-  def handleMessages: Iteratee[Unit] = {
+  def handleMessages: Iteratee[Unit] = repeat {
     logger.debug("starting to parse request")
     for {
       a <- take(1)
-      firstByte = a.head
-      request <- Request.getRequest(firstByte)
+      opCode = a.head
+      request <- Request.getRequest(opCode)
     } yield {
       logger.debug(s"parsed request ${request}")
+      request match {
+        case r: HasLocalReply => {
+          val reply = ReplyBuilder.buildReply(r, 1)
+          logger.debug(s"generated reply ${reply}, with length ${reply.toBytes.length}")
+          socket write reply.toBytes
+        }
+      }
     }
   }
 }

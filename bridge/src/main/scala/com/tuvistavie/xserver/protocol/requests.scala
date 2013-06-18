@@ -13,12 +13,17 @@ trait RequestGenerator {
   def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder): IO.Iteratee[Request]
 }
 
+trait HasReply
+
+trait HasLocalReply extends HasReply
+
+trait NeedsTransfer
+
 object Request extends Logging {
   import IO._
   import request._
 
   def getRequest(opCode: Int)(implicit endian: java.nio.ByteOrder, socket: SocketHandle): Iteratee[Request] = {
-    logger.debug(s"${opCode}")
     for {
       header <- take(3)
       iterator = header.iterator
@@ -53,6 +58,7 @@ package request {
   case class QueryExtension (
     val name: String
   ) extends Request(98)
+    with HasLocalReply
 
   object QueryExtension extends RequestGenerator with Logging {
     override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {

@@ -1,4 +1,4 @@
-package com.tuvistavie.xserver.backend.protocol.reply
+package com.tuvistavie.xserver.backend.protocol.replies
 
 import com.tuvistavie.xserver.backend.io._
 import com.tuvistavie.xserver.backend.protocol.types._
