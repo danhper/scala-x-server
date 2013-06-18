@@ -15,8 +15,8 @@ class ExtendedByteStringBuilder(builder: ByteStringBuilder) {
   }
 
   def putBoolean(b: Boolean) {
-    if(b) builder.putByte(0)
-    else builder.putByte(1)
+    if(b) builder.putByte(1)
+    else builder.putByte(0)
   }
 }
 
