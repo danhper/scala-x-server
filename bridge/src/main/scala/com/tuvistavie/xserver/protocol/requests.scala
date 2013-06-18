@@ -74,4 +74,18 @@ package request {
       }
     }
   }
+
+  object CreateGC extends RequestGenerator with Logging {
+    override def parseRequest(length: Int, date: Int)(implicit endian: java.nio.ByteOrder) = {
+      for {
+        request <- take(length)
+        iterator = request.iterator
+        contextId = iterator.getInt
+        drawable = iterator.getInt
+        bitMask = iterator.getInt
+      } yield {
+
+      }
+    }
+  }
 }
