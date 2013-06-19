@@ -20,10 +20,6 @@
 
 preStart() {
     RUN_AS_GROUP=`id -g -n $RUN_AS_USER`
-    if [ "X$RUN_AS_GROUP" = "X" ]
-        then
-        RUN_AS_GROUP=$RUN_AS_USER
-    fi
     if [ "$RUN_AS_USER" != "" ]; then
         if [ ! -d "$PIDDIR" ]; then
             mkdir "$PIDDIR"
