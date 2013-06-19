@@ -19,18 +19,22 @@
 # Optimized for use with version 3.5.17 of the Wrapper.
 
 preStart() {
+    RUN_AS_GROUP=`id -g -n $RUN_AS_USER`
+    if [ "X$RUN_AS_GROUP" = "X" ]
+        then
+        RUN_AS_GROUP=$RUN_AS_USER
+    fi
     if [ "$RUN_AS_USER" != "" ]; then
         if [ ! -d "$PIDDIR" ]; then
             mkdir "$PIDDIR"
+            chown $RUN_AS_USER:$RUN_AS_GROUP $PIDDIR
         fi
     fi
 }
 
 postStop() {
-    if [ "$RUN_AS_USER" != "" ]; then
-        if [ -d "$PIDDIR" ]; then
-            rm -r "$PIDDIR"
-        fi
+    if [ -d "$PIDDIR" ]; then
+        rm -r "$PIDDIR"
     fi
 }
 
@@ -47,6 +51,9 @@ WRAPPER_CONF="../conf/wrapper.conf"
 PRIORITY=
 
 # Location of the pid file.
+if [ -z "$RUN_AS_USER" ]; then
+    RUN_AS_USER=$USER
+fi
 PIDDIR="./$RUN_AS_USER"  # for development
 #PIDDIR=/var/run  # for production
 
