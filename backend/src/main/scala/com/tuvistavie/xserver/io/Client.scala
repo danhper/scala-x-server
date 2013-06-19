@@ -3,7 +3,8 @@ package com.tuvistavie.xserver.backend.io
 import akka.actor.{Actor, IO}
 import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.protocol.error.{ ConnectionError, ProtocolException, XError }
-import com.tuvistavie.xserver.protocol.{ Request, Reply, HasReply, HasLocalReply, ReplyBuilder, Connection }
+import com.tuvistavie.xserver.protocol.{ request, ReplyBuilder, Connection }
+import request.{ Request, HasLocalReply }
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
 case class ClientConnectionClosed(id: Int)

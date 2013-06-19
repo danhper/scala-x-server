@@ -1,9 +1,12 @@
-package com.tuvistavie.xserver.protocol
+package com.tuvistavie.xserver.protocol.request
 
 import akka.actor.IO
+import akka.util.ByteIterator
 import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, Conversions }
 
+import ExtendedByteIterator._
+import Conversions._
 
 abstract class Request (
   val opCode: Int
@@ -20,12 +23,10 @@ trait HasLocalReply extends HasReply
 trait NeedsTransfer
 
 object Request extends Logging {
-  import IO._
-  import request._
 
-  def getRequest(opCode: Int)(implicit endian: java.nio.ByteOrder, socket: SocketHandle): Iteratee[Request] = {
+  def getRequest(opCode: Int)(implicit endian: java.nio.ByteOrder, socket: IO.SocketHandle): IO.Iteratee[Request] = {
     for {
-      header <- take(3)
+      header <- IO.take(3)
       iterator = header.iterator
       data = iterator.getByte
       length = (iterator.getShort - 1) * 4  // in bytes without header length
@@ -39,53 +40,34 @@ object Request extends Logging {
   def getRequestContent(opCode: Int, length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
     generators.get(opCode) match {
       case Some(g) => g.parseRequest(length, data)
-      case None => Iteratee(BadRequest)
+      case None => IO.Iteratee(BadRequest)
     }
   }
 
   val generators: Map[Int, RequestGenerator] = Map(
-    98 -> QueryExtension
+    55  -> CreateGCRequest,
+    98  -> QueryExtensionRequest
   )
 }
 
-package request {
-  import ExtendedByteIterator._
-  import Conversions._
-  import IO._
+case object BadRequest extends Request(0)
 
-  case object BadRequest extends Request(0)
+case class QueryExtensionRequest (
+  val name: String
+) extends Request(98)
+  with HasLocalReply
 
-  case class QueryExtension (
-    val name: String
-  ) extends Request(98)
-    with HasLocalReply
-
-  object QueryExtension extends RequestGenerator with Logging {
-    override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-      for {
-        request <- take(length)
-        iterator = request.iterator
-        n = iterator.getShort.toInt
-        _ = iterator.skip(2)
-        name = iterator.getString(n)
-        _ = iterator.skip(n.padding)
-      } yield {
-        QueryExtension(name)
-      }
-    }
-  }
-
-  object CreateGC extends RequestGenerator with Logging {
-    override def parseRequest(length: Int, date: Int)(implicit endian: java.nio.ByteOrder) = {
-      for {
-        request <- take(length)
-        iterator = request.iterator
-        contextId = iterator.getInt
-        drawable = iterator.getInt
-        bitMask = iterator.getInt
-      } yield {
-        BadRequest
-      }
+object QueryExtensionRequest extends RequestGenerator with Logging {
+  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    for {
+      request <- IO.take(length)
+    } yield {
+      val iterator = request.iterator
+      val n = iterator.getShort.toInt
+      iterator.skip(2)
+      val name = iterator.getString(n)
+      iterator.skip(n padding)
+      QueryExtensionRequest(name)
     }
   }
 }

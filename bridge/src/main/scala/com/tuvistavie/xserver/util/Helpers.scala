@@ -35,6 +35,18 @@ class ExtendedByteIterator(iterator: ByteIterator) {
     skip(n padding)
   }
 
+  def getPaddedByte = {
+    val n = iterator.getByte
+    skip(3)
+    n
+  }
+
+  def getPaddedShort(implicit endian: java.nio.ByteOrder) = {
+    val n = iterator.getShort
+    skip(2)
+    n
+  }
+
   def getString(n: Int): String = {
     val byteArray: Array[Byte] = new Array[Byte](n)
     iterator.getBytes(byteArray)
