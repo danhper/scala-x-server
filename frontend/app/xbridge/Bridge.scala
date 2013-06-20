@@ -9,7 +9,7 @@ import play.api.libs.iteratee.Concurrent
 import play.api.libs.iteratee.Enumerator
 
 import com.tuvistavie.xserver.frontend.auth.UserManager
-import com.tuvistavie.xserver.bridge.messages.Register
+import com.tuvistavie.xserver.bridge.messages.{ Register, RequestMessage }
 import com.tuvistavie.xserver.frontend.util.Config
 
 case object Connect
@@ -61,6 +61,9 @@ class Bridge (
       remoteBridge = Some(actor)
       log.debug("registered actor {}", actor.toString)
     }
+    case RequestMessage(request) => {
+      log.debug("received request {}", request)
+    }
     case Connect => {
       sender ! Connected(wsEnumerator)
       log.debug("websocket connection accepted")
@@ -68,6 +71,9 @@ class Bridge (
     case JsonMessage(message) => {
       log.debug("received message " + message.toString)
       wsChannel.push(JsObject(Seq("maybe" -> JsString("it works!"))))
+    }
+    case unknownMessage => {
+      log.debug("received unkonwn messaged {}", unknownMessage)
     }
   }
 }

@@ -96,6 +96,9 @@
     "/home/daniel/Documents/projects/scala-x-server/frontend/target/scala-2.10/classes"
     "/home/daniel/Documents/projects/scala-x-server/backend/target/scala-2.10/classes"
     "/home/daniel/Documents/projects/scala-x-server/bridge/target/scala-2.10/classes"
+    "/home/daniel/.m2/repository/org/json4s/json4s-core_2.10/3.2.4/json4s-core_2.10-3.2.4.jar"
+    "/home/daniel/.m2/repository/org/json4s/json4s-ast_2.10/3.2.4/json4s-ast_2.10-3.2.4.jar"
+    "/home/daniel/.m2/repository/org/json4s/json4s-native_2.10/3.2.4/json4s-native_2.10-3.2.4.jar"
   )
 
   :runtime-deps (

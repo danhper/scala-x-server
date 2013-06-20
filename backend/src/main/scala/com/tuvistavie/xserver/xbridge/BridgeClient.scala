@@ -23,7 +23,7 @@ object BridgeClient extends Logging with BridgeClientLike {
   val ref = system.actorOf(Props[BridgeClient], "bridge-" + RuntimeConfig.displayNumber)
 
   private val serverPath = Config.getString("bridge.server.path").format(RuntimeConfig.displayNumber)
-  private lazy val server = system.actorFor(serverPath)
+  lazy val server = system.actorFor(serverPath)
 
   override def register() {
     logger.debug(s"registering to actor with path ${serverPath}")
