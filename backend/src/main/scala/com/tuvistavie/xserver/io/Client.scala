@@ -96,8 +96,12 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     }
     case r: NeedsTransfer => {
       implicit val formats = Serialization.formats(NoTypeHints)
-      val serializedRequest = write(request)
+      val serializedRequest = write(Map(
+        "type" -> request.getClass.getSimpleName,
+        "request" -> request
+      ))
       logger.debug(s"transfering serialized request ${serializedRequest} to ${BridgeClient.server}")
+      BridgeClient.server ! RequestMessage(serializedRequest)
     }
     case _ => {
       logger.debug("not handling request")

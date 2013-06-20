@@ -62,7 +62,8 @@ class Bridge (
       log.debug("registered actor {}", actor.toString)
     }
     case RequestMessage(request) => {
-      log.debug("received request {}", request)
+      log.debug("sending request {} to browser", request)
+      wsChannel.push(JsString(request))
     }
     case Connect => {
       sender ! Connected(wsEnumerator)
