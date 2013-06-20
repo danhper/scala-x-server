@@ -13,6 +13,7 @@ case class CreateGCRequest (
   drawable: Int,
   values: Map[String, Int]
 ) extends Request(55)
+  with NeedsTransfer
 
 object GC {
   import ExtendedByteIterator._

@@ -4,7 +4,7 @@ import akka.actor.{Actor, IO}
 import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.protocol.error.{ ConnectionError, ProtocolException, XError }
 import com.tuvistavie.xserver.protocol.{ request, ReplyBuilder, Connection }
-import request.{ Request, HasLocalReply }
+import request.{ Request, HasLocalReply, NeedsTransfer }
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
 case class ClientConnectionClosed(id: Int)
@@ -78,6 +78,18 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     }
   }
 
+  def handleRequest(request: Request) = request match {
+    case r: HasLocalReply => {
+      val reply = ReplyBuilder.buildReply(r, 1)
+      logger.debug(s"generated reply ${reply}, with length ${reply.toBytes.length}")
+      logger.debug(s"reply content: ${reply.toBytes}")
+      socket write reply.toBytes
+    }
+    case r: NeedsTransfer => {
+
+    }
+  }
+
   def handleMessages: Iteratee[Unit] = repeat {
     logger.debug("starting to parse input")
     for {
@@ -88,14 +100,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
     } yield {
       logger.debug(s"parsed ${parsed}")
       parsed match {
-        case request: Request => request match {
-          case r: HasLocalReply => {
-            val reply = ReplyBuilder.buildReply(r, 1)
-            logger.debug(s"generated reply ${reply}, with length ${reply.toBytes.length}")
-            logger.debug(s"reply content: ${reply.toBytes}")
-            socket write reply.toBytes
-          }
-        }
+        case request: Request => handleRequest(request)
         case error: XError => {
           logger.error(s"received error: ${error}")
         }

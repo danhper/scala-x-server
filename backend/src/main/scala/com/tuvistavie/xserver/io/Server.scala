@@ -41,7 +41,7 @@ object Server extends Logging {
   val ref = system.actorOf(Props(new Server(RuntimeConfig.displayNumber)), "mainServer")
 
   private[this] var clientsById = Map[Int, Client]()
-  private var _currentId = 0
+  private var _currentId = 1
   private def currentId = _currentId
 
   private def addClient(client: Client) {
