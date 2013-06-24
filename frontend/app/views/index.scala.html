@@ -9,7 +9,7 @@
     var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
     var chatSocket = new WS("@com.tuvistavie.xserver.frontend.controllers.routes.Application.connect.webSocketURL()");
     chatSocket.onopen = function() {
-      console.log("foo");
+      console.log("channel opened");
       chatSocket.send(JSON.stringify({
         foo: "bar"
       }));

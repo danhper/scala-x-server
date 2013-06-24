@@ -4,7 +4,7 @@ import scala.sys.addShutdownHook
 import scala.sys.process.Process
 import akka.actor.{ Actor, ActorRef, ActorLogging }
 import play.api.Play
-import play.api.libs.json.{ JsValue, JsObject, JsString }
+import play.api.libs.json.{ Json, JsValue, JsObject, JsString }
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.iteratee.Enumerator
 
@@ -63,7 +63,7 @@ class Bridge (
     }
     case RequestMessage(request) => {
       log.debug("sending request {} to browser", request)
-      wsChannel.push(JsString(request))
+      wsChannel.push(Json.parse(request))
     }
     case Connect => {
       sender ! Connected(wsEnumerator)
