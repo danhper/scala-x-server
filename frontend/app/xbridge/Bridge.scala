@@ -8,7 +8,7 @@ import play.api.libs.json.{ Json, JsValue, JsObject, JsString }
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.iteratee.Enumerator
 
-import com.tuvistavie.xserver.frontend.auth.UserManager
+import com.tuvistavie.xserver.frontend.auth.{ UserManager, User }
 import com.tuvistavie.xserver.bridge.messages.{ Register, RequestMessage }
 import com.tuvistavie.xserver.frontend.util.Config
 
@@ -19,8 +19,7 @@ case class JsonMessage(message: JsValue)
 
 
 class Bridge (
-  val id: Int,
-  username: String
+  user: User
 ) extends Actor with ActorLogging {
 
   private var initialized = false
@@ -39,20 +38,20 @@ class Bridge (
 
   override def preStart() {
     log.debug("starting actor with path {}", self.path.toString)
-    val port = s"wrapper.java.additional.2=-Dbridge.akka.remote.netty.port=${clientBasePort + id}"
-    val args = List("start", port, "--", "-n", id.toString)
-    val process = Process(binPath :: args, None, "RUN_AS_USER" -> username)
+    val port = s"wrapper.java.additional.2=-Dbridge.akka.remote.netty.port=${clientBasePort + user.id}"
+    val args = List("start", port, "--", "-n", user.id.toString, "-w", user.properties.windowWidth.toString, "-h", user.properties.windowHeight.toString)
+    val process = Process(binPath :: args, None, "RUN_AS_USER" -> user.name)
     process.run()
   }
 
   override def postStop() {
     stopBridge()
     shutdownHook.remove()
-    UserManager.current.removeUser(id)
+    UserManager.current.removeUser(user.id)
   }
 
   private def stopBridge() {
-    Process(Seq(binPath, "stop"), None, "RUN_USER" -> username).!
+    Process(Seq(binPath, "stop"), None, "RUN_USER" -> user.name).!
   }
 
   def receive = {

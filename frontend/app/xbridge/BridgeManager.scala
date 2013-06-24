@@ -23,7 +23,7 @@ object BridgeManager {
   def create(user: User): Boolean = {
     val actorName = s"bridgeServer-${user.id}"
     Logger.debug(s"starting actor ${actorName}")
-    val actor = system.actorOf(Props(new Bridge(user.id, user.name)), actorName)
+    val actor = system.actorOf(Props(new Bridge(user)), actorName)
     bridges += (user.id -> actor)
     true
   }
