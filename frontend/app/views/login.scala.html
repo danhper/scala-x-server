@@ -12,6 +12,9 @@
           var keycode = e.which || e.keyCode;
           if(keycode == 13) {
             var form = document.getElementById("login-form");
+            form["userProperties.windowHeight"].value = window.innerHeight;
+            form["userProperties.windowWidth"].value = window.innerWidth;
+            console.log(form);
             form.submit();
           }
         }
@@ -22,6 +25,8 @@
 <body>
   <div id="login-box">
   @helper.form(action = com.tuvistavie.xserver.frontend.controllers.routes.Application.doLogin(), 'id -> "login-form") {
+      <input type="hidden" name="userProperties.windowWidth" value="100">
+      <input type="hidden" name="userProperties.windowHeight" value="100">
       <table>
         <tr>
           <td>

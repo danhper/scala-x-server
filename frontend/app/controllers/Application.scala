@@ -4,10 +4,11 @@ import play.api.{ Play, Mode }
 import play.api.mvc.{ Controller, Action, WebSocket }
 import play.api.libs.json.{ JsValue, JsObject, JsString }
 import play.api.libs.iteratee.{ Done, Input, Enumerator }
+import play.api.Logger
 
 import com.tuvistavie.xserver.bridge.BridgeManager
 import com.tuvistavie.xserver.frontend.forms.loginForm
-import com.tuvistavie.xserver.frontend.auth.{ NixLoginManager, DummyLoginManager }
+import com.tuvistavie.xserver.frontend.auth.{ NixLoginManager, DummyLoginManager, UserManager }
 import com.tuvistavie.xserver.frontend.util.Config
 
 object Application extends Controller {
@@ -38,10 +39,14 @@ object Application extends Controller {
   def doLogin() = Action { implicit request =>
     loginForm.bindFromRequest.fold (
       formWithErrors => BadRequest(views.html.login()), {
-        case (username, password) => loginManager.authenticate(username, password) match {
-          case Some(user) => Redirect(indexRoute).withSession (
-              Config.getString("auth.token-name") -> user.token
+        case (username, password, properties) => loginManager.authenticate(username, password) match {
+          case Some(user) => {
+            Logger.debug("registering user properties" + properties)
+            val registeredUser = UserManager.current registerUser(username, password, properties)
+            Redirect(indexRoute).withSession (
+              Config.getString("auth.token-name") -> registeredUser.token
             )
+          }
           case None => BadRequest(views.html.login())
         }
       }

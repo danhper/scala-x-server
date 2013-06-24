@@ -16,7 +16,7 @@ trait TokenAuthentication {
 
 trait DummyPasswordAuthentication extends PasswordAuthentication {
   override def authenticate(username: String, password: String) = {
-    Some(UserManager.current createUser(username, password))
+    Some(User(username))
   }
 }
 
@@ -25,7 +25,7 @@ trait UnixAuthentication extends PasswordAuthentication {
     val authPath = Config.getString("paths.nix-password-checker")
     val pb = Process(authPath, Seq(username, password))
     val exitCode: Int = pb.!
-    if(exitCode == 0) Some(UserManager.current createUser(username, password))
+    if(exitCode == 0) Some(User(username))
     else None
   }
 }

@@ -7,12 +7,6 @@ import sun.misc.BASE64Encoder
 
 import com.tuvistavie.xserver.frontend.util.Config
 
-case class User(
-  id: Int,
-  name: String,
-  token: String
-)
-
 object UserManager {
   val current = new UserManager {
     implicit val app = Play.current
@@ -35,11 +29,11 @@ trait UserManager {
   def canCreateUser = availableIds.exists(_ == true)
   def findUserByToken(token: String) = users.get(token)
 
-  def createUser(username: String, password: String): User = {
+  def registerUser(username: String, password: String, properties: UserProperties): User = {
     val id = availableIds.indexOf(true)
     availableIds(id) = false
     val token = hasher.hash(tokenGenerator.generateToken(username, password))
-    val user = User(id, username, token)
+    val user = User(username, id, token, properties)
     users += (token -> user)
     user
   }
