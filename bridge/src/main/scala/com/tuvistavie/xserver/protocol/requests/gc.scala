@@ -7,7 +7,6 @@ import akka.actor.IO
 
 import com.tuvistavie.xserver.backend.util.ExtendedByteIterator
 
-
 case class CreateGCRequest (
   cid: Int,
   drawable: Int,
@@ -18,31 +17,45 @@ case class CreateGCRequest (
 object GC {
   import ExtendedByteIterator._
 
+  case class ValueInfo (
+    mask: Int,
+    name: String,
+    byteNum: Int
+  )
+
+  val values = List(
+    ValueInfo(0x00000001, "function", 1),
+    ValueInfo(0x00000002, "planeMask", 4),
+    ValueInfo(0x00000004, "foreground", 4),
+    ValueInfo(0x00000008, "background", 4),
+    ValueInfo(0x00000010, "lineWidth", 2),
+    ValueInfo(0x00000020, "lineStyle", 1),
+    ValueInfo(0x00000040, "capStyle", 1),
+    ValueInfo(0x00000080, "joinStyle", 1),
+    ValueInfo(0x00000100, "fillStyle", 1),
+    ValueInfo(0x00000200, "fillRule", 1),
+    ValueInfo(0x00000400, "tile", 4),
+    ValueInfo(0x00000800, "stipple", 4),
+    ValueInfo(0x00001000, "tileStippleXOrigin", 2),
+    ValueInfo(0x00002000, "tileStippleYOrigin", 2),
+    ValueInfo(0x00004000, "font", 4),
+    ValueInfo(0x00008000, "subwindowMode", 1),
+    ValueInfo(0x00010000, "graphicsExposures", 1),
+    ValueInfo(0x00020000, "clipXOrigin", 2),
+    ValueInfo(0x00040000, "clipYOrigin", 2),
+    ValueInfo(0x00080000, "clipMask", 4),
+    ValueInfo(0x00100000, "dashOffset", 2),
+    ValueInfo(0x00200000, "dashes", 1),
+    ValueInfo(0x00400000, "arcMode", 2)
+  )
+
+
   def getValues(mask: Int, iterator: ByteIterator)(implicit endian: java.nio.ByteOrder) = {
     val mapBuilder = new MapBuilder[String, Int, Map[String, Int]](Map.empty)
-    if((mask & 0x00000001) != 0) mapBuilder += ("function" -> iterator.getPaddedByte)
-    if((mask & 0x00000002) != 0) mapBuilder += ("planeMask" -> iterator.getInt)
-    if((mask & 0x00000004) != 0) mapBuilder += ("foreground" -> iterator.getInt)
-    if((mask & 0x00000008) != 0) mapBuilder += ("background" -> iterator.getInt)
-    if((mask & 0x00000010) != 0) mapBuilder += ("lineWidth" -> iterator.getPaddedShort)
-    if((mask & 0x00000020) != 0) mapBuilder += ("lineStyle" -> iterator.getPaddedByte)
-    if((mask & 0x00000040) != 0) mapBuilder += ("capStyle" -> iterator.getPaddedByte)
-    if((mask & 0x00000080) != 0) mapBuilder += ("joinStyle" -> iterator.getPaddedByte)
-    if((mask & 0x00000100) != 0) mapBuilder += ("fillStyle" -> iterator.getPaddedByte)
-    if((mask & 0x00000200) != 0) mapBuilder += ("fillRule" -> iterator.getPaddedByte)
-    if((mask & 0x00000400) != 0) mapBuilder += ("tile" -> iterator.getInt)
-    if((mask & 0x00000800) != 0) mapBuilder += ("stipple" -> iterator.getInt)
-    if((mask & 0x00001000) != 0) mapBuilder += ("tileStippleXOrigin" -> iterator.getPaddedShort)
-    if((mask & 0x00002000) != 0) mapBuilder += ("tileStippleYOrigin" -> iterator.getPaddedShort)
-    if((mask & 0x00004000) != 0) mapBuilder += ("font" -> iterator.getInt)
-    if((mask & 0x00008000) != 0) mapBuilder += ("subwindowMode" -> iterator.getPaddedByte)
-    if((mask & 0x00010000) != 0) mapBuilder += ("graphicsExposures" -> iterator.getPaddedByte)
-    if((mask & 0x00020000) != 0) mapBuilder += ("clipXOrigin" -> iterator.getPaddedShort)
-    if((mask & 0x00040000) != 0) mapBuilder += ("clipYOrigin" -> iterator.getPaddedShort)
-    if((mask & 0x00080000) != 0) mapBuilder += ("clipMask" -> iterator.getInt)
-    if((mask & 0x00100000) != 0) mapBuilder += ("dashOffset" -> iterator.getPaddedShort)
-    if((mask & 0x00200000) != 0) mapBuilder += ("dashes" -> iterator.getPaddedByte)
-    if((mask & 0x00400000) != 0) mapBuilder += ("arcMode" -> iterator.getPaddedShort)
+    values.foreach { v =>
+      if((v.mask & mask) != 0)
+        mapBuilder += (v.name -> iterator.getPaddedVal(v.byteNum))
+    }
     mapBuilder result
   }
 }

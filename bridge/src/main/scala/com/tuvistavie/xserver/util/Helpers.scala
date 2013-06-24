@@ -41,6 +41,12 @@ class ExtendedByteIterator(iterator: ByteIterator) {
     n
   }
 
+  def getPaddedVal(byteNum: Int)(implicit endian: java.nio.ByteOrder) = byteNum match {
+    case 1 => getPaddedByte
+    case 2 => getPaddedShort
+    case 4 => iterator.getInt
+  }
+
   def getPaddedShort(implicit endian: java.nio.ByteOrder) = {
     val n = iterator.getShort
     skip(2)
