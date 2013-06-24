@@ -3,9 +3,7 @@ package com.tuvistavie.xserver.backend.model
 import akka.util.ByteString
 import com.typesafe.scalalogging.slf4j.Logging
 
-import com.tuvistavie.xserver.backend.util.ExtendedByteStringBuilder
-import com.tuvistavie.xserver.backend.util.Computations
-import com.tuvistavie.xserver.backend.util.Config
+import com.tuvistavie.xserver.backend.util.{ ExtendedByteStringBuilder, Computations, Config, RuntimeConfig }
 
 class Screen (
   val root: Int,
@@ -60,10 +58,10 @@ object Screen {
     new Screen(
       Config.getInt("server.screen.root-id"),
       2,
-      0xff,
-      0,
-      0,
-      0,
+      0xffffff,
+      0x000000,
+      Window.root.width,
+      Window.root.height,
       0,
       0,
       0,

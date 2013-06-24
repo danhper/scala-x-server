@@ -1,17 +1,21 @@
 package com.tuvistavie.xserver.backend.model
 
-import com.tuvistavie.xserver.backend.util.Config
+import com.tuvistavie.xserver.backend.util.{ Config, RuntimeConfig }
 
 class Window (
-  override val id: Int
+  override val id: Int,
+  val inputClass: InputClass,
+  val width: Int,
+  val height: Int
 ) extends Resource(id) {
 
 }
 
 object Window {
-  val root = Window(Config.getInt("server.screen.root-id"))
-  def apply(id: Int) = {
-    if(Resource.canAllocate(id)) new Window(id)
-    else throw new IllegalArgumentException("id " + id + " already allocated")
-  }
+  val root = new Window(
+    Config.getInt("server.screen.root-id"),
+    InputClass.InputOutput,
+    RuntimeConfig.rootWidth,
+    RuntimeConfig.rootHeight
+  )
 }
