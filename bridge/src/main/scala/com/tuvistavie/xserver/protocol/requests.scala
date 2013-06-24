@@ -5,6 +5,7 @@ import akka.util.ByteIterator
 import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, Conversions }
 
+import com.tuvistavie.xserver.backend.protocol.Atom
 import ExtendedByteIterator._
 import Conversions._
 
@@ -45,6 +46,7 @@ object Request extends Logging {
   }
 
   val generators: Map[Int, RequestGenerator] = Map(
+    20  -> GetPropertyRequest,
     55  -> CreateGCRequest,
     98  -> QueryExtensionRequest
   )
@@ -68,6 +70,34 @@ object QueryExtensionRequest extends RequestGenerator with Logging {
       val name = iterator.getString(n)
       iterator.skip(n padding)
       QueryExtensionRequest(name)
+    }
+  }
+}
+
+case class GetPropertyRequest (
+  window: Int,
+  property: Atom,
+  propType: Atom,
+  longOffset: Int,
+  longLength: Int,
+  delete: Boolean
+) extends Request(20)
+  with HasLocalReply
+
+object GetPropertyRequest extends RequestGenerator with Logging {
+  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    for {
+      request <- IO.take(length)
+    } yield {
+      val iterator = request.iterator
+      GetPropertyRequest(
+        iterator.getInt,
+        Atom.fromValue(iterator.getInt),
+        Atom.fromValue(iterator.getInt),
+        iterator.getInt,
+        iterator.getInt,
+        data != 0
+      )
     }
   }
 }
