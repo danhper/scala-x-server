@@ -7,7 +7,11 @@ import sun.misc.BASE64Encoder
 
 import com.tuvistavie.xserver.frontend.util.Config
 
-case class User(id: Int, name: String, token: String)
+case class User(
+  id: Int,
+  name: String,
+  token: String
+)
 
 object UserManager {
   val current = new UserManager {
