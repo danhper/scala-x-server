@@ -21,14 +21,16 @@ object InitSettings  {
     opt[Int]('w', "root-width") valueName("<root-width>") action { (x, c) =>
       c.copy(rootWidth = x)
     } validate { x =>
-      if(x >= 640) success else failure("<root-width> must >=640")
+      if(x >= Config.getInt("server.screen.min-width")) success
+      else failure("<root-width> must >=640")
     } text("set the width for the root window")
 
 
     opt[Int]('h', "root-height") valueName("<root-height>") action { (x, c) =>
       c.copy(rootWidth = x)
     } validate { x =>
-      if(x >= 480) success else failure("<root-height> must >=480")
+      if(x >= Config.getInt("server.screen.min-height")) success
+      else failure("<root-height> must >=480")
     } text("set the height for the root window")
 
     opt[Unit]('s', "stand-alone") action { (_, c) =>
