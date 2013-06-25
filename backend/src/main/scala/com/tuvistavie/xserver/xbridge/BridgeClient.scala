@@ -10,6 +10,7 @@ import messages.Register
 
 trait BridgeClientLike {
   def register(): Unit
+  def !(msg: Any): Unit
 }
 
 class BridgeClient extends Actor with ActorLogging {
@@ -29,9 +30,14 @@ object BridgeClient extends Logging with BridgeClientLike {
     logger.debug(s"registering to actor with path ${serverPath}")
     server ! Register(ref)
   }
+
+  override def !(msg: Any) {
+    server ! msg
+  }
 }
 
 object DummyBridgeClient extends BridgeClientLike {
-  override def register() {
-  }
+  override def register() { }
+
+  override def !(msg: Any) { }
 }

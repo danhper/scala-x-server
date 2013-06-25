@@ -6,8 +6,9 @@ import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.protocol.error.{ ConnectionError, ProtocolException, XError }
 import com.tuvistavie.xserver.protocol.{ request, ReplyBuilder, Connection }
 import request.{ Request, HasLocalReply, NeedsTransfer }
-import com.tuvistavie.xserver.bridge.BridgeClient
+import com.tuvistavie.xserver.bridge.{ BridgeClient, DummyBridgeClient, BridgeClientLike }
 import com.tuvistavie.xserver.bridge.messages.RequestMessage
+import com.tuvistavie.xserver.backend.util.RuntimeConfig
 
 import org.json4s.NoTypeHints
 import org.json4s.native.Serialization
@@ -66,6 +67,8 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
 
   implicit val endian: java.nio.ByteOrder
   implicit val socket: SocketHandle = handle
+  val server: BridgeClientLike = if(RuntimeConfig.standAlone) DummyBridgeClient
+                                 else BridgeClient
 
   private implicit var sequenceNumber = 0
 
@@ -101,7 +104,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
         "request" -> request
       ))
       logger.debug(s"transfering serialized request ${serializedRequest} to ${BridgeClient.server}")
-      BridgeClient.server ! RequestMessage(serializedRequest)
+      server ! RequestMessage(serializedRequest)
     }
     case _ => {
       logger.debug("not handling request")
