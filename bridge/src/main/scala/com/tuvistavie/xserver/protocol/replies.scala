@@ -32,11 +32,11 @@ case class QueryExtensionReply (
   override def toBytes(implicit endian: java.nio.ByteOrder): ByteString = {
     val baseBuilder = super.toBytes
     val builder = ByteString.newBuilder
-    builder putBoolean(present)
-    builder putByte(majorOpcode)
-    builder putByte(firstEvent)
-    builder putByte(firstError)
-    builder fill(20)
+    builder putBoolean present
+    builder putByte majorOpcode
+    builder putByte firstEvent
+    builder putByte firstError
+    builder fill 20
     baseBuilder ++ builder.result
   }
 }

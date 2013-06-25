@@ -14,6 +14,12 @@ class ExtendedByteStringBuilder(builder: ByteStringBuilder) {
     fill(n.padding)
   }
 
+  def writeNum(n: Int, byteNum: Int)(implicit endian: java.nio.ByteOrder) = byteNum match {
+    case 1 => builder putByte n
+    case 2 => builder putShort n
+    case 4 => builder putInt n
+  }
+
   def putBoolean(b: Boolean) {
     if(b) builder.putByte(1)
     else builder.putByte(0)
