@@ -47,6 +47,8 @@ object Request extends Logging {
 
   val generators: Map[Int, RequestGenerator] = Map(
     1   -> CreateWindowRequest,
+    2   -> ChangeWindowAttributesRequest,
+    8   -> MapWindow,
     20  -> GetPropertyRequest,
     55  -> CreateGCRequest,
     98  -> QueryExtensionRequest

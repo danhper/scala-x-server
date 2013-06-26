@@ -11,8 +11,8 @@ object GCRequestHelper extends ValueGenerator {
   val values = List(
     ValueInfo(0x00000001, "function", 1),
     ValueInfo(0x00000002, "planeMask", 4),
-    ValueInfo(0x00000004, "foreground", 4, true),
-    ValueInfo(0x00000008, "background", 4, true),
+    ValueInfo(0x00000004, "foreground", 4),
+    ValueInfo(0x00000008, "background", 4),
     ValueInfo(0x00000010, "lineWidth", 2),
     ValueInfo(0x00000020, "lineStyle", 1),
     ValueInfo(0x00000040, "capStyle", 1),
@@ -44,7 +44,7 @@ with NeedsTransfer {
   val opCode = 55
 }
 
-object CreateGCRequest extends RequestGenerator with Logging {
+object CreateGCRequest extends RequestGenerator {
   override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
     for {
       request <- IO.take(length)

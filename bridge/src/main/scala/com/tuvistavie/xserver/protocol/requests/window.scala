@@ -42,7 +42,7 @@ with NeedsTransfer {
   val opCode = 1
 }
 
-object CreateWindowRequest extends RequestGenerator with Logging {
+object CreateWindowRequest extends RequestGenerator {
   override def parseRequest(length: Int, depth: Int)(implicit endian: java.nio.ByteOrder) = {
     for {
       request <- IO.take(length)
@@ -59,6 +59,46 @@ object CreateWindowRequest extends RequestGenerator with Logging {
       val values = WindowRequestHelper.getValues(bitMask, iterator)
       CreateWindowRequest(wid, parent, depth, x, y, width, height,
         borderWidth, inputClass, visualId, values)
+    }
+  }
+}
+
+case class ChangeWindowAttributesRequest (
+  window: Int,
+  values: Map[String, Int]
+) extends Request
+with NeedsTransfer {
+  val opCode = 2
+}
+
+object ChangeWindowAttributesRequest extends RequestGenerator {
+  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    for {
+      request <- IO.take(length)
+    } yield {
+      val iterator = request iterator
+      val window = iterator getInt
+      val bitMask = iterator getInt
+      val values = WindowRequestHelper.getValues(bitMask, iterator)
+      ChangeWindowAttributesRequest(window, values)
+    }
+  }
+}
+
+case class MapWindow (
+  window: Int
+) extends Request
+with NeedsTransfer {
+  val opCode = 8
+}
+
+object MapWindow extends RequestGenerator {
+  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    for {
+      request <- IO.take(length)
+    } yield {
+      val iterator = request.iterator
+      MapWindow(iterator getInt)
     }
   }
 }
