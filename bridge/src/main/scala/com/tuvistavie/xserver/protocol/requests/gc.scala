@@ -7,15 +7,6 @@ import akka.actor.IO
 
 import com.tuvistavie.xserver.backend.util.ExtendedByteIterator
 
-case class CreateGCRequest (
-  cid: Int,
-  drawable: Int,
-  values: Map[String, Int]
-) extends Request
-  with NeedsTransfer {
-    val opCode = 55
-  }
-
 object GCRequestHelper extends ValueGenerator {
   val values = List(
     ValueInfo(0x00000001, "function", 1),
@@ -44,8 +35,17 @@ object GCRequestHelper extends ValueGenerator {
   )
 }
 
+case class CreateGCRequest (
+  cid: Int,
+  drawable: Int,
+  values: Map[String, Int]
+) extends Request
+with NeedsTransfer {
+  val opCode = 55
+}
+
 object CreateGCRequest extends RequestGenerator with Logging {
-  override def parseRequest(length: Int, date: Int)(implicit endian: java.nio.ByteOrder) = {
+  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
     for {
       request <- IO.take(length)
     } yield {
