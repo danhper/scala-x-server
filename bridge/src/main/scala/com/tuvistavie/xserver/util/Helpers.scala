@@ -45,23 +45,43 @@ class ExtendedByteIterator(iterator: ByteIterator) {
     skip(n padding)
   }
 
-  def getPaddedByte = {
+
+  def getByte(unsigned: Boolean = false) = {
     val n = iterator.getByte
+    if(unsigned) n & 0xff
+    else n
+  }
+
+  def getShort(unsigned: Boolean = false)(implicit endian: java.nio.ByteOrder) = {
+    val n = iterator.getShort
+    if(unsigned) n & 0xffff
+    else n
+  }
+
+  def getInt(unsigned: Boolean = false)(implicit endian: java.nio.ByteOrder) = {
+    val n = iterator.getInt
+    if(unsigned) n & 0xffffffff
+    else n
+  }
+
+  def getPaddedByte(unsigned: Boolean = false) = {
+    val n = getByte(unsigned)
     skip(3)
     n
   }
 
-  def getPaddedVal(byteNum: Int)(implicit endian: java.nio.ByteOrder) = byteNum match {
-    case 1 => getPaddedByte
-    case 2 => getPaddedShort
-    case 4 => iterator.getInt
-  }
-
-  def getPaddedShort(implicit endian: java.nio.ByteOrder) = {
+  def getPaddedShort(unsigned: Boolean = false)(implicit endian: java.nio.ByteOrder) = {
     val n = iterator.getShort
     skip(2)
     n
   }
+
+  def getPaddedVal(byteNum: Int, unsigned: Boolean = false)(implicit endian: java.nio.ByteOrder) = byteNum match {
+    case 1 => getPaddedByte(unsigned)
+    case 2 => getPaddedShort(unsigned)
+    case 4 => getInt(unsigned)
+  }
+
 
   def getString(n: Int): String = {
     val byteArray: Array[Byte] = new Array[Byte](n)
