@@ -14,7 +14,7 @@ trait Request {
 }
 
 trait RequestGenerator {
-  def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder): IO.Iteratee[Request]
+  def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder): Request
 }
 
 trait HasReply
@@ -32,16 +32,13 @@ object Request extends Logging {
       data = iterator.getByte
       length = (iterator.getShort - 1) * 4  // in bytes without header length
       _ = logger.debug(s"handling request with opcode ${opCode} and length ${length}")
-      request <- getRequestContent(opCode, length, data)
+      request <- IO.take(length)
     } yield {
-      request
-    }
-  }
-
-  def getRequestContent(opCode: Int, length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    generators get opCode match {
-      case Some(g) => g.parseRequest(length, data)
-      case None => IO.Iteratee(BadRequest)
+      val iterator = request.iterator
+      generators get opCode match {
+        case Some(g) => g.parseRequest(iterator, data)
+        case None => BadRequest
+      }
     }
   }
 
@@ -68,17 +65,12 @@ case class QueryExtensionRequest (
 }
 
 object QueryExtensionRequest extends RequestGenerator with Logging {
-  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    for {
-      request <- IO.take(length)
-    } yield {
-      val iterator = request.iterator
-      val n = iterator.getShort.toInt
-      iterator.skip(2)
-      val name = iterator.getString(n)
-      iterator.skip(n padding)
-      QueryExtensionRequest(name)
-    }
+  override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    val n = iterator.getShort.toInt
+    iterator.skip(2)
+    val name = iterator.getString(n)
+    iterator.skip(n padding)
+    QueryExtensionRequest(name)
   }
 }
 
@@ -95,19 +87,14 @@ case class GetPropertyRequest (
   }
 
 object GetPropertyRequest extends RequestGenerator with Logging {
-  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    for {
-      request <- IO.take(length)
-    } yield {
-      val iterator = request.iterator
-      GetPropertyRequest(
-        iterator.getInt,
-        Atom.fromValue(iterator.getInt),
-        Atom.fromValue(iterator.getInt),
-        iterator.getInt,
-        iterator.getInt,
-        data != 0
-      )
-    }
+  override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    GetPropertyRequest(
+      iterator.getInt,
+      Atom.fromValue(iterator.getInt),
+      Atom.fromValue(iterator.getInt),
+      iterator.getInt,
+      iterator.getInt,
+      data != 0
+    )
   }
 }

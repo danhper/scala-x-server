@@ -2,8 +2,8 @@ package com.tuvistavie.xserver.protocol.request
 
 import akka.actor.IO
 import com.typesafe.scalalogging.slf4j.Logging
-
 import com.tuvistavie.xserver.backend.model.InputClass
+import akka.util.ByteIterator
 
 object WindowRequestHelper extends ValueGenerator {
   val values = List(
@@ -43,23 +43,18 @@ with NeedsTransfer {
 }
 
 object CreateWindowRequest extends RequestGenerator {
-  override def parseRequest(length: Int, depth: Int)(implicit endian: java.nio.ByteOrder) = {
-    for {
-      request <- IO.take(length)
-    } yield {
-      val iterator = request.iterator
-      val wid = iterator getInt
-      val parent = iterator getInt
-      val (x, y) = (iterator getShort, iterator getShort)
-      val (width, height) = (iterator getShort, iterator getShort)
-      val borderWidth = iterator getShort
-      val inputClass = InputClass.fromInt(iterator getShort)
-      val visualId = iterator getInt
-      val bitMask = iterator getInt
-      val values = WindowRequestHelper.getValues(bitMask, iterator)
-      CreateWindowRequest(wid, parent, depth, x, y, width, height,
-        borderWidth, inputClass, visualId, values)
-    }
+  override def parseRequest(iterator: ByteIterator, depth: Int)(implicit endian: java.nio.ByteOrder) = {
+    val wid = iterator getInt
+    val parent = iterator getInt
+    val (x, y) = (iterator getShort, iterator getShort)
+    val (width, height) = (iterator getShort, iterator getShort)
+    val borderWidth = iterator getShort
+    val inputClass = InputClass.fromInt(iterator getShort)
+    val visualId = iterator getInt
+    val bitMask = iterator getInt
+    val values = WindowRequestHelper.getValues(bitMask, iterator)
+    CreateWindowRequest(wid, parent, depth, x, y, width, height,
+      borderWidth, inputClass, visualId, values)
   }
 }
 
@@ -72,16 +67,11 @@ with NeedsTransfer {
 }
 
 object ChangeWindowAttributesRequest extends RequestGenerator {
-  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    for {
-      request <- IO.take(length)
-    } yield {
-      val iterator = request iterator
-      val window = iterator getInt
-      val bitMask = iterator getInt
-      val values = WindowRequestHelper.getValues(bitMask, iterator)
-      ChangeWindowAttributesRequest(window, values)
-    }
+  override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    val window = iterator getInt
+    val bitMask = iterator getInt
+    val values = WindowRequestHelper.getValues(bitMask, iterator)
+    ChangeWindowAttributesRequest(window, values)
   }
 }
 
@@ -93,12 +83,7 @@ with NeedsTransfer {
 }
 
 object MapWindow extends RequestGenerator {
-  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    for {
-      request <- IO.take(length)
-    } yield {
-      val iterator = request.iterator
-      MapWindow(iterator getInt)
-    }
+  override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    MapWindow(iterator getInt)
   }
 }

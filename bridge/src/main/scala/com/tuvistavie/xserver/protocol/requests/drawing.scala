@@ -31,16 +31,11 @@ with NeedsTransfer {
 }
 
 object PolyFillRectangle extends RequestGenerator {
-  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    for {
-      request <- IO.take(length)
-    } yield {
-      val iterator = request iterator
-      val drawable = iterator getInt
-      val context = iterator getInt
-      val rectangles: ListBuffer[Rectangle] = new ListBuffer()
-      while(iterator.nonEmpty) rectangles += Rectangle(iterator)
-      PolyFillRectangle(drawable, context, rectangles result)
-    }
+  override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    val drawable = iterator getInt
+    val context = iterator getInt
+    val rectangles: ListBuffer[Rectangle] = new ListBuffer()
+    while(iterator.nonEmpty) rectangles += Rectangle(iterator)
+    PolyFillRectangle(drawable, context, rectangles result)
   }
 }

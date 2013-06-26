@@ -4,7 +4,6 @@ import scala.collection.mutable.MapBuilder
 import com.typesafe.scalalogging.slf4j.Logging
 import akka.util.ByteIterator
 import akka.actor.IO
-
 import com.tuvistavie.xserver.backend.util.ExtendedByteIterator
 
 object GCRequestHelper extends ValueGenerator {
@@ -45,16 +44,11 @@ with NeedsTransfer {
 }
 
 object CreateGCRequest extends RequestGenerator {
-  override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    for {
-      request <- IO.take(length)
-    } yield {
-      val iterator = request.iterator
-      val contextId = iterator.getInt
-      val drawable = iterator.getInt
-      val bitMask = iterator.getInt
-      val values = GCRequestHelper.getValues(bitMask, iterator)
-      CreateGCRequest(contextId, drawable, values)
-    }
+  override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
+    val contextId = iterator.getInt
+    val drawable = iterator.getInt
+    val bitMask = iterator.getInt
+    val values = GCRequestHelper.getValues(bitMask, iterator)
+    CreateGCRequest(contextId, drawable, values)
   }
 }
