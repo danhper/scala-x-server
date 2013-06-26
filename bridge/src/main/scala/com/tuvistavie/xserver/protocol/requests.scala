@@ -39,7 +39,7 @@ object Request extends Logging {
   }
 
   def getRequestContent(opCode: Int, length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    generators.get(opCode) match {
+    generators get opCode match {
       case Some(g) => g.parseRequest(length, data)
       case None => IO.Iteratee(BadRequest)
     }
@@ -51,6 +51,7 @@ object Request extends Logging {
     8   -> MapWindow,
     20  -> GetPropertyRequest,
     55  -> CreateGCRequest,
+    70  -> PolyFillRectangle,
     98  -> QueryExtensionRequest
   )
 }
