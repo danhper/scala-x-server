@@ -49,6 +49,7 @@ object Request extends Logging {
     20  -> GetPropertyRequest,
     55  -> CreateGCRequest,
     70  -> PolyFillRectangle,
+    74  -> PolyText8,
     98  -> QueryExtensionRequest
   )
 }
@@ -86,7 +87,7 @@ case class GetPropertyRequest (
     val opCode = 20
   }
 
-object GetPropertyRequest extends RequestGenerator with Logging {
+object GetPropertyRequest extends RequestGenerator {
   override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
     GetPropertyRequest(
       iterator.getInt,

@@ -35,7 +35,7 @@ object PolyFillRectangle extends RequestGenerator {
     val drawable = iterator getInt
     val context = iterator getInt
     val rectangles: ListBuffer[Rectangle] = new ListBuffer()
-    while(iterator.nonEmpty) rectangles += Rectangle(iterator)
+    while(iterator nonEmpty) rectangles += Rectangle(iterator)
     PolyFillRectangle(drawable, context, rectangles result)
   }
 }
