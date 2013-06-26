@@ -38,8 +38,12 @@ trait UserManager {
     user
   }
 
-  def removeUser(id: Int) {
-
+  def removeUser(id: Int) = users find { case (k, u) => id == u.id } match {
+    case Some((k, u)) => {
+      users -= k
+      availableIds(u.id) = true
+    }
+    case None =>
   }
 }
 

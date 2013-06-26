@@ -23,12 +23,15 @@ object BridgeManager {
 
   private val system = ActorSystem("XBridgeServer", ConfigFactory.load.getConfig("xbridge-server"))
 
-  def create(user: User): Boolean = {
-    val actorName = s"bridgeServer-${user.id}"
-    Logger.debug(s"starting actor ${actorName}")
-    val actor = system.actorOf(Props(new Bridge(user)), actorName)
-    bridges += (user.id -> actor)
-    true
+  def create(user: User): Boolean = bridges get user.id match {
+    case Some(_) => false
+    case None => {
+      val actorName = s"bridgeServer-${user.id}"
+      Logger.debug(s"starting actor ${actorName}")
+      val actor = system.actorOf(Props(new Bridge(user)), actorName)
+      bridges += (user.id -> actor)
+      true
+    }
   }
 
   def connect(userOpt: Option[User]) = userOpt flatMap { u => bridges get(u.id) } match {
@@ -38,6 +41,7 @@ object BridgeManager {
           val iteratee = Iteratee.foreach[JValue] { event =>
             bridge ! JsonMessage(event)
           }.mapDone { _ =>
+            bridges -= userOpt.get.id
             bridge ! PoisonPill
           }
           (iteratee, enumerator)
