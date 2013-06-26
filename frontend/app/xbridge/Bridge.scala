@@ -14,7 +14,6 @@ import com.tuvistavie.xserver.protocol.request.CreateGCRequest
 import com.tuvistavie.xserver.frontend.util.Config
 
 import org.json4s.native.Serialization
-import org.json4s.native.Serialization.write
 import org.json4s.JsonDSL._
 import org.json4s.{ NoTypeHints, Extraction, JValue }
 

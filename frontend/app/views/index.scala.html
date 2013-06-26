@@ -4,7 +4,6 @@
 <html>
 <head>
   <title>X in Browser | Login</title>
-  <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
   <script>
     var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
     var chatSocket = new WS("@com.tuvistavie.xserver.frontend.controllers.routes.Application.connect.webSocketURL()");
