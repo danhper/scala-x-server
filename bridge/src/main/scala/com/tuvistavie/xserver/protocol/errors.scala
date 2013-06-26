@@ -21,15 +21,15 @@ object XError extends Logging {
     logger.debug("starting to parse error")
     for {
       errorContent <- take(31)
-      iterator = errorContent.iterator
-      code = iterator.getByte
-      _ = logger.debug("handling error with code ${code}")
-      sequenceNumber = iterator.getShort
-      data = iterator.getInt
-      minorOpcode = iterator.getShort
-      majorOpcode = iterator.getByte
-      _ = iterator.skip(21)
     } yield {
+      val iterator = errorContent iterator
+      val code = iterator.getByte
+      logger.debug(s"handling error with code ${code}")
+      val sequenceNumber = iterator getShort
+      val data = iterator getInt
+      val minorOpcode = iterator getShort
+      val majorOpcode = iterator.getByte
+      iterator skip 21
       code match {
         case  1 => RequestError(sequenceNumber, minorOpcode, majorOpcode)
         case  2 => ValueError(sequenceNumber, data, minorOpcode, majorOpcode)
