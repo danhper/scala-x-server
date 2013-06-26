@@ -10,12 +10,18 @@ import play.api.libs.iteratee.Enumerator
 
 import com.tuvistavie.xserver.frontend.auth.{ UserManager, User }
 import com.tuvistavie.xserver.bridge.messages.{ Register, RequestMessage }
+import com.tuvistavie.xserver.protocol.request.CreateGCRequest
 import com.tuvistavie.xserver.frontend.util.Config
 
+import org.json4s.native.Serialization
+import org.json4s.native.Serialization.write
+import org.json4s.JsonDSL._
+import org.json4s.{ NoTypeHints, Extraction, JValue }
+
 case object Connect
-case class Connected(enumerator: Enumerator[JsValue])
+case class Connected(enumerator: Enumerator[JValue])
 case class CannotConnect(error: String)
-case class JsonMessage(message: JsValue)
+case class JsonMessage(message: JValue)
 
 
 class Bridge (
@@ -29,12 +35,14 @@ class Bridge (
   private val binPath = Play.current.configuration.getString("paths.backend").get
   private val clientBasePort = Play.current.configuration.getInt("xbridge-server.client.base-port").get
 
-  val wsEnumerator = Concurrent.unicast[JsValue]{ c =>
+  val wsEnumerator = Concurrent.unicast[JValue]{ c =>
     log.debug(s"created enumerator ${self.toString} with channel ${c.toString}")
     channel = Some(c)
   }
-  private var channel: Option[Concurrent.Channel[JsValue]] = None
-  private lazy val wsChannel: Concurrent.Channel[JsValue] = channel.get
+  private var channel: Option[Concurrent.Channel[JValue]] = None
+  private lazy val wsChannel: Concurrent.Channel[JValue] = channel.get
+
+  implicit val formats = Serialization.formats(NoTypeHints)
 
   override def preStart() {
     log.debug("starting actor with path {}", self.path.toString)
@@ -62,7 +70,12 @@ class Bridge (
     }
     case RequestMessage(request) => {
       log.debug("sending request {} to browser", request)
-      wsChannel.push(Json.parse(request))
+      val jsonRequest = Extraction.decompose(Map(
+        "opCode"  -> request.opCode,
+        "type"    -> request.getClass.getSimpleName,
+        "request" -> request
+      ))
+      wsChannel.push(jsonRequest)
     }
     case Connect => {
       sender ! Connected(wsEnumerator)
@@ -70,7 +83,8 @@ class Bridge (
     }
     case JsonMessage(message) => {
       log.debug("received message " + message.toString)
-      wsChannel.push(JsObject(Seq("maybe" -> JsString("it works!"))))
+      val json = ("maybe" -> "it works")
+      wsChannel.push(json)
     }
     case unknownMessage => {
       log.debug("received unkonwn messaged {}", unknownMessage)

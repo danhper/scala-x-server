@@ -11,6 +11,9 @@ import play.api.libs.json.{ JsValue, JsObject, JsString }
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.{ Iteratee, Done, Input, Enumerator }
 
+import org.json4s.{ JValue, NoTypeHints }
+import org.json4s.JsonDSL._
+
 import com.tuvistavie.xserver.frontend.auth.User
 
 
@@ -32,7 +35,7 @@ object BridgeManager {
     case Some(bridge) => {
       (bridge ? Connect).map {
         case Connected(enumerator) => {
-          val iteratee = Iteratee.foreach[JsValue] { event =>
+          val iteratee = Iteratee.foreach[JValue] { event =>
             bridge ! JsonMessage(event)
           }.mapDone { _ =>
             bridge ! PoisonPill
@@ -42,8 +45,8 @@ object BridgeManager {
       }
     }
     case None => {
-      val iteratee = Done[JsValue, Unit]((),Input.EOF)
-      val enumerator = Enumerator[JsValue](JsObject(Seq("error" -> JsString("foobar")))) >>> Enumerator.eof
+      val iteratee = Done[JValue, Unit]((),Input.EOF)
+      val enumerator = Enumerator[JValue]("error" -> "foobar") >>> Enumerator.eof
       Future(iteratee,enumerator)
     }
   }

@@ -10,10 +10,6 @@ import com.tuvistavie.xserver.bridge.{ BridgeClient, DummyBridgeClient, BridgeCl
 import com.tuvistavie.xserver.bridge.messages.RequestMessage
 import com.tuvistavie.xserver.backend.util.RuntimeConfig
 
-import org.json4s.NoTypeHints
-import org.json4s.native.Serialization
-import org.json4s.native.Serialization.write
-
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
 case class ClientConnectionClosed(id: Int)
 
@@ -98,13 +94,8 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
       socket write reply.toBytes
     }
     case r: NeedsTransfer => {
-      implicit val formats = Serialization.formats(NoTypeHints)
-      val serializedRequest = write(Map(
-        "type" -> request.getClass.getSimpleName,
-        "request" -> request
-      ))
-      logger.debug(s"transfering serialized request ${serializedRequest} to ${BridgeClient.server}")
-      server ! RequestMessage(serializedRequest)
+      logger.debug(s"transfering request ${request} to ${BridgeClient.server}")
+      server ! RequestMessage(request)
     }
     case _ => {
       logger.debug("not handling request")

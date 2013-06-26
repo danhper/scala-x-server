@@ -2,9 +2,14 @@ package com.tuvistavie.xserver.frontend.controllers
 
 import play.api.{ Play, Mode }
 import play.api.mvc.{ Controller, Action, WebSocket }
-import play.api.libs.json.{ JsValue, JsObject, JsString }
 import play.api.libs.iteratee.{ Done, Input, Enumerator }
 import play.api.Logger
+import play.api.mvc.WebSocket.FrameFormatter.stringFrame
+import play.api.mvc.WebSocket.FrameFormatter
+
+
+import org.json4s.{ JValue, NoTypeHints }
+import org.json4s.native.{ JsonMethods, JsonParser }
 
 import com.tuvistavie.xserver.bridge.BridgeManager
 import com.tuvistavie.xserver.frontend.forms.loginForm
@@ -13,6 +18,11 @@ import com.tuvistavie.xserver.frontend.util.Config
 
 object Application extends Controller {
   implicit val app = Play.current
+
+  implicit val jsonFrame: FrameFormatter[JValue] = stringFrame.transform(
+    x =>JsonMethods.compact(JsonMethods.render(x)),
+    JsonParser.parse
+  )
 
   val loginManager = Play.mode match {
     case Mode.Prod => NixLoginManager
@@ -53,7 +63,7 @@ object Application extends Controller {
     )
   }
 
-  def connect = WebSocket.async[JsValue] { implicit request =>
+  def connect = WebSocket.async[JValue] { implicit request =>
     BridgeManager.connect(loginManager.login)
   }
 }

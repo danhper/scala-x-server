@@ -9,9 +9,9 @@ import com.tuvistavie.xserver.backend.protocol.Atom
 import ExtendedByteIterator._
 import Conversions._
 
-abstract class Request (
+trait Request {
   val opCode: Int
-)
+}
 
 trait RequestGenerator {
   def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder): IO.Iteratee[Request]
@@ -52,12 +52,16 @@ object Request extends Logging {
   )
 }
 
-case object BadRequest extends Request(0)
+case object BadRequest extends Request {
+  val opCode = 1
+}
 
 case class QueryExtensionRequest (
-  val name: String
-) extends Request(98)
-  with HasLocalReply
+  name: String
+) extends Request
+  with HasLocalReply {
+  val opCode = 98
+}
 
 object QueryExtensionRequest extends RequestGenerator with Logging {
   override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {
@@ -81,8 +85,10 @@ case class GetPropertyRequest (
   longOffset: Int,
   longLength: Int,
   delete: Boolean
-) extends Request(20)
-  with HasLocalReply
+) extends Request
+  with HasLocalReply {
+    val opCode = 20
+  }
 
 object GetPropertyRequest extends RequestGenerator with Logging {
   override def parseRequest(length: Int, data: Int)(implicit endian: java.nio.ByteOrder) = {

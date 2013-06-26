@@ -11,8 +11,10 @@ case class CreateGCRequest (
   cid: Int,
   drawable: Int,
   values: Map[String, Int]
-) extends Request(55)
-  with NeedsTransfer
+) extends Request
+  with NeedsTransfer {
+    val opCode = 55
+  }
 
 object GC {
   import ExtendedByteIterator._
