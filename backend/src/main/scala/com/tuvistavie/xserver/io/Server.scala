@@ -24,7 +24,6 @@ private class Server(displayNumber: Int) extends Actor with ActorLogging {
       val child = context.actorOf(Props(new ClientManager(Server.currentId)))
       var socket = server.accept()(child)
       log.info("new client connected with uuid: {}", socket.uuid)
-
     }
     case ClientConnectionAdded(socket, client) => {
       Server.addClient(client)

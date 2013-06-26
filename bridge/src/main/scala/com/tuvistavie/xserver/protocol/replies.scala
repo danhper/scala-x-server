@@ -1,42 +1,73 @@
 package com.tuvistavie.xserver.protocol.reply
 
 import akka.util.ByteString
-
+import com.tuvistavie.xserver.protocol.Atom
 import com.tuvistavie.xserver.backend.util.{ ExtendedByteStringBuilder, Conversions }
 import ExtendedByteStringBuilder._
 import Conversions._
+import com.tuvistavie.xserver.protocol.request._
 
-abstract class Reply (
-  val data: Int,
-  val sequenceNumber: Int,
+trait Reply {
+  val data: Int
+  val sequenceNumber: Int
   val replyLength: Int
-) {
-  def toBytes(implicit endian: java.nio.ByteOrder): ByteString = {
+
+  def toByteString(implicit endian: java.nio.ByteOrder): ByteString = {
     val builder = ByteString.newBuilder
     builder putByte(1)
     builder putByte(data toByte)
     builder putShort(sequenceNumber)
     builder putInt(replyLength)
-    builder result
+    builder.result ++ dataToByteString
   }
+
+  protected def dataToByteString(implicit endian: java.nio.ByteOrder): ByteString
 }
 
-
 case class QueryExtensionReply (
-  override val sequenceNumber: Int,
+  sequenceNumber: Int,
   present: Boolean,
   majorOpcode: Int,
   firstEvent: Int,
   firstError:Int
-  ) extends Reply(0, sequenceNumber, 0) {
-  override def toBytes(implicit endian: java.nio.ByteOrder): ByteString = {
-    val baseBuilder = super.toBytes
+  ) extends Reply {
+  val data = 0
+  val replyLength = 0
+
+  protected override def dataToByteString(implicit endian: java.nio.ByteOrder) = {
     val builder = ByteString.newBuilder
     builder putBoolean present
     builder putByte majorOpcode
     builder putByte firstEvent
     builder putByte firstError
     builder fill 20
-    baseBuilder ++ builder.result
+    builder.result
+  }
+}
+
+case class GetPropertyReply (
+  sequenceNumber: Int,
+  format: Int,
+  propertyType: Atom,
+  bytesAfter: Int,
+  value: List[Int]
+) extends Reply {
+  val data = format
+  val replyLength = value.length.withPadding / 4
+
+  protected override def dataToByteString(implicit endian: java.nio.ByteOrder) = {
+    val builder = ByteString.newBuilder
+    builder putInt propertyType.id
+    builder putInt bytesAfter
+    if(format == 0) {
+      builder putInt 0
+      builder fill 12
+    } else {
+      builder putInt (value.length * 8 / format)
+      builder fill 12
+      builder putIntList (value, format / 8)
+      builder putPadding value.length
+    }
+    builder result
   }
 }

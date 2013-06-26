@@ -70,29 +70,29 @@ object Connection extends Logging {
     )
     logger.debug(s"calculated reply length: ${replyLength}")
     val builder = ByteString.newBuilder
-    builder putByte(1) // success
-    builder fill(1) // skip
-    builder putShort(Config.getInt("server.protocol.major-version"))
-    builder putShort(Config.getInt("server.protocol.minor-version"))
-    builder putShort(replyLength)
-    builder putInt(Config.getInt("server.info.release-version"))
-    builder putInt(clientId << ServerInfo.clientOffset) // resource id base
-    builder putInt(ServerInfo.idMask)
-    builder putInt(Config.getInt("server.misc.motion-buffer-size"))
-    builder putShort(Config.getString("server.info.vendor") length)
-    builder putShort(Config.getInt("server.misc.maximum-request-length"))
-    builder putByte(Config.getInt("server.display.number-of-screens"))
+    builder putByte 1 // success
+    builder fill 1 // unused
+    builder putShort Config.getInt("server.protocol.major-version")
+    builder putShort Config.getInt("server.protocol.minor-version")
+    builder putShort replyLength
+    builder putInt Config.getInt("server.info.release-version")
+    builder putInt (clientId << ServerInfo.clientOffset) // resource id base
+    builder putInt ServerInfo.idMask
+    builder putInt Config.getInt("server.misc.motion-buffer-size")
+    builder putShort Config.getString("server.info.vendor").length
+    builder putShort Config.getInt("server.misc.maximum-request-length")
+    builder putByte Config.getInt("server.display.number-of-screens")
     logger debug(s"${PixmapFormat.formats.length} pixmap formats")
-    builder putByte(PixmapFormat.formats.length)
-    builder putByte(Config.getInt("server.image.byte-order"))
-    builder putByte(Config.getInt("server.bitmap.byte-order"))
-    builder putByte(Config.getInt("server.bitmap.scanline-unit"))
-    builder putByte(Config.getInt("server.bitmap.scanline-pad"))
-    builder putByte(Keyboard.minCode)
-    builder putByte(Keyboard.maxCode)
-    builder fill(4)
-    builder putBytes(Config.getString("server.info.vendor") getBytes)
-    builder writePadding(Config.getString("server.info.vendor") length)
+    builder putByte PixmapFormat.formats.length
+    builder putByte Config.getInt("server.image.byte-order")
+    builder putByte Config.getInt("server.bitmap.byte-order")
+    builder putByte Config.getInt("server.bitmap.scanline-unit")
+    builder putByte Config.getInt("server.bitmap.scanline-pad")
+    builder putByte Keyboard.minCode
+    builder putByte Keyboard.maxCode
+    builder fill 4
+    builder putBytes Config.getString("server.info.vendor").getBytes
+    builder putPadding Config.getString("server.info.vendor").length
     val serverInfo = builder result
     val pixmapFormats = (ByteString.empty /: PixmapFormat.formats.map(_ toByteString)) (_++_)
     val screenInfo = Screen.main toByteString

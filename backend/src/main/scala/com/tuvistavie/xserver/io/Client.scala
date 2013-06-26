@@ -66,7 +66,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
   val server: BridgeClientLike = if(RuntimeConfig.standAlone) DummyBridgeClient
                                  else BridgeClient
 
-  private implicit var sequenceNumber = 0
+  private implicit var sequenceNumber = 1
 
   def handleConnection: Iteratee[Unit] = {
     for {
@@ -79,7 +79,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
           socket write response
         }
         case Connection(_, _, Some(protocol), _) => {
-          socket write ConnectionError("authentication not supported\n").toBytes
+          socket write ConnectionError("authentication not supported\n").toByteString
           logger.debug(s"refused connection needing auth: ${protocol}")
         }
       }
@@ -88,10 +88,10 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
 
   def handleRequest(request: Request) = request match {
     case r: HasLocalReply => {
-      val reply = ReplyBuilder.buildReply(r, 1)
-      logger.debug(s"generated reply ${reply}, with length ${reply.toBytes.length}")
-      logger.debug(s"reply content: ${reply.toBytes}")
-      socket write reply.toBytes
+      val reply = ReplyBuilder.buildReply(r, sequenceNumber)
+      logger.debug(s"generated reply ${reply}, with length ${reply.toByteString.length}")
+      logger.debug(s"reply content: ${reply.toByteString}")
+      socket write reply.toByteString
     }
     case r: NeedsTransfer => {
       logger.debug(s"transfering request ${request} to ${BridgeClient.server}")
@@ -111,6 +111,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
                 else Request.getRequest(opCode)
     } yield {
       logger.debug(s"parsed ${parsed}")
+      logger.debug(s"sequenceNumber: ${sequenceNumber}")
       parsed match {
         case request: Request => {
           handleRequest(request)

@@ -5,7 +5,7 @@ import akka.util.ByteIterator
 import com.typesafe.scalalogging.slf4j.Logging
 import com.tuvistavie.xserver.backend.util.{ ExtendedByteIterator, Conversions }
 
-import com.tuvistavie.xserver.backend.protocol.Atom
+import com.tuvistavie.xserver.protocol.Atom
 import ExtendedByteIterator._
 import Conversions._
 

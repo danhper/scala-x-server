@@ -64,7 +64,7 @@ abstract class XError (
   import Conversions._
   import ExtendedByteStringBuilder._
 
-  def toBytes(implicit endian: java.nio.ByteOrder) = {
+  def toByteString(implicit endian: java.nio.ByteOrder) = {
     val builder = ByteString.newBuilder
     builder putByte  0
     builder putByte  code

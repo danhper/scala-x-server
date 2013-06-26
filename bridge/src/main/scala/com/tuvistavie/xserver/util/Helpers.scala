@@ -10,14 +10,18 @@ class ExtendedByteStringBuilder(builder: ByteStringBuilder) {
     (1 to n) foreach { _ => builder.putByte(0) }
   }
 
-  def writePadding(n: Int) {
+  def putPadding(n: Int) {
     fill(n.padding)
   }
 
-  def writeNum(n: Int, byteNum: Int)(implicit endian: java.nio.ByteOrder) = byteNum match {
+  def putNum(n: Int, byteNum: Int)(implicit endian: java.nio.ByteOrder) = byteNum match {
     case 1 => builder putByte n
     case 2 => builder putShort n
     case 4 => builder putInt n
+  }
+
+  def putIntList(list: List[Int], byteNum: Int)(implicit endian: java.nio.ByteOrder) {
+    list foreach { putNum(_, byteNum) }
   }
 
   def putBoolean(b: Boolean) {
