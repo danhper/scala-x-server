@@ -11,5 +11,9 @@ POST    /doLogin                    com.tuvistavie.xserver.frontend.controllers.
 
 GET     /connect                    com.tuvistavie.xserver.frontend.controllers.Application.connect
 
+GET     /test                       com.tuvistavie.xserver.frontend.controllers.Application.test
+
+GET     /ws                         com.tuvistavie.xserver.frontend.controllers.Application.testWs
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

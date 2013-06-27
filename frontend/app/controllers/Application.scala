@@ -6,15 +6,14 @@ import play.api.libs.iteratee.{ Done, Input, Enumerator }
 import play.api.Logger
 import play.api.mvc.WebSocket.FrameFormatter.stringFrame
 import play.api.mvc.WebSocket.FrameFormatter
-
-
 import org.json4s.{ JValue, NoTypeHints }
 import org.json4s.native.{ JsonMethods, JsonParser }
-
 import com.tuvistavie.xserver.bridge.BridgeManager
 import com.tuvistavie.xserver.frontend.forms.loginForm
 import com.tuvistavie.xserver.frontend.auth.{ NixLoginManager, DummyLoginManager, UserManager }
 import com.tuvistavie.xserver.frontend.util.Config
+
+import play.api.libs.iteratee.Iteratee
 
 object Application extends Controller {
   implicit val app = Play.current
@@ -65,5 +64,15 @@ object Application extends Controller {
 
   def connect = WebSocket.async[JValue] { implicit request =>
     BridgeManager.connect(loginManager.login)
+  }
+
+  def test = Action { implicit request =>
+    Ok(views.html.test())
+  }
+
+  def testWs = WebSocket.using[String] { request =>
+      val in = Iteratee.consume[String]()
+      val out = Enumerator("Hello!") >>> Enumerator.eof
+      (in, out)
   }
 }

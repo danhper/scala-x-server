@@ -17,13 +17,14 @@ define([
     onError: {}
   };
 
-  var WsManager = function() {
+  var WsWrapper = function() {
   };
 
-  WsManager.prototype.connect = function(hostname) {
+  WsWrapper.prototype.connect = function(host) {
     if(connectionInitialized) {
       throw new WsException("socket already connected");
     }
+    hostname = host;
     socket = new WS(hostname);
     connectionInitialized = true;
     initializeWebsocket();
@@ -56,7 +57,11 @@ define([
     }
   };
 
-  WsManager.prototype.addListener = function(type, name, callback) {
+  WsWrapper.prototype.getHostName = function() {
+    return hostname;
+  };
+
+  WsWrapper.prototype.addListener = function(type, name, callback) {
     checkListenerType(type);
     if(name in listeners[type]) {
       throw new WsException("listener " + name + " already defined for " + type + " event");
@@ -64,7 +69,7 @@ define([
     listeners[type][name] = callback;
   };
 
-  WsManager.prototype.removeListener = function(type, name) {
+  WsWrapper.prototype.removeListener = function(type, name) {
     checkListenerType(type);
     if(!(name in listeners[type])) {
       throw new WsException("listener " + name + " not defined for " + type + " event");
@@ -72,39 +77,39 @@ define([
     delete listeners[type][name];
   };
 
-  WsManager.prototype.addOnOpenListener = function(name, callback) {
+  WsWrapper.prototype.addOnOpenListener = function(name, callback) {
     this.addListener("onOpen", name, callback);
   };
 
-  WsManager.prototype.addOnMessageListener = function(name, callback) {
+  WsWrapper.prototype.addOnMessageListener = function(name, callback) {
     this.addListener("onMessage", name, callback);
   };
 
-  WsManager.prototype.addOnCloseListener = function(name, callback) {
+  WsWrapper.prototype.addOnCloseListener = function(name, callback) {
     this.addListener("onClose", name, callback);
   };
 
-  WsManager.prototype.addOnErrorListener = function(name, callback) {
+  WsWrapper.prototype.addOnErrorListener = function(name, callback) {
     this.addListener("onError", name, callback);
   };
 
-  WsManager.prototype.removeOnOpenListener = function(name) {
+  WsWrapper.prototype.removeOnOpenListener = function(name) {
     this.removeListener("onOpen", name);
   };
 
-  WsManager.prototype.removeOnMessageListener = function(name) {
+  WsWrapper.prototype.removeOnMessageListener = function(name) {
     this.removeListener("onMessage", name);
   };
 
-  WsManager.prototype.removeOnCloseListener = function(name) {
+  WsWrapper.prototype.removeOnCloseListener = function(name) {
     this.removeListener("onClose", name);
   };
 
-  WsManager.prototype.removeOnErrorListener = function(name) {
+  WsWrapper.prototype.removeOnErrorListener = function(name) {
     this.removeListener("onError", name);
   };
 
-  WsManager.prototype.close = function() {
+  WsWrapper.prototype.close = function() {
     if(!connectionInitialized) {
       throw new WsException("socket not opened");
     }
@@ -112,5 +117,12 @@ define([
     connectionInitialized = false;
   };
 
-  return WsManager;
+  WsWrapper.prototype.send = function(message) {
+    if(!connectionInitialized) {
+      throw new WsException("socket not opened");
+    }
+    socket.send(message);
+  };
+
+  return WsWrapper;
 });
