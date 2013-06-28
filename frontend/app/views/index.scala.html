@@ -7,12 +7,14 @@
   <script>
     define('config', function() {
       return {
-        wsURL: "@com.tuvistavie.xserver.frontend.controllers.routes.Application.connect.webSocketURL()"
+        wsURL: "@com.tuvistavie.xserver.frontend.controllers.routes.Application.connect.webSocketURL()",
+        containerId: "container"
       };
     });
   </script>
   <script src="@routes.Assets.at("javascripts/main.js")"></script>
 </head>
 <body>
+<div id="container"></div>
 </body>
 </html>

@@ -4,7 +4,8 @@ require.config({
   paths: {
     domReady: 'libs/domReady',
     Logger: 'libs/logger.min',
-    lodash: 'libs/lodash.min'
+    lodash: 'libs/lodash.min',
+    Kinectic: 'libs/kinetic-v4.5.4.min'
   }
 });
 
