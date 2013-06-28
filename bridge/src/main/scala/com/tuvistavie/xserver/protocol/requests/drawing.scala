@@ -21,7 +21,7 @@ object Rectangle {
   }
 }
 
-case class PolyFillRectangle (
+case class PolyFillRectangleRequest (
   drawable: Int,
   context: Int,
   rectangles: List[Rectangle]
@@ -30,12 +30,12 @@ with NeedsTransfer {
   val opCode = 70
 }
 
-object PolyFillRectangle extends RequestGenerator {
+object PolyFillRectangleRequest extends RequestGenerator {
   override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
     val drawable = iterator getInt
     val context = iterator getInt
     val rectangles: ListBuffer[Rectangle] = new ListBuffer()
     while(iterator nonEmpty) rectangles += Rectangle(iterator)
-    PolyFillRectangle(drawable, context, rectangles result)
+    PolyFillRectangleRequest(drawable, context, rectangles result)
   }
 }

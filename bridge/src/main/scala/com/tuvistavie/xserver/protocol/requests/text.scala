@@ -29,7 +29,7 @@ case class TextItem8Font (
 ) extends TextItem8
 
 
-case class PolyText8 (
+case class PolyText8Request (
   drawable: Int,
   context: Int,
   x: Int,
@@ -40,13 +40,13 @@ with NeedsTransfer {
   val opCode = 74
 }
 
-object PolyText8 extends RequestGenerator {
+object PolyText8Request extends RequestGenerator {
   override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
     val drawable = iterator getInt
     val context = iterator getInt
     val (x, y) = (iterator getShort, iterator getShort)
     val items = new ListBuffer[TextItem8]()
     while(iterator.len >= 2) items += TextItem8.fromByteIterator(iterator)
-    PolyText8(drawable, context, x, y, items result)
+    PolyText8Request(drawable, context, x, y, items result)
   }
 }

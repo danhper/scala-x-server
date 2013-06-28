@@ -75,15 +75,15 @@ object ChangeWindowAttributesRequest extends RequestGenerator {
   }
 }
 
-case class MapWindow (
+case class MapWindowRequest (
   window: Int
 ) extends Request
 with NeedsTransfer {
   val opCode = 8
 }
 
-object MapWindow extends RequestGenerator {
+object MapWindowRequest extends RequestGenerator {
   override def parseRequest(iterator: ByteIterator, data: Int)(implicit endian: java.nio.ByteOrder) = {
-    MapWindow(iterator getInt)
+    MapWindowRequest(iterator getInt)
   }
 }
