@@ -7,28 +7,28 @@ define([
   var stage; // layer container
   var root;
 
-  var WindowManager = function() {
-  };
+  var windowManager = {
+    add: function(win) {
+      win.parent.addChild(win);
+      windows[win.id] = win;
+    },
 
-  WindowManager.prototype.add = function(windowId, win) {
-    windows[windowId] = win;
-  };
+    get: function(windowId) {
+      if(!_(windows).has(windowId)) {
+        throw "window " + windowId + " does not exist";
+      }
+      return windows[windowId];
+    },
 
-  WindowManager.prototype.get = function(windowId) {
-    if(!_(windows).has(windowId)) {
-      throw "foo";
+    setRoot: function(mainStage, layer) {
+      if(!_.isUndefined(root)) {
+        throw "cannot change root window";
+      }
+      stage = mainStage;
+      root = layer;
+      stage.add(root);
     }
-    return windows[windowId];
   };
 
-  WindowManager.prototype.setRoot = function(mainStage, layer) {
-    if(!_.isUndefined(root)) {
-      throw "foo";
-    }
-    stage = mainStage;
-    root = layer;
-    stage.add(root);
-  };
-
-  return new WindowManager();
+  return windowManager;
 });

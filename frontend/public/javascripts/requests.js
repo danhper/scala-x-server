@@ -2,7 +2,6 @@ define([
   'requests/text',
   'requests/drawing',
   'requests/base'
-], function() {
-
-  return _.merge({});
+], function(textRequests, drawingRequests, baseRequests) {
+  return _.merge({}, _.values(arguments));
 });
