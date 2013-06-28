@@ -63,7 +63,7 @@ define([
 
   WsWrapper.prototype.addListener = function(type, name, callback) {
     checkListenerType(type);
-    if(name in listeners[type]) {
+    if(_(listeners[type]).has(name)) {
       throw new WsException("listener " + name + " already defined for " + type + " event");
     }
     listeners[type][name] = callback;
@@ -71,7 +71,7 @@ define([
 
   WsWrapper.prototype.removeListener = function(type, name) {
     checkListenerType(type);
-    if(!(name in listeners[type])) {
+    if(!_(listeners[type]).has(name)) {
       throw new WsException("listener " + name + " not defined for " + type + " event");
     }
     delete listeners[type][name];
