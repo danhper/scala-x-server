@@ -3,7 +3,8 @@ require.config({
 
   paths: {
     domReady: 'libs/domReady',
-    Logger: 'libs/logger.min'
+    Logger: 'libs/logger.min',
+    lodash: 'libs/lodash.min'
   }
 });
 

@@ -1,7 +1,8 @@
 define([
+  'lodash',
   'Logger',
   'util/WsException'
-], function(Logger, WsException) {
+], function(_, Logger, WsException) {
   var hostname;
 
   var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
@@ -37,22 +38,21 @@ define([
       onerror:   "onError",
       onclose:   "onClose"
     };
-    for(var wsEvent in events) {
-      var eventName = events[wsEvent];
-      socket[wsEvent] = initEventFunction(eventName);
-    }
+    _(events).forEach(function(localEventName, wsEventName) {
+      socket[wsEventName] = initEventFunction(localEventName);
+    });
   };
 
   var initEventFunction = function(eventName) {
     return function(evt) {
-      for(var i in listeners[eventName]) {
-        listeners[eventName][i](evt);
-      }
+      _(listeners[eventName]).forEach(function(callback) {
+        callback(evt);
+      });
     };
   };
 
   var checkListenerType = function(type) {
-    if(!(type in listeners)) {
+    if(!_(listeners).has(type)) {
       throw new WsException("event " + type + " does not exist");
     }
   };
