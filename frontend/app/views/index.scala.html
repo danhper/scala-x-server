@@ -1,5 +1,4 @@
 @()(implicit request: RequestHeader)
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,20 +12,6 @@
     });
   </script>
   <script src="@routes.Assets.at("javascripts/main.js")"></script>
-  <script>
-    var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
-    var chatSocket = new WS("@com.tuvistavie.xserver.frontend.controllers.routes.Application.connect.webSocketURL()");
-    chatSocket.onopen = function() {
-      console.log("channel opened");
-      chatSocket.send(JSON.stringify({
-        foo: "bar"
-      }));
-    };
-    chatSocket.onmessage = function(message) {
-      var messageContent = JSON.parse(message.data);
-      console.log(messageContent);
-    };
-  </script>
 </head>
 <body>
 </body>

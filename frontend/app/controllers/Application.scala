@@ -65,14 +65,4 @@ object Application extends Controller {
   def connect = WebSocket.async[JValue] { implicit request =>
     BridgeManager.connect(loginManager.login)
   }
-
-  def test = Action { implicit request =>
-    Ok(views.html.test())
-  }
-
-  def testWs = WebSocket.using[String] { request =>
-      val in = Iteratee.consume[String]()
-      val out = Enumerator("Hello!") >>> Enumerator.eof
-      (in, out)
-  }
 }
