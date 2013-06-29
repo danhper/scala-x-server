@@ -3,8 +3,8 @@ package com.tuvistavie.xserver.backend.util
 case class InitSettings (
   displayNumber: Int = 1,
   standAlone: Boolean = false,
-  rootHeight: Int = 800,
-  rootWidth: Int = 600
+  rootWidth: Int = 800,
+  rootHeight: Int = 600
 )
 
 object InitSettings  {
@@ -27,7 +27,7 @@ object InitSettings  {
 
 
     opt[Int]('h', "root-height") valueName("<root-height>") action { (x, c) =>
-      c.copy(rootWidth = x)
+      c.copy(rootHeight = x)
     } validate { x =>
       if(x >= Config.getInt("server.screen.min-height")) success
       else failure("<root-height> must >=480")
