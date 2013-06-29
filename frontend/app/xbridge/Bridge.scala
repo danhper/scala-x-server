@@ -9,7 +9,7 @@ import play.api.libs.iteratee.Concurrent
 import play.api.libs.iteratee.Enumerator
 
 import com.tuvistavie.xserver.frontend.auth.{ UserManager, User }
-import com.tuvistavie.xserver.bridge.messages.{ Register, RequestMessage }
+import com.tuvistavie.xserver.bridge.messages._
 import com.tuvistavie.xserver.frontend.util.Config
 
 import org.json4s.native.Serialization
@@ -68,9 +68,16 @@ class Bridge (
       remoteBridge = Some(actor)
       log.debug("registered actor {}", actor.toString)
     }
-    case RequestMessage(request) => {
+    case AddClient(id) => {
+      log.debug("adding client with id {}", id)
+    }
+    case RemoveClient(id) => {
+      log.debug("removing client with id {}", id)
+    }
+    case RequestMessage(clientId, request) => {
       log.debug("sending request {} to browser", request)
       val jsonRequest = Extraction.decompose(Map(
+        "clientId" -> clientId,
         "opCode"  -> request.opCode,
         "type"    -> request.getClass.getSimpleName,
         "request" -> request

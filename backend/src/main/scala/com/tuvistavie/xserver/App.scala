@@ -17,9 +17,7 @@ object App extends Logging {
       case None => sys.exit(1)
     }
     val displayNumber = RuntimeConfig.displayNumber
-    val bridge = if(RuntimeConfig.standAlone) DummyBridgeClient
-                 else BridgeClient
-    bridge.register()
+    BridgeClient.current.register()
     Server.run()
   }
 }

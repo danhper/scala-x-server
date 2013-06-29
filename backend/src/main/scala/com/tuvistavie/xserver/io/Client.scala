@@ -7,7 +7,7 @@ import com.tuvistavie.xserver.protocol.error.{ ConnectionError, ProtocolExceptio
 import com.tuvistavie.xserver.protocol.{ request, ReplyBuilder, Connection }
 import request.{ Request, HasLocalReply, NeedsTransfer }
 import com.tuvistavie.xserver.bridge.{ BridgeClient, DummyBridgeClient, BridgeClientLike }
-import com.tuvistavie.xserver.bridge.messages.RequestMessage
+import com.tuvistavie.xserver.bridge.messages._
 import com.tuvistavie.xserver.backend.util.RuntimeConfig
 
 case class ClientConnectionAdded(socket: IO.Handle, client: Client)
@@ -35,6 +35,7 @@ class ClientManager(private val id: Int) extends Actor with Logging {
     case Read(socket, bytes) => it(Chunk(bytes))
     case Closed(socket, cause) => {
       logger.info("client socket with uuid {} has been closed: {}", socket.uuid, cause)
+      BridgeClient.current ! RemoveClient(id)
       context.parent ! ClientConnectionClosed(id)
       context.stop(self)
     }
@@ -63,8 +64,6 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
 
   implicit val endian: java.nio.ByteOrder
   implicit val socket: SocketHandle = handle
-  val server: BridgeClientLike = if(RuntimeConfig.standAlone) DummyBridgeClient
-                                 else BridgeClient
 
   private implicit var sequenceNumber = 1
 
@@ -76,6 +75,7 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
         case Connection(_, _, None, None) => {
           val response = Connection.getOkResponse(id)
           logger.debug(s"sending ok response to client ${id} with length of ${response.length}")
+          BridgeClient.current ! AddClient(id)
           socket write response
         }
         case Connection(_, _, Some(protocol), _) => {
@@ -94,8 +94,8 @@ abstract class Client(id: Int, handle: IO.SocketHandle) extends Logging {
       socket write reply.toByteString
     }
     case r: NeedsTransfer => {
-      logger.debug(s"transfering request ${request} to ${BridgeClient.server}")
-      server ! RequestMessage(request)
+      logger.debug(s"transfering request ${request} to ${BridgeClient.current}")
+      BridgeClient.current ! RequestMessage(id, request)
     }
     case _ => {
       logger.debug("not handling request")

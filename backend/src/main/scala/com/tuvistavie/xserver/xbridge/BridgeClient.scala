@@ -12,20 +12,25 @@ import messages._
 
 import messages.Register
 
+object BridgeClient {
+  val current = if(RuntimeConfig.standAlone) DummyBridgeClient
+                else TCPBridgeClient
+}
+
 trait BridgeClientLike {
   def register(): Unit
   def !(msg: Any): Unit
 }
 
-class BridgeClient extends Actor with ActorLogging {
+class TCPBridgeClient extends Actor with ActorLogging {
   def receive = {
     case foo =>
   }
 }
 
-object BridgeClient extends Logging with BridgeClientLike {
+object TCPBridgeClient extends Logging with BridgeClientLike {
   val system = ActorSystem("XBridgeClient", ConfigFactory.load.getConfig("bridge"))
-  val ref = system.actorOf(Props[BridgeClient], "bridge-" + RuntimeConfig.displayNumber)
+  val ref = system.actorOf(Props[TCPBridgeClient], "bridge-" + RuntimeConfig.displayNumber)
 
   private val serverPath = Config.getString("bridge.server.path").format(RuntimeConfig.displayNumber)
   lazy val server = system.actorFor(serverPath)
@@ -33,7 +38,7 @@ object BridgeClient extends Logging with BridgeClientLike {
   override def register() {
     logger.debug(s"registering to actor with path ${serverPath}")
     server ! Register(ref)
-    server ! RequestMessage(CreateRootRequest(
+    server ! RequestMessage(-1, CreateRootRequest(
       Window.root.id,
       Window.root.width,
       Window.root.height
