@@ -10,7 +10,6 @@ import play.api.libs.iteratee.Enumerator
 
 import com.tuvistavie.xserver.frontend.auth.{ UserManager, User }
 import com.tuvistavie.xserver.bridge.messages.{ Register, RequestMessage }
-import com.tuvistavie.xserver.protocol.request.CreateGCRequest
 import com.tuvistavie.xserver.frontend.util.Config
 
 import org.json4s.native.Serialization
@@ -43,6 +42,8 @@ class Bridge (
 
   implicit val formats = Serialization.formats(NoTypeHints)
 
+  private var unsentMessages: List[JValue] = List.empty
+
   override def preStart() {
     log.debug("starting actor with path {}", self.path.toString)
     val port = s"wrapper.java.additional.2=-Dbridge.akka.remote.netty.port=${clientBasePort + user.id}"
@@ -74,11 +75,15 @@ class Bridge (
         "type"    -> request.getClass.getSimpleName,
         "request" -> request
       ))
-      wsChannel.push(jsonRequest)
+      channel match {
+        case Some(c) => c.push(jsonRequest)
+        case None => unsentMessages :+= jsonRequest
+      }
     }
     case Connect => {
       sender ! Connected(wsEnumerator)
       log.debug("websocket connection accepted")
+      unsentMessages foreach { m => wsChannel push m }
     }
     case JsonMessage(message) => {
       log.debug("received message " + message.toString)

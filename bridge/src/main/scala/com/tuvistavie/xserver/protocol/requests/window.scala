@@ -25,6 +25,14 @@ object WindowRequestHelper extends ValueGenerator {
   )
 }
 
+case class CreateRootRequest (
+  id: Int,
+  width: Int,
+  height: Int
+) extends Request {
+  val opCode = 0
+}
+
 case class CreateWindowRequest (
   id: Int,
   parent: Int,

@@ -1,10 +1,14 @@
 package com.tuvistavie.xserver.bridge
 
 import akka.actor.{ Actor, ActorRef, ActorSystem, ActorLogging, Props }
-
-import com.tuvistavie.xserver.backend.util.{ Config, RuntimeConfig }
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.slf4j.Logging
+
+import com.tuvistavie.xserver.backend.util.{ Config, RuntimeConfig }
+import com.tuvistavie.xserver.backend.model.Window
+import com.tuvistavie.xserver.protocol.request.CreateRootRequest
+import messages._
+
 
 import messages.Register
 
@@ -29,6 +33,11 @@ object BridgeClient extends Logging with BridgeClientLike {
   override def register() {
     logger.debug(s"registering to actor with path ${serverPath}")
     server ! Register(ref)
+    server ! RequestMessage(CreateRootRequest(
+      Window.root.id,
+      Window.root.width,
+      Window.root.height
+    ))
   }
 
   override def !(msg: Any) {

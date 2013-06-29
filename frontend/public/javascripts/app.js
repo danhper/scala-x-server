@@ -1,7 +1,7 @@
 define([
   'Logger',
   'config',
-  'controllers/WsWrapper',
+  'util/WsWrapper',
   'requests'
 ], function(Logger, config, WS, requests) {
 
@@ -23,13 +23,13 @@ define([
       console.log(message.data);
     });
 
-    socket.addOnMessageListener('handleRequset', function(message) {
-      var data = JSON.parse(message);
-      if(!_(requests).has(data.type)) {
-        Logger.error("method " + data.type + " does not exist");
-      }
-      requests[data.type](data.request);
-    });
+    // socket.addOnMessageListener('handleRequset', function(message) {
+    //   var data = JSON.parse(message);
+    //   if(!_(requests).has(data.type)) {
+    //     Logger.error("method " + data.type + " does not exist");
+    //   }
+    //   requests[data.type](data.request);
+    // });
 
     socket.connect(config.wsURL);
   };

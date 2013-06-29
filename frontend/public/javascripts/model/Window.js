@@ -1,6 +1,6 @@
 define([
   'config',
-  'WindowManager'
+  'model/WindowManager'
 ], function(config, windowManager) {
 
   var Window = function(attrs) {
