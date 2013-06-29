@@ -1,23 +1,27 @@
 define([
   'lodash',
   'Kinectic',
-  'model/WindowManager'
-], function(_, Kinectic, windowManager) {
+  'model/WindowManager',
+  'model/ClientManager'
+], function(_, Kinectic, WindowManager, ClientManager) {
   var drawingRequests = {
     // TODO: set stroke and strokeWidth with GC
-    PolyFillRectangleRequest: function(request) {
-      var win = windowManager.get(request.drawable);
+    PolyFillRectangleRequest: function(request, clientId) {
+      var win = WindowManager.get(request.drawable);
+      var client = ClientManager.get(clientId);
       _(request.rectangles).forEach(function(rectangle) {
-        win.drawable.add(new Kinetic.Rect({
+        var rectangleNode = new Kinetic.Rect({
           x: rectangle.x,
           y: rectangle.y,
           width: rectangle.width,
           height: rectangle.height,
           stroke: 'black',
           strokeWidth: 1
-        }));
+        });
+        win.drawable.add(rectangleNode);
+        client.addNode(rectangleNode);
       });
-      windowManager.updateDisplay();
+      WindowManager.updateDisplay();
     }
   };
   return drawingRequests;

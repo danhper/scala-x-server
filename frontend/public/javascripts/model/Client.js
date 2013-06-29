@@ -1,8 +1,10 @@
 define([
-  'lodash'
-], function(_) {
+  'lodash',
+  'Logger'
+], function(_, Logger, WindowManager) {
 
   var Client = function(id) {
+    Logger.debug("creating client with id " + id);
     this.id = id;
   };
 
@@ -10,11 +12,11 @@ define([
     nodes: [],
 
     addNode: function(node) {
-      nodes.push(node);
+      this.nodes.push(node);
     },
 
     destroy: function() {
-      _(nodes).forEach(function(node) {
+      _(this.nodes).forEach(function(node) {
         node.destroy();
       });
     }

@@ -3,13 +3,13 @@ define([
   'Logger',
   'config',
   'model/Window'
-], function(_, Logger, config, Window) {
+], function(_, Logger, config, Window, ClientManager) {
   var windows = {};
 
   var stage; // layer container
   var root;
 
-  var windowManager = {
+  var WindowManager = {
     add: function(win) {
       win.parent.addChild(win);
       windows[win.id] = win;
@@ -38,7 +38,7 @@ define([
       windows[rootWindow.id] = rootWindow;
     },
 
-    createFromRequest: function(request) {
+    createFromRequest: function(request, clientId) {
       var parent = this.get(request.parent);
       var drawable = new Kinetic.Group({
         x: request.x,
@@ -53,6 +53,7 @@ define([
         drawable: drawable
       });
       this.add(newWindow);
+      return newWindow;
     },
 
     updateDisplay: function() {
@@ -60,5 +61,5 @@ define([
     }
   };
 
-  return windowManager;
+  return WindowManager;
 });
