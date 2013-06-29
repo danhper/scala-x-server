@@ -69,6 +69,17 @@ class Bridge (
     }
   }
 
+  def sendClientUpdate(id: Int, action: String) = {
+    val jsonRequest = Extraction.decompose(Map(
+      "type" -> "clientUpdate",
+      "content" -> Map(
+        "clientId" -> id,
+        "action" -> action
+      )
+    ))
+    sendWSMessage(jsonRequest)
+  }
+
   def receive = {
     case Register(actor) => {
       initialized = true
@@ -77,25 +88,11 @@ class Bridge (
     }
     case AddClient(id) => {
       log.debug("adding client with id {}", id)
-      val jsonRequest = Extraction.decompose(Map(
-        "type" -> "clientUpdate",
-        "content" -> Map(
-          "clientId" -> id,
-          "action" -> "add"
-        )
-      ))
-      sendWSMessage(jsonRequest)
+      sendClientUpdate(id, "add")
     }
     case RemoveClient(id) => {
       log.debug("removing client with id {}", id)
-      val jsonRequest = Extraction.decompose(Map(
-        "type" -> "clientUpdate",
-        "content" -> Map(
-          "clientId" -> id,
-          "action" -> "remove"
-        )
-      ))
-      sendWSMessage(jsonRequest)
+      sendClientUpdate(id, "remove")
     }
     case RequestMessage(clientId, request) => {
       log.debug("sending request {} to browser", request)
