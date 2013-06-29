@@ -27,11 +27,21 @@ define([
 
     socket.addOnMessageListener('handleRequest', function(message) {
       var data = JSON.parse(message.data);
-      if(!_(requests).has(data.type)) {
-        Logger.warn("method " + data.type + " does not exist");
-      } else {
-        requests[data.type](data.request);
+      switch(data.type) {
+        case "request":
+          var content = data.content;
+          if(!_(requests).has(content.action)) {
+            Logger.warn("method " + content.action + " does not exist");
+          } else {
+            requests[content.action](content.request);
+          }
+          break;
+        case "clientUpdate":
+          break;
+        default:
+          Logger.error("unkonwn request type " + data.type);
       }
+
     });
 
     socket.connect(config.wsURL);

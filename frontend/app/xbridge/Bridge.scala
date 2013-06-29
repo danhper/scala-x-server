@@ -62,6 +62,13 @@ class Bridge (
     Process(Seq(binPath, "stop"), None, "RUN_USER" -> user.name).!
   }
 
+  def sendWSMessage(message: JValue) = {
+    channel match {
+      case Some(c) => c.push(message)
+      case None => unsentMessages :+= message
+    }
+  }
+
   def receive = {
     case Register(actor) => {
       initialized = true
@@ -70,22 +77,38 @@ class Bridge (
     }
     case AddClient(id) => {
       log.debug("adding client with id {}", id)
+      val jsonRequest = Extraction.decompose(Map(
+        "type" -> "clientUpdate",
+        "content" -> Map(
+          "clientId" -> id,
+          "action" -> "add"
+        )
+      ))
+      sendWSMessage(jsonRequest)
     }
     case RemoveClient(id) => {
       log.debug("removing client with id {}", id)
+      val jsonRequest = Extraction.decompose(Map(
+        "type" -> "clientUpdate",
+        "content" -> Map(
+          "clientId" -> id,
+          "action" -> "remove"
+        )
+      ))
+      sendWSMessage(jsonRequest)
     }
     case RequestMessage(clientId, request) => {
       log.debug("sending request {} to browser", request)
       val jsonRequest = Extraction.decompose(Map(
-        "clientId" -> clientId,
-        "opCode"  -> request.opCode,
-        "type"    -> request.getClass.getSimpleName,
-        "request" -> request
+        "type" -> "request",
+        "content" -> Map(
+          "clientId" -> clientId,
+          "opCode"  -> request.opCode,
+          "action"    -> request.getClass.getSimpleName,
+          "request" -> request
+        )
       ))
-      channel match {
-        case Some(c) => c.push(jsonRequest)
-        case None => unsentMessages :+= jsonRequest
-      }
+      sendWSMessage(jsonRequest)
     }
     case Connect => {
       sender ! Connected(wsEnumerator)
