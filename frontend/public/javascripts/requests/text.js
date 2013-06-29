@@ -5,7 +5,7 @@ define([
 ], function(_, Kinectic, windowManager) {
   var textRequests = {
     // TODO: set fill and font with GC
-    polyText8Request: function(request) {
+    PolyText8Request: function(request) {
       var win = windowManager.get(request.drawable);
       _(request.textItems).forEach(function(textInfo) {
         win.drawable.add(new Kinetic.Text({
@@ -16,6 +16,7 @@ define([
           fill: 'black'
         }));
       });
+      windowManager.updateDisplay();
     }
   };
   return textRequests;

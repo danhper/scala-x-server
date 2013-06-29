@@ -9,6 +9,8 @@ define([
     Logger.useDefaults();
     Logger.debug("initializing application with config:");
     Logger.debug(config);
+    Logger.debug("available requests: ");
+    Logger.debug(requests);
     initializeWebsocket();
   };
 
@@ -16,20 +18,21 @@ define([
     var socket = new WS();
 
     socket.addOnOpenListener('connect', function() {
-      console.log('connected');
+      Logger.debug('connected');
     });
 
     socket.addOnMessageListener('echo', function(message) {
-      console.log(message.data);
+      Logger.debug(message.data);
     });
 
-    // socket.addOnMessageListener('handleRequset', function(message) {
-    //   var data = JSON.parse(message);
-    //   if(!_(requests).has(data.type)) {
-    //     Logger.error("method " + data.type + " does not exist");
-    //   }
-    //   requests[data.type](data.request);
-    // });
+    socket.addOnMessageListener('handleRequest', function(message) {
+      var data = JSON.parse(message.data);
+      if(!_(requests).has(data.type)) {
+        Logger.warn("method " + data.type + " does not exist");
+      } else {
+        requests[data.type](data.request);
+      }
+    });
 
     socket.connect(config.wsURL);
   };

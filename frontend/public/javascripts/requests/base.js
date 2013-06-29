@@ -5,13 +5,22 @@ define([
   'model/WindowManager'
 ], function(_, Kinectic, Window, windowManager) {
   var baseRequests = {
-    createGCRequest: function(request) {
+    CreateGCRequest: function(request) {
     },
 
-    createWindowRequest: function(request) {
-      var newWindow = Window.createWindowRequest(request);
-      windowManager.add(newWindow);
+    CreateRootRequest: function(request) {
+      windowManager.createRoot(request);
+    },
+
+    CreateWindowRequest: function(request) {
+      windowManager.createFromRequest(request);
+    },
+
+    MapWindowRequest: function(request) {
+      var win = windowManager.get(request.window);
+      win.drawable.show();
     }
   };
+
   return baseRequests;
 });

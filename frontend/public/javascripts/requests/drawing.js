@@ -5,7 +5,7 @@ define([
 ], function(_, Kinectic, windowManager) {
   var drawingRequests = {
     // TODO: set stroke and strokeWidth with GC
-    polyFillRectangleRequest: function(request) {
+    PolyFillRectangleRequest: function(request) {
       var win = windowManager.get(request.drawable);
       _(request.rectangles).forEach(function(rectangle) {
         win.drawable.add(new Kinetic.Rect({
@@ -17,6 +17,7 @@ define([
           strokeWidth: 1
         }));
       });
+      windowManager.updateDisplay();
     }
   };
   return drawingRequests;
