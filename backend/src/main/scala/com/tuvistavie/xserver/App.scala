@@ -3,7 +3,7 @@ package com.tuvistavie.xserver.backend
 import com.typesafe.scalalogging.slf4j.Logging
 
 import io.Server
-import util.{ Config, RuntimeConfig, InitSettings, loadRuntimeConfig }
+import util.{ Config, RuntimeConfig, InitSettings, loadRuntimeConfig, Init }
 import com.tuvistavie.xserver.backend.model.PixmapFormat
 import com.tuvistavie.xserver.bridge.{ BridgeClient, DummyBridgeClient }
 
@@ -19,5 +19,6 @@ object App extends Logging {
     val displayNumber = RuntimeConfig.displayNumber
     BridgeClient.current.register()
     Server.run()
+    Init.runInitFile()
   }
 }

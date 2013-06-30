@@ -9,3 +9,18 @@ package object util {
   private def getRuntimeConfig = runtimeConfig.get
   def loadRuntimeConfig(conf: InitSettings) = runtimeConfig = Some(conf)
 }
+
+package util {
+  object Path {
+    val sep = java.io.File.separatorChar
+
+    def removeTrailingSep(path: String) = path.last match {
+      case `sep` => path dropRight 1
+      case _ => path
+    }
+
+    def join(paths: String*) = {
+      paths map removeTrailingSep mkString sep.toString
+    }
+  }
+}

@@ -5,7 +5,19 @@ case class InitSettings (
   standAlone: Boolean = false,
   rootWidth: Int = 800,
   rootHeight: Int = 600
-)
+) {
+  lazy val display: String = getDisplay
+  private def getDisplay: String = {
+    try {
+      makeDisplayName(java.net.InetAddress.getLocalHost.getHostName)
+    } catch {
+      case e: java.net.UnknownHostException => makeDisplayName("localhost")
+    }
+  }
+  private def makeDisplayName(hostname: String) = {
+    Seq(hostname, displayNumber, "0") mkString ":"
+  }
+}
 
 object InitSettings  {
   private var parser = new scopt.OptionParser[InitSettings]("scalaxs") {
