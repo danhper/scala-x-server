@@ -59,7 +59,7 @@ class Bridge (
   }
 
   private def stopBridge() {
-    Process(Seq(binPath, "stop"), None, "RUN_USER" -> user.name).!
+    Process(Seq(binPath, "stop"), None, "RUN_AS_USER" -> user.name).!
   }
 
   def sendWSMessage(message: JValue) = {
