@@ -41,7 +41,7 @@ object Application extends Controller {
     }
   }
 
-  def login = Action {
+  def login = Action { implicit request =>
     Ok(views.html.login())
   }
 
@@ -56,7 +56,11 @@ object Application extends Controller {
               Config.getString("auth.token-name") -> registeredUser.token
             )
           }
-          case None => BadRequest(views.html.login())
+          case None => {
+            Redirect(loginRoute).flashing(
+             "error" -> "Bad creditentials"
+             )
+          }
         }
       }
     )
